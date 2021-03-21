@@ -1,10 +1,12 @@
 package com.grupoq.app.controllers;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.text.ParseException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -76,14 +78,32 @@ public class ProductoController {
 	INotadeCreditoService notadecreditoService;
 
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM", "ROLE_SELLER" })
-	@RequestMapping(value = { "/listar", "/listar/{op}/{nombrep}", "/listar/{op}" }, method = RequestMethod.GET)
+	@RequestMapping(value = { "/listar", "/listar/{op}/{nombrep}", "/listar/{op}",
+			"/listar/{date1}/{date2}/fechas" }, method = RequestMethod.GET)
 	public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model,
 			@PathVariable(value = "nombrep", required = false) String nombrep,
+			@PathVariable(value = "date1", required = false) String date1,
+			@PathVariable(value = "date2", required = false) String date2,
 			@PathVariable(value = "op", required = false) String op,
 			@RequestParam(name = "op2", required = false, defaultValue = "0") int op2) {
 		Pageable pageRequest;
 		boolean enablebtnall = false;
 		boolean enableallsearch = false;
+
+		Date date1_ = null;
+		Date date2_ = null;
+		if (date1 != null) {
+			try {
+				date1_ = new SimpleDateFormat("yyyy-MM-dd").parse(date1);
+				date2_ = new SimpleDateFormat("yyyy-MM-dd").parse(date2);
+				model.addAttribute("rangofechas", date1 + " y " + date2);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
 		// mostrar todos o no 0= a todas y >0 es por paginado
 		int npage = 20;
 		if (op != null) {
@@ -97,7 +117,7 @@ public class ProductoController {
 		enableallsearch = (op != null) ? true : false;
 
 		Page<Producto> productos = null;
-//		String xlsxPath = (page > 0) ? "?page=" + page : "";
+		// String xlsxPath = (page > 0) ? "?page=" + page : "";
 		String xlsxPath = "?page=" + page;
 		xlsxPath = (op2 != 0) ? xlsxPath + "&op2=" + op2 : xlsxPath;
 
@@ -150,8 +170,16 @@ public class ProductoController {
 			}
 			xlsxPath += (page > 0) ? "?page=" + page : "";
 		} else {
-			productos = productoService.findAllJoin(pageRequest);
 			xlsxPath = (op == null) ? xlsxPath : xlsxPath + "/all";
+			if (date1 != null && nombrep == null) {
+				pageRequest = Pageable.unpaged();
+				enableallsearch = true;
+				pathall = "fechas";
+			}
+
+			productos = (date1 != null && nombrep == null) ? productoService.findAllFechas(pageRequest, date1_, date2_)
+					: productoService.findAllJoin(pageRequest);
+			
 			System.out.print("\nEL PATH: " + xlsxPath);
 
 		}
@@ -175,9 +203,9 @@ public class ProductoController {
 	@RequestMapping(value = "/listartodos", method = RequestMethod.GET)
 	public void listarTodos(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
 		List<Producto> productos = productoService.findAllList();
-//		model.addAttribute("titulo", "Listado de marcas");
+		// model.addAttribute("titulo", "Listado de marcas");
 		model.addAttribute("productos", productos);
-//		return "/giros/listar";
+		// return "/giros/listar";
 	}
 
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_SELLER" })
@@ -249,15 +277,15 @@ public class ProductoController {
 		return "/productos/productoform";
 	}
 
-//	@Secured({"ROLE_ADMIN","ROLE_INV"})
-//	@RequestMapping(value = "/nuevo10", method = RequestMethod.GET)
-//	public String nuevosdjiosjfdoi(Map<String, Object> model) {
-//		Producto productos = new Producto();
-//		model.put("producto", productos);
-//		model.put("titulo", "Crear nuevo producto");
-//		model.put("nullchecker", 1);
-//		return "/templates/productos/productoform";
-//	}
+	// @Secured({"ROLE_ADMIN","ROLE_INV"})
+	// @RequestMapping(value = "/nuevo10", method = RequestMethod.GET)
+	// public String nuevosdjiosjfdoi(Map<String, Object> model) {
+	// Producto productos = new Producto();
+	// model.put("producto", productos);
+	// model.put("titulo", "Crear nuevo producto");
+	// model.put("nullchecker", 1);
+	// return "/templates/productos/productoform";
+	// }
 
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_SELLER" })
 	@RequestMapping(value = "/productosave", method = RequestMethod.POST)
@@ -298,7 +326,7 @@ public class ProductoController {
 
 		if (producto.getId() != null) {
 			try {
-				productoService.save(producto);				
+				productoService.save(producto);
 			} catch (Exception e) {
 				// TODO: handle exception
 			}
@@ -378,7 +406,7 @@ public class ProductoController {
 
 		model.put("categoriaid", producto.getCategoria().getId());
 		model.put("marcaid", producto.getMarca().getIdm());
-//		model.put("margenid", producto.getMargen().getId());
+		// model.put("margenid", producto.getMargen().getId());
 		model.put("presentacionid", producto.getPresentacion().getId());
 		model.put("proveedorid", producto.getProveedor().getId());
 		model.put("nullchecker", 0);
@@ -397,10 +425,10 @@ public class ProductoController {
 	@GetMapping(value = "/ver/{id}")
 	public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
 
-//		Taller taller = clienteService.findByIdTallerWithClienteWithFactura(id);
-//		List<?> taller = facturaService.probando(id);
-//		Generica sin fetch no join
-//		Producto producto = productoService.findOne(id);
+		// Taller taller = clienteService.findByIdTallerWithClienteWithFactura(id);
+		// List<?> taller = facturaService.probando(id);
+		// Generica sin fetch no join
+		// Producto producto = productoService.findOne(id);
 		Producto producto = productoService.fetchProductoWithInventario(id);
 		if (producto == null) {
 			flash.addFlashAttribute("error", "El producto no existe en la base de datos");

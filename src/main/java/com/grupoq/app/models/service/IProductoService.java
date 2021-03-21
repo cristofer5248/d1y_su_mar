@@ -4,6 +4,7 @@ package com.grupoq.app.models.service;
 
 import org.springframework.data.domain.Pageable;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ public interface IProductoService {
 
 	public Page<Producto> findAll(Pageable page);
 	public Page<Producto> findAllJoin(Pageable page);
+	public Page<Producto> findAllFechas(Pageable pageable,Date date1, Date date2);
 	public Page<Producto> findAllJoinFalse(Pageable page);
 	
 	

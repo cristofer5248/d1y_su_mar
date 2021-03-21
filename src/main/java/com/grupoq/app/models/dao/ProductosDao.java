@@ -1,5 +1,6 @@
 package com.grupoq.app.models.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -26,6 +27,10 @@ public interface ProductosDao extends PagingAndSortingRepository<Producto, Long>
 	//este es el eque lista todo en el get listar
 	@Query(value = "select p from Producto p join fetch p.marca m join fetch p.categoria c join fetch p.proveedor pro join fetch p.presentacion pre where p.status=true", countQuery = "select count(p) from Producto p join p.marca m join p.categoria c join p.proveedor pro join p.presentacion pre where p.status=true")
 	public Page<Producto> findAllJoin(Pageable page);
+
+	//este es para listar por fecha
+	@Query(value = "select p from Producto p join fetch p.marca m join fetch p.categoria c join fetch p.proveedor pro join fetch p.presentacion pre join fetch p.productosmodify pm where p.status=true and pm.fecha between ?1 and ?2", countQuery = "select count(p) from Producto p join p.marca m join p.categoria c join p.proveedor pro join p.productosmodify pm join p.presentacion pre where p.status=true and pm.fecha between ?1 and ?2")
+	public Page<Producto> findAllFechas(Pageable pageable,Date date1, Date date2);
 
 	@Query(value = "select p from Producto p join fetch p.marca m join fetch p.categoria c join fetch p.proveedor pro join fetch p.presentacion pre where p.status=false", countQuery = "select count(p) from Producto p join p.marca m join p.categoria c join p.proveedor pro join p.presentacion pre where p.status=false")
 	public Page<Producto> findAllJoinFalse(Pageable page);

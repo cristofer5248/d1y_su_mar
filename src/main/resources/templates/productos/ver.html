@@ -77,6 +77,7 @@
 							<th>Fecha de modificacion</th>
 							<th>Precio</th>
 							<th>Proveedor</th>
+							<th>Stock</th>
 
 						</tr>
 					</thead>
@@ -85,7 +86,8 @@
 							th:with="df=#{date.format}">
 							<td th:text="${#calendars.format(productosmodify_.fecha,df)}"></td>
 							<td th:text="${productosmodify_.precio}"></td>
-							<td th:text="${productosmodify_.proveedor}"></td>
+							<td th:text="${productosmodify_.proveedor}"></td>							
+							<td th:text="${productosmodify_.stock}"></td>
 						</tr>
 					</tbody>
 

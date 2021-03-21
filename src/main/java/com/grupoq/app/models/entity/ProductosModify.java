@@ -3,6 +3,7 @@ package com.grupoq.app.models.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -26,6 +27,9 @@ public class ProductosModify implements Serializable{
 	
 	private Double precio;
 	private String proveedor;
+
+	@Column(length = 6)
+	private int stock;
 //	alter table productos_modify add column proveedor varchar(200) after precio;
 //	update productos_modify set proveedor="No disponible en su momento" where id>0;
 	private Date fecha;
@@ -95,7 +99,14 @@ public class ProductosModify implements Serializable{
 	public void setProveedor(String proveedor) {
 		this.proveedor = proveedor;
 	}
+	public int getStock() {
+		return stock;
+	}
 
+
+	public void setStock(int stock) {
+		this.stock = stock;
+	}
 
 	private static final long serialVersionUID = 1L;
 

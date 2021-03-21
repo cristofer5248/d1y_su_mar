@@ -1,5 +1,6 @@
 package com.grupoq.app.models.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,5 +146,13 @@ public class IProductoServiceImpl implements IProductoService {
 		// TODO Auto-generated method stub
 		return productosDao.findOneByCodigoNot(id, id2);
 	}
+
+	@Override
+	public Page<Producto> findAllFechas(Pageable pageable, Date date1, Date date2) {
+		// TODO Auto-generated method stub
+		return productosDao.findAllFechas(pageable, date1, date2);
+	}
+
+
 
 }

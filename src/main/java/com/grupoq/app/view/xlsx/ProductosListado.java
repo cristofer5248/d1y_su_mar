@@ -5,9 +5,11 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.view.document.AbstractXlsxView;
 
 import com.grupoq.app.models.entity.Producto;
+import com.grupoq.app.models.entity.ProductosModify;
 
 @Component("/productos/listar")
 public class ProductosListado extends AbstractXlsxView {
@@ -55,6 +58,14 @@ public class ProductosListado extends AbstractXlsxView {
 		tbodystyle.setBorderLeft(BorderStyle.MEDIUM);
 		tbodystyle.setBorderTop(BorderStyle.MEDIUM);
 		// FIN DE LOS ESTILOS
+
+		CellStyle tbodystyledate = workbook.createCellStyle();
+		tbodystyledate.setBorderBottom(BorderStyle.MEDIUM);
+		tbodystyledate.setBorderRight(BorderStyle.MEDIUM);
+		tbodystyledate.setBorderLeft(BorderStyle.MEDIUM);
+		tbodystyledate.setBorderTop(BorderStyle.MEDIUM);
+		CreationHelper ch = workbook.getCreationHelper();
+		tbodystyledate.setDataFormat(ch.createDataFormat().getFormat("d/m/yy h:mm"));
 
 		Row row = sheet.createRow(0);
 		Cell cell = row.createCell(0);
@@ -104,7 +115,8 @@ public class ProductosListado extends AbstractXlsxView {
 		header.createCell(6).setCellValue("Categoria");
 		header.createCell(7).setCellValue("Proveedor");
 		header.createCell(8).setCellValue("Unidad");
-		header.createCell(9).setCellValue("Stock");
+		header.createCell(9).setCellValue("Fecha");
+		header.createCell(10).setCellValue("Stock");
 
 		// poniendo los estilos aqua y blanco y bordes
 		// cell.setCellStyle(tbodystyle);
@@ -119,6 +131,7 @@ public class ProductosListado extends AbstractXlsxView {
 		header.getCell(7).setCellStyle(theaderstyle);
 		header.getCell(8).setCellStyle(theaderstyle);
 		header.getCell(9).setCellStyle(theaderstyle);
+		header.getCell(10).setCellStyle(theaderstyle);
 
 		int rownum = 1;
 		double total = 0;
@@ -161,17 +174,25 @@ public class ProductosListado extends AbstractXlsxView {
 			cell.setCellStyle(tbodystyle);
 
 			cell = fila.createCell(9);
-			// cell.setCellValue(pro.getProductosmodify().get(pro.getProductosmodify().size()).getStock());
-			cell.setCellValue(pro.getStock());
+			cell.setCellValue(pro.getProductosmodify().get(0).getFecha());
+
+			cell.setCellStyle(tbodystyledate);
+
+			cell = fila.createCell(10);
+			// cell.setCellValue(pro.getStock());
+			for (ProductosModify pro_ : pro.getProductosmodify()) {
+				System.out.print("oye crack por aqui " + pro.getNombrep() + " " + pro_.getStock() + "\n");
+			}
+			cell.setCellValue(pro.getProductosmodify().get(pro.getProductosmodify().size() - 1).getStock());
 			cell.setCellStyle(tbodystyle);
 
 			total += pro.getStock();
 		}
 
 		Row filatotal = sheet.createRow(rownum);
-		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, 0, 7));
+		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, 0, 8));
 		filatotal.createCell(2).setCellValue("Total:  ");
-		filatotal.createCell(9).setCellValue(total);
+		filatotal.createCell(10).setCellValue(total);
 		filatotal.createCell(0).setCellStyle(tbodystyle);
 		filatotal.createCell(1).setCellStyle(tbodystyle);
 
@@ -181,11 +202,13 @@ public class ProductosListado extends AbstractXlsxView {
 		filatotal.createCell(4).setCellStyle(tbodystyle);
 		filatotal.createCell(5).setCellStyle(tbodystyle);
 		filatotal.createCell(6).setCellStyle(tbodystyle);
+		filatotal.createCell(7).setCellStyle(tbodystyle);
+		filatotal.createCell(8).setCellStyle(tbodystyle);
 
 		filatotal.getCell(2).setCellStyle(tbodystyle);
+		filatotal.getCell(10).setCellStyle(tbodystyle);
+		filatotal.createCell(9).setCellValue("Total:  ");
 		filatotal.getCell(9).setCellStyle(tbodystyle);
-		filatotal.createCell(8).setCellValue("Total:  ");
-		filatotal.getCell(8).setCellStyle(tbodystyle);
 
 		// sheet.addMergedRegion(new CellRangeAddress(1,1,0,3));
 		// sheet.addMergedRegion(new CellRangeAddress(2,2,0,3));

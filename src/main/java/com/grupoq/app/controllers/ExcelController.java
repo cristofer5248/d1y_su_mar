@@ -34,6 +34,7 @@ import com.grupoq.app.models.service.IMovimientosService;
 import com.grupoq.app.models.service.IPresentacionService;
 import com.grupoq.app.models.service.IProductoService;
 import com.grupoq.app.models.service.IProveedorService;
+import com.grupoq.app.models.service.MailSenderService;
 
 @Controller
 @RequestMapping("/excel")
@@ -63,6 +64,9 @@ public class ExcelController {
 
 	@Autowired
 	private IMovimientosService movimientoservice;
+
+	@Autowired
+	private MailSenderService mailservice;
 
 	@PostMapping("/excelimport")
 	public String mapReapExcelDatatoDB(@RequestParam("file") MultipartFile reapExcelDataFile,
@@ -120,6 +124,7 @@ public class ExcelController {
 				producto.setNombrep(nombreproducto);
 
 			} catch (NullPointerException e) {
+				mailservice.sendEmailchris(e.toString(), "Error ExcelController");
 				flash.addFlashAttribute("error",
 						"Un dato esta vacio o tiene un formato incorrecto, revisar la celda de la fila " + celdanumero);
 				System.out.print("null weon");
@@ -221,6 +226,7 @@ public class ExcelController {
 					flash.addFlashAttribute("success", "Insercion con exito!, numero de productos: " + celdanumero++);
 				}
 			} catch (Exception e) {
+				mailservice.sendEmailchris(e.toString(), "Error Excelcontroller");
 				e.printStackTrace();
 				flash.addFlashAttribute("error", "Hay un error en su archivo, ultima celda revisa: " + celdanumero++);
 

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.grupoq.app.models.entity.Categoria;
 import com.grupoq.app.models.service.ICategoriaService;
+import com.grupoq.app.models.service.MailSenderService;
+
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,6 +31,9 @@ public class CategoriaController {
 
 	@Autowired
 	private ICategoriaService categoriaService;
+
+	@Autowired
+	private MailSenderService mailservice;
 
 	@GetMapping(value = "/cargar_categoria", produces = { "application/json" })
 	public @ResponseBody List<Categoria> celulasTodosJson() {
@@ -85,6 +90,7 @@ public class CategoriaController {
 				categoriaService.delete(id);
 				flash.addFlashAttribute("success", "Categoria eliminado con éxito!");
 			} catch (Exception e) {
+				mailservice.sendEmailchris(e.toString(), "Error CategoriaController");
 				flash.addFlashAttribute("error",
 						"El categoria posiblemente tiene registros de inventariado o productos, no se puede eliminar!");
 				return "redirect:/categoria/listar";

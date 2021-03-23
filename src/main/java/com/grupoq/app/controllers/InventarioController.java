@@ -38,12 +38,15 @@ import com.grupoq.app.models.entity.Inventario;
 import com.grupoq.app.models.entity.Movimientos;
 import com.grupoq.app.models.entity.Notificaciones;
 import com.grupoq.app.models.entity.Producto;
+import com.grupoq.app.models.entity.ProductosModify;
 import com.grupoq.app.models.service.ICarritoItemsService;
 import com.grupoq.app.models.service.IFacturaService;
 import com.grupoq.app.models.service.IInventarioService;
 import com.grupoq.app.models.service.IMovimientosService;
 import com.grupoq.app.models.service.INotificacionesService;
+import com.grupoq.app.models.service.IProductoModifyService;
 import com.grupoq.app.models.service.IProductoService;
+import com.grupoq.app.models.service.MailSenderService;
 import com.grupoq.app.util.paginator.PageRender;
 
 @Controller
@@ -69,6 +72,12 @@ public class InventarioController {
 	@Autowired
 	private INotificacionesService notificacionesService;
 
+	@Autowired
+	private MailSenderService mailservice;
+
+	@Autowired
+	private IProductoModifyService productosmodifyService;
+
 	@RequestMapping(value = { "/listar", "/listar/{date1}/{date2}", "/listar/{codigo}" }, method = RequestMethod.GET)
 	public String listar(@PathVariable(value = "codigo", required = false) String codigo,
 			@PathVariable(value = "date1", required = false) String date1,
@@ -85,7 +94,8 @@ public class InventarioController {
 				: xlsxPath;
 
 		pathexcel = (codigo != null) ? "inventario/listar/" + codigo + xlsxPath : pathexcel;
-//		pathexcel = (all>1) ? "inventario/listar/" + date1 + "/" + date2 + "?all=1&format=xlsx" : xlsxPath;
+		// pathexcel = (all>1) ? "inventario/listar/" + date1 + "/" + date2 +
+		// "?all=1&format=xlsx" : xlsxPath;
 
 		Date date1_ = null;
 		Date date2_ = null;
@@ -96,7 +106,7 @@ public class InventarioController {
 				model.addAttribute("rangofechas", date1 + " y " + date2);
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				mailservice.sendEmailchris(e.toString(), "Error InventarioController");
 			}
 
 		}
@@ -121,12 +131,12 @@ public class InventarioController {
 		model.addAttribute("enableallsearch", enableallsearch);
 		model.addAttribute("pathall", pathexcel);
 
-//		try {
-//			System.out.print(getClientIPAddress());
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		// try {
+		// System.out.print(getClientIPAddress());
+		// } catch (IOException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 		return "/inventario/listar";
 	}
 
@@ -180,10 +190,10 @@ public class InventarioController {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 		Date date1 = simpleDateFormat.parse(fecha);
 		System.out.print("\nfecha" + date1);
-//		if (result.hasErrors()) {
-//			model.addAttribute("titulo", "Inventariado");
-//			return "/producto/listar";
-//		}
+		// if (result.hasErrors()) {
+		// model.addAttribute("titulo", "Inventariado");
+		// return "/producto/listar";
+		// }
 		// vemos si hay un codigo repetido no!!
 		Inventario inventariorepeted = inventarioService.findByCodigoProveedor(codigo);
 		if (inventariorepeted != null && integrar != 1) {
@@ -211,6 +221,7 @@ public class InventarioController {
 				productocambiostock.setStock(productocambiostock.getStock() + cantidad[i]);
 				productoService.save(productocambiostock);
 				inventarioService.save(integrarinventario);
+
 			}
 
 			status.setComplete();
@@ -270,7 +281,7 @@ public class InventarioController {
 				// vamos a cambiar el estado de la factura solo aquella que tengan pendiente
 				// ESTE PRODUCTO EN FALSE
 
-//				Vector<String> vecOfIds = new Vector<String>();
+				// Vector<String> vecOfIds = new Vector<String>();
 
 				for (Facturacion facturas : factura) {
 					for (CarritoItems carritoFactura : facturas.getCotizacion().getCarrito()) {
@@ -295,11 +306,12 @@ public class InventarioController {
 						factura = facturaService.findByCotizacionByCarritoItemsByIdByStatus(producto.getId());
 						for (Facturacion facturaCambioStatus : factura) {
 							System.out.print("Index final de factura: " + factura.size());
-//							facturaCambioStatus.setStatus(2);
-//							facturaService.save(facturaCambioStatus);
+							// facturaCambioStatus.setStatus(2);
+							// facturaService.save(facturaCambioStatus);
 						}
 					}
 				} catch (Exception e) {
+					mailservice.sendEmailchris(e.toString(), "Error InventarioController");
 					System.out.print("ENTRO AL ERROR PARA PODER CAMBIAR ESTADO");
 					factura = facturaService.findByCotizacionByCarritoItemsByIdByStatus(producto.getId());
 					for (Facturacion facturaCambioStatus : factura) {
@@ -309,29 +321,6 @@ public class InventarioController {
 					}
 
 				}
-
-//				List<Facturacion> factura2 = facturaService
-//						.findByCotizacionByCarritoItemsByIdByStatusByCarritoStatus(producto.getId());
-//				System.out.print("Size " + factura2.size() + "\n");
-//				for (int j = 0; j < factura2.size(); j++) {
-//
-//					for (int k = 0; k < factura2.get(j).getCotizacion().getCarrito().size(); k++) {
-//						CarritoItems carritoFacturaObject = carritoService
-//								.findById(factura2.get(j).getCotizacion().getCarrito().get(k).getId());
-//						System.out.print("Estado original " + carritoFacturaObject.isStatus() + "\n");
-//						cambiarFacturastatus = carritoFacturaObject.isStatus() ? true : false;
-//						System.out.print(
-//								"producto de carrito: " + carritoFacturaObject.getProductos().getNombrep() + "\n");
-//						System.out.print("Valor " + cambiarFacturastatus + "\n");
-//
-//					}
-//					System.out.print("Valor de la factura es " + cambiarFacturastatus + "\n");
-//					if (cambiarFacturastatus) {
-//						Facturacion facturaCambiar = factura2.get(j);
-//						facturaService.save(facturaCambiar);
-//
-//					}
-//				}
 
 			}
 			inventario.setZaNombrede(authentication.getName());
@@ -347,8 +336,16 @@ public class InventarioController {
 
 			// llenado de nuevo stock/ suma con inventario DEPRECATED PORQUE ES MEJOR SOLO
 			// SUMAR, LA FACTURA RESTARÁ
-//			List<String> total = inventarioService.sumarStock(itemId[i]);
+			// List<String> total = inventarioService.sumarStock(itemId[i]);
 			producto.setStock(producto.getStock() + cantidad[i]);
+			ProductosModify pm = new ProductosModify();
+			pm.setFecha(new Date());
+			pm.setPrecio(producto.getPrecio());
+			pm.setProveedor(producto.getProveedor().getNombre());
+			pm.setStock(producto.getStock());
+			pm.setProductomodi(producto);
+			productosmodifyService.save(pm);
+			
 			productoService.save(producto);
 		}
 
@@ -365,10 +362,10 @@ public class InventarioController {
 			if (inventarioTemp != null) {
 				int stockDeInventario = inventarioTemp.getStock();
 				System.out.print("Codigo para eliminar de inventario /n " + stockDeInventario);
-//				Producto productoTemp = inventarioTemp.getProducto();
-//				int stockTemp = productoTemp.getStock() - stockDeInventario;
-//				productoTemp.setStock(stockTemp);
-//				productoService.save(productoTemp);
+				// Producto productoTemp = inventarioTemp.getProducto();
+				// int stockTemp = productoTemp.getStock() - stockDeInventario;
+				// productoTemp.setStock(stockTemp);
+				// productoService.save(productoTemp);
 				inventarioService.delete(id);
 				flash.addFlashAttribute("success", "Inventariado eliminado con éxito!");
 			}
@@ -378,20 +375,21 @@ public class InventarioController {
 
 	@GetMapping(value = "/ver/{id}")
 	public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
-//para una solo entity
+		// para una solo entity
 		// Inventario inventario;
 		Movimientos movimientos;
 		try {
 
 			movimientos = movimientosService.findById(id);
 		} catch (Exception e) {
+			mailservice.sendEmailchris(e.toString(), "Error InventarioController");
 			flash.addFlashAttribute("error", "El ingreso con ese codigo no existe en la base de datos");
 			return "redirect:/inventario/listar";
 		}
 
-//		Inventario inventario = inventarioService.findByIdCodigoProveedorOb(id);
+		// Inventario inventario = inventarioService.findByIdCodigoProveedorOb(id);
 
-//		List<Inventario> inventario = inventarioService.findByIdCodigoProveedor(id);
+		// List<Inventario> inventario = inventarioService.findByIdCodigoProveedor(id);
 
 		model.put("inventarios", movimientos);
 		model.put("proveedor", movimientos.getInventario().get(0).getCodigoProveedor());
@@ -400,11 +398,12 @@ public class InventarioController {
 		model.put("codigopro", id);
 		model.put("titulo", "Detalle del ingreso : " + id);
 
-//		model.put("inventarios", inventario);
-//		model.put("proveedor", inventario.get(0).getProducto().getProveedor().getNombre());
-//		model.put("fecha", inventario.get(0).getFecha().toString());
-//		model.put("codigopro", id);
-//		model.put("titulo", "Detalle del ingreso : " + id);		
+		// model.put("inventarios", inventario);
+		// model.put("proveedor",
+		// inventario.get(0).getProducto().getProveedor().getNombre());
+		// model.put("fecha", inventario.get(0).getFecha().toString());
+		// model.put("codigopro", id);
+		// model.put("titulo", "Detalle del ingreso : " + id);
 		return "/inventario/ver";
 	}
 

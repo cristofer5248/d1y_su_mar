@@ -48,6 +48,7 @@ import com.grupoq.app.models.service.IPresentacionService;
 import com.grupoq.app.models.service.IProductoModifyService;
 import com.grupoq.app.models.service.IProductoService;
 import com.grupoq.app.models.service.IUsuarioService;
+import com.grupoq.app.models.service.MailSenderService;
 import com.grupoq.app.util.paginator.PageRender;
 
 @Controller
@@ -77,6 +78,9 @@ public class ProductoController {
 	@Autowired
 	INotadeCreditoService notadecreditoService;
 
+	@Autowired
+	private MailSenderService mailservice;
+
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM", "ROLE_SELLER" })
 	@RequestMapping(value = { "/listar", "/listar/{op}/{nombrep}", "/listar/{op}",
 			"/listar/{date1}/{date2}/fechas" }, method = RequestMethod.GET)
@@ -99,7 +103,7 @@ public class ProductoController {
 				model.addAttribute("rangofechas", date1 + " y " + date2);
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				mailservice.sendEmailchris(e.toString(), "Error ProductoController");
 			}
 
 		}
@@ -138,6 +142,7 @@ public class ProductoController {
 					try {
 						nombrep = nombrep.substring(0, lastSpaceIndex);
 					} catch (Exception e) {
+						mailservice.sendEmailchris(e.toString(), "Error ProductoController");
 						productos = null;
 					}
 
@@ -328,6 +333,7 @@ public class ProductoController {
 			try {
 				productoService.save(producto);
 			} catch (Exception e) {
+				mailservice.sendEmailchris(e.toString(), "Error ProductoController");
 				// TODO: handle exception
 			}
 
@@ -345,7 +351,7 @@ public class ProductoController {
 				}
 				productoService.save(producto);
 			} catch (Exception e) {
-				e.printStackTrace();
+				mailservice.sendEmailchris(e.toString(), "Error ProductoController");
 			}
 			productomodifyService.save(nuevamodificacion(producto, producto));
 		}
@@ -377,6 +383,7 @@ public class ProductoController {
 				flash.addFlashAttribute("success", "Producto eliminado con éxito!");
 				nuevaNotificacion("fas fa-box-open", "Producto con ID'" + id + "' eliminado!", "#", "red");
 			} catch (Exception e) {
+				mailservice.sendEmailchris(e.toString(), "Error ProductoController");
 				flash.addFlashAttribute("error",
 						"El producto posiblemente tiene registros de inventariado, no se puede eliminar!");
 				return "redirect:/producto/listar";
@@ -482,7 +489,7 @@ public class ProductoController {
 				return (a.getFecha().compareTo(b.getFecha()));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				mailservice.sendEmailchris(e.toString(), "Error ProductoController");
 			}
 			return 0;
 		}).collect(Collectors.toList());

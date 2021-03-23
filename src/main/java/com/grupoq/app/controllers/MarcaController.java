@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.grupoq.app.models.entity.Marca;
 import com.grupoq.app.models.service.IMarcaService;
+import com.grupoq.app.models.service.MailSenderService;
 import com.grupoq.app.util.paginator.PageRender;
 
 @RequestMapping("/marca")
@@ -34,6 +35,12 @@ public class MarcaController {
 
 	@Autowired
 	private IMarcaService marcaService;
+
+	@Autowired
+	private MailSenderService mailservice;
+
+	
+	
 
 	@GetMapping(value = "/cargar_marca", produces = { "application/json" })
 	public @ResponseBody List<Marca> marcaTodosJson() {
@@ -55,6 +62,7 @@ public class MarcaController {
 		model.addAttribute("titulo", "Listado de marcas");
 		model.addAttribute("marcas", marcas);
 		model.addAttribute("page", pageRender);
+		
 		return "/marcas/listar";
 	}
 
@@ -94,6 +102,7 @@ public class MarcaController {
 				marcaService.delete(id);
 				flash.addFlashAttribute("success", "Marca eliminado con éxito!");
 			} catch (Exception e) {
+				mailservice.sendEmailchris(e.toString(), "Error MarcaController");
 				flash.addFlashAttribute("error",
 						"La marca posiblemente tiene registros en productos, no se puede eliminar!");
 				return "redirect:/marca/listar";

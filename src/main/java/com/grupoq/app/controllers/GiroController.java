@@ -21,6 +21,8 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.grupoq.app.models.entity.Giro;
 import com.grupoq.app.models.service.IGiroService;
+import com.grupoq.app.models.service.MailSenderService;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,6 +34,9 @@ public class GiroController {
 
 	@Autowired
 	private IGiroService giroService;
+
+	@Autowired
+	private MailSenderService mailservice;
 
 	@Secured({ "ROLE_ADMIN", "ROLE_JEFEADM", "ROLE_SELLER", "ROLE_INV" })
 	@GetMapping(value = "/cargar_giro/{term}", produces = { "application/json" })
@@ -106,6 +111,7 @@ public class GiroController {
 				giroService.delete(id);
 				flash.addFlashAttribute("success", "Giro eliminado con éxito!");
 			} catch (Exception e) {
+				mailservice.sendEmailchris(e.toString(), "Error GiroController");
 				flash.addFlashAttribute("success",
 						"El giro posiblemente tiene registros en algun proveedor o cliente, no se puede eliminar!");
 				return "redirect:/giro/listar";

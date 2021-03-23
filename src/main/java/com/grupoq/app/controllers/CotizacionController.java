@@ -18,6 +18,7 @@ import com.grupoq.app.models.entity.Notificaciones;
 import com.grupoq.app.models.service.ICotizacionService;
 import com.grupoq.app.models.service.INotificacionesService;
 
+
 @Controller
 @RequestMapping("/cotizacion")
 public class CotizacionController {
@@ -26,6 +27,9 @@ public class CotizacionController {
 	ICotizacionService cotizacionService;
 	@Autowired
 	INotificacionesService notificacionesService;
+
+	
+	
 
 	@RequestMapping(value = "/listar/{param}", method = RequestMethod.GET)
 	public String listar(@RequestParam(value = "param", required = true) String param, Model model) {

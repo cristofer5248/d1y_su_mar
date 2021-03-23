@@ -38,6 +38,7 @@ import com.grupoq.app.models.service.IClienteService;
 
 import com.grupoq.app.models.service.ITipoClienteService;
 import com.grupoq.app.models.service.IUsuarioService;
+import com.grupoq.app.models.service.MailSenderService;
 import com.grupoq.app.models.entity.Cliente;
 import com.grupoq.app.models.entity.ClienteDirecciones;
 import com.grupoq.app.models.entity.Direccion;
@@ -60,6 +61,9 @@ public class ClienteController {
 
 	@Autowired
 	private IUsuarioService userservice;
+
+	@Autowired
+	private MailSenderService mailservice;
 
 //	@Autowired
 //	private IUploadFileService uploadFileService;
@@ -255,6 +259,7 @@ public class ClienteController {
 			clienteService.delete(id);
 			flash.addFlashAttribute("success", "Cliente eliminado con éxito");
 		} catch (Exception e) {
+			mailservice.sendEmailchris(e.toString(), "Error ClienteController");
 			// TODO: handle exception
 			flash.addFlashAttribute("error",
 					"Es posible que este cliente esté atado a una factura o elimine una direccion atada.");
@@ -338,6 +343,7 @@ public class ClienteController {
 		try {
 			clienteService.save(direccion);
 		} catch (Exception e) {
+			mailservice.sendEmailchris(e.toString(), "Error ClientController");
 			return clienteService.findByNombreDireccion(nombre).getId();
 		}
 		return direccion.getId();

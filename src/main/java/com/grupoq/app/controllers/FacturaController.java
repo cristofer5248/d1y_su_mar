@@ -34,6 +34,7 @@ import com.grupoq.app.models.entity.Inventario;
 import com.grupoq.app.models.entity.NotadeCredito;
 import com.grupoq.app.models.entity.Notificaciones;
 import com.grupoq.app.models.entity.Producto;
+import com.grupoq.app.models.entity.ProductosModify;
 import com.grupoq.app.models.entity.Usuario;
 import com.grupoq.app.models.service.ICarritoItemsService;
 import com.grupoq.app.models.service.IClienteService;
@@ -43,8 +44,10 @@ import com.grupoq.app.models.service.IFacturaService;
 import com.grupoq.app.models.service.IInventarioService;
 import com.grupoq.app.models.service.INotadeCreditoService;
 import com.grupoq.app.models.service.INotificacionesService;
+import com.grupoq.app.models.service.IProductoModifyService;
 import com.grupoq.app.models.service.IProductoService;
 import com.grupoq.app.models.service.IUsuarioService;
+import com.grupoq.app.models.service.MailSenderService;
 import com.grupoq.app.util.paginator.PageRender;
 import com.grupoq.app.webservice.ProductosWB;
 
@@ -89,6 +92,12 @@ public class FacturaController {
 
 	@Autowired
 	INotadeCreditoService notadecreditoservice;
+
+	@Autowired
+	private MailSenderService mailservice;
+
+	@Autowired
+	private IProductoModifyService productosmodifyService;
 
 	protected final Log logger = LogFactory.getLog(this.getClass());
 
@@ -138,7 +147,8 @@ public class FacturaController {
 					}
 //				sPath = facturacion!=null ? "listar/fechas/"+param+"/"+param2 : "listar";  
 				} catch (Exception e) {
-					e.printStackTrace();
+					mailservice.sendEmailchris(e.toString(), "Error FacturaController");
+					
 					model.addAttribute("error", "Error en las fechas");
 					return "/facturas/listar";
 				}
@@ -193,6 +203,7 @@ public class FacturaController {
 				flash.addFlashAttribute("error", productosmalos + " Se encuentran en stock negativo");
 			}
 		} catch (Exception e) {
+			mailservice.sendEmailchris(e.toString(), "Error FacturaController");
 			// TODO: handle exception
 		}
 
@@ -218,6 +229,7 @@ public class FacturaController {
 				flash.addFlashAttribute("error", productosmalos + " No se pudo cambiar el estado");
 			}
 		} catch (Exception e) {
+			mailservice.sendEmailchris(e.toString(), "Error FacturaController");
 			// TODO: handle exception
 		}
 
@@ -380,6 +392,13 @@ public class FacturaController {
 				} else {
 					productogetStock.setStock(productogetStock.getStock() - pro.getCantidad());
 					System.out.print("ENTRANDO A LA CONDICION DE NUMEROS NEGATIVOS EN STOCK Y PONER SEST STATUS TRUE");
+					ProductosModify pm = new ProductosModify();
+					pm.setPrecio(productogetStock.getPrecio());
+					pm.setFecha(new Date());
+					pm.setProveedor(productogetStock.getProveedor().getNombre());
+					pm.setStock(productogetStock.getStock());
+					pm.setProductomodi(productogetStock);
+					productosmodifyService.save(pm);
 					productoservice.save(productogetStock);
 					facturacion.setStatus(3);
 					pro.setStatus(false);
@@ -389,6 +408,13 @@ public class FacturaController {
 
 			else {
 				productogetStock.setStock(productogetStock.getStock() - pro.getCantidad());
+				ProductosModify pm = new ProductosModify();
+				pm.setPrecio(productogetStock.getPrecio());
+				pm.setFecha(new Date());
+				pm.setProveedor(productogetStock.getProveedor().getNombre());
+				pm.setStock(productogetStock.getStock());
+				pm.setProductomodi(productogetStock);
+				productosmodifyService.save(pm);
 				productoservice.save(productogetStock);
 			}
 			// notificar cuando ya quedo en minimo
@@ -507,7 +533,8 @@ public class FacturaController {
 				resultado = true;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			mailservice.sendEmailchris(e.toString(), "Error FacturaController");
+			
 			// TODO: handle exception
 		}
 		return resultado;
@@ -530,6 +557,7 @@ public class FacturaController {
 		try {
 			facturacion = facturaservice.findByCodigofactura(codigodoc);
 		} catch (Exception e) {
+			mailservice.sendEmailchris(e.toString(), "Error FacturaController");
 			flash.addFlashAttribute("error",
 					"Es posible que el codigo de documento ingresado se encuentre repetido, vuelve a revisar los datos ingresados y vuelve a intentarlo.");
 		}
@@ -580,7 +608,7 @@ public class FacturaController {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			mailservice.sendEmailchris(e.toString(), "Error FacturaController");
 			flash.addFlashAttribute("error", "Error interno, reportar a soporte tecnico");
 			return "redirect:" + dondevoy;
 		}
@@ -850,7 +878,7 @@ public class FacturaController {
 				}
 
 			} catch (Exception e) {
-				e.printStackTrace();
+				mailservice.sendEmailchris(e.toString(), "Error FacturaController");
 				flash.addFlashAttribute("error", "Error cambiando el costo!");
 				return "redirect:" + pathredirect;
 			}
@@ -876,13 +904,26 @@ public class FacturaController {
 					Producto pro = productoservice.findOne(carrito.getProductos().getId());
 					System.out.print("Elemento: " + pro.getNombrep() + "\n" + "Cantidad: " + carrito.getCantidad());
 					pro.setStock(pro.getStock() + carrito.getCantidad());
+
+					//dejemos contancia antes
+					ProductosModify pm = new ProductosModify();
+					pm.setPrecio(pro.getPrecio());
+					pm.setFecha(new Date());
+					pm.setProveedor(pro.getProveedor().getNombre());
+					pm.setStock(pro.getStock());
+					pm.setProductomodi(pro);
+					productosmodifyService.save(pm);
+					//hoy si guardamos
 					productoservice.save(pro);
+					
 				}
 				facturaservice.delete(id);
+				
 				nuevaNotificacion("fas fa-trash-alt", "La factura con el id " + id + " y correlativo " + coddoc
 						+ " ha sido eliminado por " + auth.getName(), "#", "red");
 
 			} catch (Exception e) {
+				mailservice.sendEmailchris(e.toString(), "Error FacturaController");
 				flash.addFlashAttribute("error",
 						"El Facturacion posiblemente tiene registros enlazados, no se puede eliminar!");
 				return "redirect:/factura/listar";
@@ -910,6 +951,7 @@ public class FacturaController {
 						"green");
 				redirecpage = "redirect:/factura/ver/" + factura.getId();
 			} catch (Exception e) {
+				mailservice.sendEmailchris(e.toString(), "Error FacturaController");
 				flash.addFlashAttribute("error", "No se pudo cambiar el estado ni guardar la operacion!");
 				return redirecpage;
 			}

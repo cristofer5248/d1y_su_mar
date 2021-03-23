@@ -27,6 +27,7 @@ import com.grupoq.app.models.entity.Descuento;
 import com.grupoq.app.models.entity.Producto;
 import com.grupoq.app.models.service.IDescuentoService;
 import com.grupoq.app.models.service.IProductoService;
+import com.grupoq.app.models.service.MailSenderService;
 
 @Controller
 @SessionAttributes("descuento")
@@ -39,6 +40,9 @@ public class DescuentoController {
 
 	@Autowired
 	IProductoService productoService;
+
+	@Autowired
+	private MailSenderService mailservice;
 
 	@GetMapping(value = "/cargar_producto/{term}/{term2}", produces = { "application/json" })
 	public @ResponseBody List<ProductosWB> listarByNombreJson(@PathVariable String term, @PathVariable Long term2) {
@@ -112,6 +116,7 @@ public class DescuentoController {
 				descuentoService.delete(id);
 				flash.addFlashAttribute("success", "Descuento eliminado con éxito!");
 			} catch (Exception e) {
+				mailservice.sendEmailchris(e.toString(), "Error DescuentoController");
 				flash.addFlashAttribute("success",
 						"La descuento posiblemente tiene registros en productos, no se puede eliminar!");
 				return "redirect:/descuento/listar/" + descuentoTemp.getProducto().getId();

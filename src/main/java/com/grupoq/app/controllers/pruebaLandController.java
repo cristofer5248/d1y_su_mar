@@ -24,6 +24,7 @@ import com.grupoq.app.models.service.IFacturaService;
 import com.grupoq.app.models.service.IGiroService;
 import com.grupoq.app.models.service.IInventarioService;
 import com.grupoq.app.models.service.IProductoService;
+import com.grupoq.app.models.service.MailSenderService;
 
 @RequestMapping("/adminzone")
 @RestController
@@ -45,6 +46,8 @@ public class pruebaLandController {
 	@Autowired
 	private ICarritoItemsService carritoitems;
 	
+	@Autowired
+	private MailSenderService mailservice;
 
 	@RequestMapping(value = "/saveExpress/{nombre}", method = { RequestMethod.GET }, produces = { "application/json" })
 	@ResponseBody
@@ -72,7 +75,7 @@ public class pruebaLandController {
 				}
 
 			} catch (Exception e) {
-
+				mailservice.sendEmailchris(e.toString(), "Error PruebalandController");
 				result += "Eliminar porque no hay ningun falso de mas";
 			}
 

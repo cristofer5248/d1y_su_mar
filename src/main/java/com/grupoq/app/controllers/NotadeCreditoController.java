@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.grupoq.app.models.entity.NotadeCredito;
 import com.grupoq.app.models.service.INotadeCreditoService;
+import com.grupoq.app.models.service.MailSenderService;
 import com.grupoq.app.util.paginator.PageRender;
 
 @Controller
@@ -35,6 +36,9 @@ public class NotadeCreditoController {
 
 	@Autowired
 	INotadeCreditoService notadecreditoservice;
+
+	@Autowired
+	private MailSenderService mailservice;
 
 	@Secured({ "ROLE_ADMIN", "ROLE_JEFEADM", "ROLE_INV", "ROLE_FACT" })
 	@RequestMapping(value = "/nuevo", method = RequestMethod.GET)
@@ -81,7 +85,7 @@ public class NotadeCreditoController {
 				model.addAttribute("rangofechas", date1 + " y " + date2);
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				mailservice.sendEmailchris(e.toString(), "Error NotaDeCreditoController");
 			}
 
 		}

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.grupoq.app.models.entity.Proveedor;
 import com.grupoq.app.models.service.IProveedorService;
+import com.grupoq.app.models.service.MailSenderService;
 import com.grupoq.app.util.paginator.PageRender;
 
 import org.springframework.data.domain.Page;
@@ -35,6 +36,9 @@ public class ProveedorController {
 
 	@Autowired
 	private IProveedorService proveedoresService;
+
+	@Autowired
+	private MailSenderService mailservice;
 
 	@GetMapping(value = "/cargar_proveedor", produces = { "application/json" })
 	public @ResponseBody List<Proveedor> celulasTodosJson() {
@@ -95,6 +99,7 @@ public class ProveedorController {
 				proveedoresService.deleteById(id);
 				flash.addFlashAttribute("success", "Proveedor eliminado con éxito!");
 			} catch (Exception e) {
+				mailservice.sendEmailchris(e.toString(), "Error ProveedorController");
 				flash.addFlashAttribute("error",
 						"El proveedor posiblemente tiene registros de inventariado o productos, no se puede eliminar!");
 				return "redirect:/proveedor/listar";

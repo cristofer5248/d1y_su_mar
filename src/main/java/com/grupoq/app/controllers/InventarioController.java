@@ -253,9 +253,9 @@ public class InventarioController {
 				if (stockenpositivo > cantidad[i]) {
 					System.out.print("Entre a a la condicion Cantidad de ingreso insuficiente para el stock");
 					flash.addFlashAttribute("error", "El producto " + producto.getNombrep()
-							+ " exige un ingreso superior a " + (producto.getStock() * -1) + " para suplir la demanda");
+							+ " aun sigue en negativo! " + ((producto.getStock() * -1)- cantidad[i]) + " ahora son necesario para suplir la demanda");
 
-					return "redirect:/inventario/listar";
+					// return "redirect:/inventario/listar";
 				}
 			}
 		}
@@ -302,16 +302,16 @@ public class InventarioController {
 					System.out.print("BUSCO HABER SI HAY ALGUN REGISTRO QUE ESTE CON CARRITO FALSE");
 					factura = facturaService
 							.findByCotizacionByCarritoItemsByIdByStatusWithoutProducto(producto.getId());
-					if (factura.isEmpty()) {
-						factura = facturaService.findByCotizacionByCarritoItemsByIdByStatus(producto.getId());
-						for (Facturacion facturaCambioStatus : factura) {
-							System.out.print("Index final de factura: " + factura.size());
-							// facturaCambioStatus.setStatus(2);
-							// facturaService.save(facturaCambioStatus);
-						}
-					}
+					// if (factura.isEmpty()) {
+					// 	factura = facturaService.findByCotizacionByCarritoItemsByIdByStatus(producto.getId());
+					// 	for (Facturacion facturaCambioStatus : factura) {
+					// 		System.out.print("Index final de factura: " + factura.size());
+					// 		// facturaCambioStatus.setStatus(2);
+					// 		// facturaService.save(facturaCambioStatus);
+					// 	}
+					// }
 				} catch (Exception e) {
-					mailservice.sendEmailchris(e.toString(), "Error InventarioController");
+					mailservice.sendEmailchris(e.toString() + " linea: 314 ", "Error InventarioController");
 					System.out.print("ENTRO AL ERROR PARA PODER CAMBIAR ESTADO");
 					factura = facturaService.findByCotizacionByCarritoItemsByIdByStatus(producto.getId());
 					for (Facturacion facturaCambioStatus : factura) {

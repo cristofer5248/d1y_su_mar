@@ -203,24 +203,35 @@ public class InventarioController {
 		if (inventariorepeted != null && integrar == 1) {
 			Inventario integrarinventario = new Inventario();
 			for (int i = 0; i < itemId.length; i++) {
-				integrarinventario.setCodigoProveedor(codigo);
-				integrarinventario.setComentario(inventariorepeted.getComentario());
-				integrarinventario.setEstado(inventariorepeted.getEstado());
-				integrarinventario.setFecha(new Date());
-				integrarinventario.setMovimientos(inventariorepeted.getMovimientos());
+				//le llenamos el producto y vemos si primero pegan los proveedores
 				integrarinventario.setProducto(productoService.findOne(itemId[i]));
-				integrarinventario.setStock(cantidad[i]);
-				integrarinventario.setZaNombrede(authentication.getName());
 				if (integrarinventario.getProducto().getProveedor().getId() != inventariorepeted.getProducto()
 						.getProveedor().getId()) {
 					flash.addFlashAttribute("error",
 							"Un producto de los que intenta ingresar no corresponde al mismo proveedor");
 					return "redirect:/inventario/nuevo";
 				}
+				integrarinventario.setCodigoProveedor(codigo);
+				integrarinventario.setComentario(inventariorepeted.getComentario());
+				integrarinventario.setEstado(inventariorepeted.getEstado());
+				integrarinventario.setFecha(new Date());
+				integrarinventario.setMovimientos(inventariorepeted.getMovimientos());
+				integrarinventario.setStock(cantidad[i]);
+				integrarinventario.setZaNombrede(authentication.getName());
+
 				Producto productocambiostock = productoService.findOne(integrarinventario.getProducto().getId());
 				productocambiostock.setStock(productocambiostock.getStock() + cantidad[i]);
-				productoService.save(productocambiostock);
 				inventarioService.save(integrarinventario);
+
+				
+				ProductosModify pm = new ProductosModify();
+				pm.setFecha(new Date());
+				pm.setPrecio(productocambiostock.getPrecio());
+				pm.setProveedor(productocambiostock.getProveedor().getNombre());
+				pm.setStock(productocambiostock.getStock() + cantidad[i]);
+				pm.setProductomodi(productocambiostock);
+				productosmodifyService.save(pm);
+				productoService.save(productocambiostock);
 
 			}
 
@@ -252,8 +263,10 @@ public class InventarioController {
 						.print("Stock para comparar: " + stockenpositivo + "la cantidad a meter " + cantidad[i] + "\n");
 				if (stockenpositivo > cantidad[i]) {
 					System.out.print("Entre a a la condicion Cantidad de ingreso insuficiente para el stock");
-					flash.addFlashAttribute("error", "El producto " + producto.getNombrep()
-							+ " aun sigue en negativo! " + ((producto.getStock() * -1)- cantidad[i]) + " ahora son necesario para suplir la demanda");
+					flash.addFlashAttribute("error",
+							"El producto " + producto.getNombrep() + " aun sigue en negativo! "
+									+ ((producto.getStock() * -1) - cantidad[i])
+									+ " ahora son necesario para suplir la demanda");
 
 					// return "redirect:/inventario/listar";
 				}
@@ -303,12 +316,13 @@ public class InventarioController {
 					factura = facturaService
 							.findByCotizacionByCarritoItemsByIdByStatusWithoutProducto(producto.getId());
 					// if (factura.isEmpty()) {
-					// 	factura = facturaService.findByCotizacionByCarritoItemsByIdByStatus(producto.getId());
-					// 	for (Facturacion facturaCambioStatus : factura) {
-					// 		System.out.print("Index final de factura: " + factura.size());
-					// 		// facturaCambioStatus.setStatus(2);
-					// 		// facturaService.save(facturaCambioStatus);
-					// 	}
+					// factura =
+					// facturaService.findByCotizacionByCarritoItemsByIdByStatus(producto.getId());
+					// for (Facturacion facturaCambioStatus : factura) {
+					// System.out.print("Index final de factura: " + factura.size());
+					// // facturaCambioStatus.setStatus(2);
+					// // facturaService.save(facturaCambioStatus);
+					// }
 					// }
 				} catch (Exception e) {
 					mailservice.sendEmailchris(e.toString() + " linea: 314 ", "Error InventarioController");
@@ -345,7 +359,6 @@ public class InventarioController {
 			pm.setStock(producto.getStock());
 			pm.setProductomodi(producto);
 			productosmodifyService.save(pm);
-			
 			productoService.save(producto);
 		}
 

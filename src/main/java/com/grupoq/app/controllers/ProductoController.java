@@ -103,7 +103,7 @@ public class ProductoController {
 				model.addAttribute("rangofechas", date1 + " y " + date2);
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
-				mailservice.sendEmailchris(e.toString(), "Error ProductoController");
+				mailservice.sendEmailchris(e.toString(), "Error ProductoController linea 106");
 			}
 
 		}
@@ -142,7 +142,7 @@ public class ProductoController {
 					try {
 						nombrep = nombrep.substring(0, lastSpaceIndex);
 					} catch (Exception e) {
-						mailservice.sendEmailchris(e.toString(), "Error ProductoController");
+						mailservice.sendEmailchris(e.toString(), "Error ProductoController linea 145");
 						productos = null;
 					}
 
@@ -333,7 +333,7 @@ public class ProductoController {
 			try {
 				productoService.save(producto);
 			} catch (Exception e) {
-				mailservice.sendEmailchris(e.toString(), "Error ProductoController");
+				mailservice.sendEmailchris(e.toString(), "Error ProductoController linea 336");
 				// TODO: handle exception
 			}
 
@@ -351,7 +351,7 @@ public class ProductoController {
 				}
 				productoService.save(producto);
 			} catch (Exception e) {
-				mailservice.sendEmailchris(e.toString(), "Error ProductoController");
+				mailservice.sendEmailchris(e.toString(), "Error ProductoController linea 354");
 			}
 			productomodifyService.save(nuevamodificacion(producto, producto));
 		}

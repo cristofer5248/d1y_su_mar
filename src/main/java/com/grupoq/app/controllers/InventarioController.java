@@ -200,43 +200,60 @@ public class InventarioController {
 			flash.addFlashAttribute("error", "No se pudo guardar en el inventario, el codigo ingresado esta repetido");
 			return "redirect:/inventario/nuevo";
 		}
+		boolean integracionyrepetido = false;
 		if (inventariorepeted != null && integrar == 1) {
 			Inventario integrarinventario = new Inventario();
 			for (int i = 0; i < itemId.length; i++) {
-				//le llenamos el producto y vemos si primero pegan los proveedores
-				integrarinventario.setProducto(productoService.findOne(itemId[i]));
-				if (integrarinventario.getProducto().getProveedor().getId() != inventariorepeted.getProducto()
+
+				// le llenamos el producto y vemos si primero pegan los proveedores
+				if (inventariorepeted.getProducto().getProveedor().getId() != inventariorepeted.getProducto()
 						.getProveedor().getId()) {
 					flash.addFlashAttribute("error",
 							"Un producto de los que intenta ingresar no corresponde al mismo proveedor");
 					return "redirect:/inventario/nuevo";
 				}
-				integrarinventario.setCodigoProveedor(codigo);
-				integrarinventario.setComentario(inventariorepeted.getComentario());
-				integrarinventario.setEstado(inventariorepeted.getEstado());
-				integrarinventario.setFecha(new Date());
-				integrarinventario.setMovimientos(inventariorepeted.getMovimientos());
-				integrarinventario.setStock(cantidad[i]);
-				integrarinventario.setZaNombrede(authentication.getName());
 
-				Producto productocambiostock = productoService.findOne(integrarinventario.getProducto().getId());
-				productocambiostock.setStock(productocambiostock.getStock() + cantidad[i]);
-				inventarioService.save(integrarinventario);
+				if (inventariorepeted.getProducto().getId() == itemId[i]) {
+					// new aqui verificamos si esta repetido para sumarlo el producto
+					inventariorepeted.setStock(inventariorepeted.getStock() + cantidad[i]);
+					integracionyrepetido=true;
 
-				
+				} else {
+					integrarinventario.setProducto(productoService.findOne(itemId[i]));
+					integrarinventario.setCodigoProveedor(codigo);
+					integrarinventario.setComentario(inventariorepeted.getComentario());
+					integrarinventario.setEstado(inventariorepeted.getEstado());
+					integrarinventario.setFecha(new Date());
+					integrarinventario.setMovimientos(inventariorepeted.getMovimientos());
+					integrarinventario.setStock(cantidad[i]);
+					integrarinventario.setZaNombrede(authentication.getName());
+				}
+
+				Producto productocambiostock = productoService.findOne(
+						inventariorepeted.getProducto().getId() == itemId[i] ? inventariorepeted.getProducto().getId()
+								: integrarinventario.getProducto().getId());
+
+				productocambiostock.setStock(inventariorepeted.getProducto().getId() == itemId[i]
+						? inventariorepeted.getStock() + cantidad[i]
+						: productocambiostock.getStock() + cantidad[i]);
+
+				inventarioService.save(
+						inventariorepeted.getProducto().getId() == itemId[i] ? inventariorepeted : integrarinventario);
+				productoService.save(productocambiostock);
+
 				ProductosModify pm = new ProductosModify();
 				pm.setFecha(new Date());
 				pm.setPrecio(productocambiostock.getPrecio());
 				pm.setProveedor(productocambiostock.getProveedor().getNombre());
-				pm.setStock(productocambiostock.getStock() + cantidad[i]);
+				pm.setStock(productocambiostock.getStock());
 				pm.setProductomodi(productocambiostock);
 				productosmodifyService.save(pm);
-				productoService.save(productocambiostock);
 
 			}
 
 			status.setComplete();
-			flash.addFlashAttribute("success", "Nuevo integracion de datos a inventario previo completado");
+			String extramsj = integracionyrepetido?" con producto repetido que fue sumado.":".";
+			flash.addFlashAttribute("success", "Nuevo integracion de datos a inventario previo completado" + extramsj);
 			nuevaNotificacion("fas fa-parachute-box", "Integracion de productos a registro antiguo",
 					"/inventario/ver/" + inventariorepeted.getMovimientos().getId(), "purple");
 			return "redirect:/inventario/listar";

@@ -39,7 +39,7 @@ public class NotificacionesController {
 		Page<Notificaciones> notificaciones = notificacionesService.findAll(pageRequest);
 		
 		PageRender<Notificaciones> pageRender = new PageRender<>("", notificaciones);
-		model.addAttribute("titulo", "Listado de movimientos actuales");
+		model.addAttribute("titulo", "Listado de movimientos actuales.");
 		model.addAttribute("notificaciones", notificaciones);		
 		model.addAttribute("page", pageRender);
 		return "/notificaciones/listar";

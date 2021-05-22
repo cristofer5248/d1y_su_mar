@@ -54,7 +54,7 @@ public class IProductoServiceImpl implements IProductoService {
 
 	@Override
 	public List<Producto> findByNombrep(String term) {
-		return productosDao.findByNombrep(term);
+		return productosDao.findByNombrep(term, term);
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class IProductoServiceImpl implements IProductoService {
 	@Override
 	public Page<Producto> findAllLike(String termn, Pageable page) {
 		// TODO Auto-generated method stub
-		return productosDao.findAllLike(termn, page);
+		return productosDao.findAllLike(termn, termn,termn, page);
 	}
 
 	@Override

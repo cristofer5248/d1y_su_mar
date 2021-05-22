@@ -11,10 +11,10 @@
 	<artifactId>dobleq</artifactId>
 	<!-- <artifactId>dysumar</artifactId> -->
 
-	<version>0.0.1-SNAPSHOT</version>
-	<!-- <version>0.1</version> -->
-	<name>dobleq</name>
-	<description>Demo project for Spring Boot</description>
+	<!-- <version>0.0.1-SNAPSHOT</version>-->
+	<version>5.1</version>
+	<name>ROOT</name>
+	<description>It_was_made_and_build_by_Christopher</description>
 	<packaging>war</packaging>
 
 	<properties>
@@ -141,6 +141,9 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<warName>ROOT.war</warName>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

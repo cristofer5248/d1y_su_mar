@@ -7,12 +7,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import com.grupoq.app.models.entity.Producto;
 
 public interface ProductosDao extends PagingAndSortingRepository<Producto, Long> {
-	@Query("select p from Producto p join fetch p.proveedor prv join fetch p.marca m join fetch p.presentacion pre where p.nombrep like %?1%")
-	public List<Producto> findByNombrep(String term);
+	//@Query("select p from Producto p join fetch p.proveedor prv join fetch p.marca m join fetch p.presentacion pre where p.nombrep like %?1%")
+	@Query(value = "select * from productos p inner join marca m on p.marca_idm=m.idm inner join categorias c on p.categoria_id=c.id inner join proveedor prov on p.proveedor_id=prov.id inner join presentacion pre on p.presentacion_id=pre.id where p.nombrep like %?1% order by p.nombrep like ?2% desc", nativeQuery =true)
+	public List<Producto> findByNombrep(String term, String term2);
 	
 	@Query("select p from Producto p join fetch p.proveedor prv join fetch p.marca m join fetch p.presentacion pre where p.nombrep like %?1% and m.nombrem like %?2%")
 	public List<Producto> findByNombrepYMarca(String term, String term2);
@@ -36,8 +38,9 @@ public interface ProductosDao extends PagingAndSortingRepository<Producto, Long>
 	public Page<Producto> findAllJoinFalse(Pageable page);
 	
 	
+	//@Query(value = "select p from Producto p join fetch p.marca m join fetch p.categoria c join fetch p.proveedor pro join fetch p.presentacion pre where p.nombrep like %?1% order by p.nombrep like ?1% desc", countQuery = "select count(p) from Producto p join p.marca m join p.categoria c join p.proveedor pro join p.presentacion pre where p.nombrep like %?1% order by p.nombrep like ?1% desc")
 	@Query(value = "select p from Producto p join fetch p.marca m join fetch p.categoria c join fetch p.proveedor pro join fetch p.presentacion pre where p.nombrep like %?1%", countQuery = "select count(p) from Producto p join p.marca m join p.categoria c join p.proveedor pro join p.presentacion pre where p.nombrep like %?1%")
-	public Page<Producto> findAllLike(String termn,Pageable page);
+	public Page<Producto> findAllLike(String termn,String termn2, @Param("title") String title, Pageable page);
 	
 	@Query("select p from Producto p where p.nombrep like %?1% and p.proveedor.id=?2")
 	public List<Producto> findByNombrepAndProveedorId(String term, Long term2);

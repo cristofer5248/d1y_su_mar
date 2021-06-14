@@ -153,6 +153,13 @@ public class IProductoServiceImpl implements IProductoService {
 		return productosDao.findAllFechas(pageable, date1, date2);
 	}
 
+	@Override
+	public List<Object[]> findAllminimo() {
+		// TODO Auto-generated method stub
+		return productosDao.findByMinimo();
+		
+	}
+
 
 
 }

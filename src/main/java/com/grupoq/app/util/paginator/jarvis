@@ -1,0 +1,150 @@
+#!/bin/bash 
+
+BLUE='\033[0;34m'
+
+NC='\033[0m'
+
+RED='\033[0;31m'
+
+echo -e "Bienvenido al sistema de actualizacion del Sistema  ${BLUE} Dysumar${NC}"
+
+echo "Desea comenzar? (Y/N)"
+
+read op
+
+if [[ "$op" == "Y" ]]; then
+
+	whoami
+
+	cd /home/chris/Documents/dysumar_git/d1y_su_mar/
+
+	git fetch --all
+
+	whoami
+
+	git reset --hard origin/main
+
+	echo "Si anterior a este mensaje obtuvo un 'Already up-to-date', detener este proceso ya que no hay actualizaciones por el momento"
+
+	echo "de lo contrario, continuar porfavor"
+
+echo -e ".${RED} Desea continuar?(Y/N)${NC}"
+
+read op2
+
+
+
+if [[ "$op2" == "Y" ]]; then
+
+whoami
+
+cd /home/chris/Documents/dysumar_git/d1y_su_mar/
+
+mvn clean
+
+whoami
+
+mvn install
+
+echo -e "Si usted se encontro con un ${BLUE} BUILD SUCCESS ${NC} al terminar este proceso, todo ha salido bien, ${RED} caso contrario llamar al desarrollador${NC} "
+
+
+
+whoami
+
+echo "Deteniendo tomcat"
+
+systemctl stop tomcat
+
+
+
+sleep 5
+
+
+
+echo "El estado de tomcat: "
+
+systemctl status tomcat
+
+sleep 5
+
+
+
+whoami
+
+rm -rf /opt/tomcat/webapps/ROOT.war
+
+echo "ROOT viejo borrado"
+
+echo "."
+
+echo "."
+
+echo "."
+
+whoami
+
+pwd /opt/tomcat/webapps/
+
+sleep 5
+
+rm -rf /opt/tomcat/webapps/ROOT/
+
+echo "CARPETA ROOT BORRADA"
+
+echo "copiando archivo nuevo..."
+
+echo "."
+
+echo "."
+
+echo "."
+
+whoami
+
+pwd /opt/tomcat/webapps/
+
+
+
+whoami
+
+cp /home/chris/Documents/dysumar_git/d1y_su_mar/target/dobleq-5.1.war /opt/tomcat/webapps/ROOT.war
+
+whoami
+
+chmod 777 /opt/tomcat/webapps/ROOT.war
+
+echo "Asignando permisos..."
+
+sleep 5
+
+
+
+echo "iniciando tomcat..."
+
+echo "."
+
+echo "."
+
+echo "."
+
+whoami
+
+systemctl start tomcat
+
+sleep 5
+
+else
+
+    echo "Espere pronto actualizaciones! Gracias."
+
+fi
+
+
+
+else
+
+    echo "Error."
+
+fi
+

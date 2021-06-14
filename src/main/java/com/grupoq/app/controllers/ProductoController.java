@@ -200,6 +200,9 @@ public class ProductoController {
 		model.addAttribute("pathall", pathall);
 		model.addAttribute("enableallsearch", enableallsearch);
 		model.addAttribute("enablebtnall", enablebtnall);
+		//We are adding the new model to get data about minimum products
+		List<Object[]> productsminimum = productoService.findAllminimo(); 
+		model.addAttribute("minimum", productsminimum);
 
 		return "/productos/listar";
 	}
@@ -550,4 +553,18 @@ public class ProductoController {
 		noti.setColor(color);
 		notificacionesService.save(noti);
 	}
+
+	
+	// @RequestMapping(value = "/minimo", method = RequestMethod.GET)
+	// public String listar(Model model,@RequestParam(name = "page", defaultValue = "0") int page) {
+	// 	Pageable pageRequest = PageRequest.of(page, 30);
+		
+	// 	Page<Producto> producto0_ = productoService.findAllminimo(pageRequest);
+		
+	// 	PageRender<Producto> pageRender = new PageRender<>("", producto0_);
+	// 	model.addAttribute("titulo", "Listado de productos minimos");
+	// 	model.addAttribute("productos", producto0_);		
+	// 	model.addAttribute("page", pageRender);
+	// 	return "/productos/listar";
+	// }
 }

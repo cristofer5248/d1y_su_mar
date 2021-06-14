@@ -7,7 +7,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.security.access.annotation.Secured;
 //import org.springframework.http.MediaType;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.grupoq.app.models.entity.CarritoItems;
 //import com.grupoq.app.models.entity.CarritoItems;
+import org.springframework.ui.Model;
 import com.grupoq.app.models.entity.Facturacion;
 import com.grupoq.app.models.entity.Giro;
 import com.grupoq.app.models.entity.Inventario;
@@ -29,8 +29,7 @@ import com.grupoq.app.models.service.MailSenderService;
 @RequestMapping("/adminzone")
 @RestController
 public class pruebaLandController {
-	
-	
+
 	@Autowired
 	private IGiroService giroService;
 
@@ -45,7 +44,7 @@ public class pruebaLandController {
 
 	@Autowired
 	private ICarritoItemsService carritoitems;
-	
+
 	@Autowired
 	private MailSenderService mailservice;
 
@@ -58,8 +57,6 @@ public class pruebaLandController {
 		return "exito";
 
 	}
-
-
 
 	@RequestMapping(value = "/facturasAllstatus/{opc}/{valor}", method = RequestMethod.GET)
 	public String verSQLFacturaStatuses(@PathVariable(value = "opc") int opc,
@@ -138,20 +135,42 @@ public class pruebaLandController {
 		return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
 	}
 
-//	@RequestMapping(value = "/probador/{opc}/{valor}", method = RequestMethod.GET)
-//	public String probador(@PathVariable(value = "opc") int opc, @PathVariable(value = "valor") String valor) {
-//		String mensaje = "";
-//		List<Facturacion> lista = facturaService.findHistorialPrecios(Long.parseLong(valor));
-//		for (int i = 0; i < lista.size(); i++) {
-//			mensaje += "<H1>" + i + "</H1><br>";
-//			mensaje += "ID: " + lista.get(i).getId()+"<br>";
-//			for (CarritoItems carrito : lista.get(i).getCotizacion().getCarrito()) {
-//				if (carrito.getProductos().getId() == Long.parseLong(valor)) {
-//					mensaje += "PRECIO: "+carrito.getPrecio()+"<br>";
-//				}
-//			}
-//		}
-//		return mensaje;
-//	}
+	// @RequestMapping(value = "/probador/{opc}/{valor}", method =
+	// RequestMethod.GET)
+	// public String probador(@PathVariable(value = "opc") int opc,
+	// @PathVariable(value = "valor") String valor) {
+	// String mensaje = "";
+	// List<Facturacion> lista =
+	// facturaService.findHistorialPrecios(Long.parseLong(valor));
+	// for (int i = 0; i < lista.size(); i++) {
+	// mensaje += "<H1>" + i + "</H1><br>";
+	// mensaje += "ID: " + lista.get(i).getId()+"<br>";
+	// for (CarritoItems carrito : lista.get(i).getCotizacion().getCarrito()) {
+	// if (carrito.getProductos().getId() == Long.parseLong(valor)) {
+	// mensaje += "PRECIO: "+carrito.getPrecio()+"<br>";
+	// }
+	// }
+	// }
+	// return mensaje;
+	// }
+
+	@RequestMapping(value = "/minimo", method = RequestMethod.GET)
+	public String listar() {
+		String text = null;
+		List<Object[]> producto0_ = productoService.findAllminimo();
+
+		for(int i=0; i<producto0_.size(); i++){
+			for (Object[] a : producto0_) {
+				text = ("Producto "
+						+ a[0]);
+						
+			}
+			
+		}
+
+		// model.addAttribute("titulo", "Listado de productos minimos");
+		// model.addAttribute("productos", producto0_);
+		return text;
+	}
 
 }

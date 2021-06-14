@@ -18,7 +18,8 @@ public interface IProductoService {
 	public Page<Producto> findAllFechas(Pageable pageable,Date date1, Date date2);
 	public Page<Producto> findAllJoinFalse(Pageable page);
 	
-	
+	public List<Object[]> findAllminimo();
+
 	public void save (Producto producto);
 	public void delete(Long id);
 	public Page<Producto> findAllLike(String termn,Pageable page);

@@ -36,12 +36,14 @@
 						th:if="${!enablebtnall}" th:href="@{'/producto/listar'+ ${xlsxpath}(format=xlsx)}">Una
 						hoja <i class="fas fa-file-excel"></i>
 					</a> <a class="btn btn-success btn-xs" th:if="${enableallsearch}"
-						th:href="@{${pathall}(format=xlsx)}">TODOS EN <i class="fas fa-file-excel"></i></a> <a
-						class="btn btn-warning btn-xs" style="color: white"
+						th:href="@{${pathall}(format=xlsx)}">TODOS EN <i class="fas fa-file-excel"></i></a>
+					<a class="btn btn-warning btn-xs" style="color: white"
 						onclick="return confirm('¿Esta seguro? Mostrar muchos datos podria tardar un poco y alentar el servidor');"
 						th:if="${!enablebtnall}" th:href="@{/producto/listar/all?page=0&op2=1}"
 						sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV', 'ROLE_JEFEADM')">⚠
 						Ver todos ⚠</a>
+					<a class="btn btn-success btn-xs" style="color: white" data-target="#minimum1" data-toggle="modal"
+						th:if="${not #lists.isEmpty(minimum)}">Minimos <i class="fas fa-exclamation-triangle"></i></a>
 
 					<form class="searchbox" id="formsearch" action="">
 						<input type="search" placeholder="Introducir parametro de busqueda......"
@@ -191,6 +193,37 @@
 						</div>
 					</div>
 				</div>
+				<div class="modal fade bd-example-modal-lg" id="minimum1" tabindex="-1" role="dialog"
+					aria-labelledby="myLargeModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-lg">
+						<div class="modal-content">
+							<div class="modal-body resposive">
+								<table id="minimumtable" class="table table-striped table-bordered table-sm">
+									<thead class="thead-inverse">
+										<tr>
+											<th width="20">VER</th>
+											<th width="100">PRODUCTO</th>
+											<th width="100">MINIMO</th>
+											<th width="100">STOCK</th>
+											<th width="100">FECHA</th>
+										</tr>
+									</thead>
+									<tbody>									
+										<tr th:each="producto: ${minimum}">
+											<td><a th:href="@{/producto/ver/} + ${producto[0]}"><i
+														class="fas fa-solid fa-eye"></i></a>
+											</td>
+											<td class="tddata" th:text="${producto[1]}"></td>
+											<td class="tddata" th:text="${producto[2]}"></td>
+											<td class="tddata" th:text="${producto[4]}"></td>
+											<td class="tddata" th:text="${producto[3]}"></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
 				<!-- Modal -->
 				<div class="modal fade" id="historialmodal" tabindex="-1" role="dialog"
 					aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -234,7 +267,7 @@
 
 	</div>
 	<input type="hidden" id="urlenviar" th:value="@{/producto/listar/}" />
-	
+
 	<footer th:replace="layout/layout :: footer"></footer>
 	<script th:replace="productos/js/historialdeprecios :: javascript"></script>
 	<!-- 	aqui supuestamente son urls -->
@@ -265,8 +298,16 @@
 		$(document).ready(function () {
 			$('#example').DataTable({
 				"paging": false,
-
 				"searching": false,
+				"info": false
+			});
+		});
+
+		$(document).ready(function () {
+			$('#minimumtable').DataTable({
+				"paging": true,
+				"order": [ 4, "desc" ],
+				"searching": true,
 				"info": false
 			});
 		});

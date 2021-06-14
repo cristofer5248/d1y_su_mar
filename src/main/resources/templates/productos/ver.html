@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head th:replace="layout/layout :: head"></head>
 
 <body>
@@ -29,11 +29,10 @@
 					<!-- 						class="btn btn-primary btn-xs" -->
 					<!-- 						th:href="@{'/taller/form/' + ${producto.id}}" -->
 					<!-- 						th:text="'Nuevo requerimiento'"></a> -->
-					<a class="btn btn-primary btn-xs" th:href="@{/producto/listar}"
-						th:text="'Volver'"></a> <a class="btn btn-primary btn-xs"
-						th:href="@{/producto/editar/} + ${idp}" th:text="'Editar'"></a> <a
-						class="btn btn-warning btn-xs" th:text="'Historial de precio'"
-						data-target="#historialmodal" data-toggle="modal"
+					<a class="btn btn-primary btn-xs" th:href="@{/producto/listar}" th:text="'Volver'"></a> <a
+						class="btn btn-primary btn-xs" th:href="@{/producto/editar/} + ${idp}" th:text="'Editar'"></a>
+					<a class="btn btn-warning btn-xs" th:text="'Historial de precio'" data-target="#historialmodal"
+						data-toggle="modal"
 						onclick="modalHistorialdePrecios(document.getElementById('idp').textContent);"></a>
 					<label th:text='${idp}' id="idp" style="visibility: hidden"></label>
 
@@ -46,29 +45,21 @@
 
 				<ul class="list-group">
 					<li class="list-group-item active" th:text="${producto.nombrep}"></li>
-					<li class="list-group-item"
-						th:text="'Codigo:    '+${producto.codigo}"></li>
-					<li class="list-group-item"
-						th:text="'Ubicacion:    '+${producto.bodega}"></li>
-					<li class="list-group-item"
-						th:text="'Categoria:    '+${producto.categoria.nombre}"></li>
-					<li class="list-group-item"
-						th:text="'En stock:  ' +${producto.stock}"></li>
-					<li class="list-group-item"
-						th:text="'Proveedor:    '+${producto.proveedor.nombre}"></li>
-					<li class="list-group-item"
-						th:text="'Marca:    '+${producto.marca.nombrem}"></li>
-					<li class="list-group-item"
-						th:text="'Costo unitario:  $'+${producto.precio}"></li>
-					<li class="list-group-item"
-						th:text="'Margen:    '+${producto.margen}+'%'"></li>
-					<li class="list-group-item"
-						th:text="'Precio de venta:  $'+${precioventa}"></li>
+					<li class="list-group-item" th:text="'Codigo:    '+${producto.codigo}"></li>
+					<li class="list-group-item" th:text="'Ubicacion:    '+${producto.bodega}"></li>
+					<li class="list-group-item" th:text="'Categoria:    '+${producto.categoria.nombre}"></li>
+					<li class="list-group-item" th:text="'En stock:  ' +${producto.stock}"></li>
+					<li class="list-group-item" th:text="'Proveedor:    '+${producto.proveedor.nombre}"></li>
+					<li class="list-group-item" th:text="'Marca:    '+${producto.marca.nombrem}"></li>
+					<li class="list-group-item" th:text="'Costo unitario:  $'+${producto.precio}"></li>
+					<li class="list-group-item" th:text="'Margen:    '+${producto.margen}+'%'"></li>
+					<li class="list-group-item" th:text="'Precio de venta:  $'+${precioventa}"></li>
+					<li class="list-group-item" th:text="'Minimo:  '+${producto.minimo}"></li>
 				</ul>
 
-				<div th:if="${#lists.isEmpty(producto.inventarios)}"
-					class="alert alert-info my-4"
-					th:text="'No hay movimientos de este producto ' + ${producto.nombrep} + ' ' + ${producto.codigo}"></div>
+				<div th:if="${#lists.isEmpty(producto.inventarios)}" class="alert alert-info my-4"
+					th:text="'No hay movimientos de este producto ' + ${producto.nombrep} + ' ' + ${producto.codigo}">
+				</div>
 
 				<table th:if="${not #lists.isEmpty(producto.productosmodify)}"
 					class="table table-bordered table-striped my-4">
@@ -82,11 +73,10 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:each="productosmodify_: ${producto.productosmodify}"
-							th:with="df=#{date.format}">
+						<tr th:each="productosmodify_: ${producto.productosmodify}" th:with="df=#{date.format}">
 							<td th:text="${#calendars.format(productosmodify_.fecha,df)}"></td>
 							<td th:text="${productosmodify_.precio}"></td>
-							<td th:text="${productosmodify_.proveedor}"></td>							
+							<td th:text="${productosmodify_.proveedor}"></td>
 							<td th:text="${productosmodify_.stock}"></td>
 						</tr>
 					</tbody>
@@ -108,25 +98,19 @@
 					</thead>
 					<tbody>
 						<tr th:each="inventario: ${movimientos}">
-							<td th:text="${inventario.id}"
-								th:style="'color:' +${inventario.color}"></td>
-							<td th:text="${inventario.codigo}"
-								th:style="'color:' +${inventario.color}"></td>
-							<td th:text="${inventario.movimiento}"
-								th:style="'color:' +${inventario.color}"></td>
-							<td th:text="${inventario.fecha}"
-								th:style="'color:' +${inventario.color}"></td>
+							<td th:text="${inventario.id}" th:style="'color:' +${inventario.color}"></td>
+							<td th:text="${inventario.codigo}" th:style="'color:' +${inventario.color}"></td>
+							<td th:text="${inventario.movimiento}" th:style="'color:' +${inventario.color}"></td>
+							<td th:text="${inventario.fecha}" th:style="'color:' +${inventario.color}"></td>
 							<!-- 							<td th:text="${inventario.cantidad}"></td> -->
 
 							<!-- 							<td th:text="${factura.cantidad * factura.servicios.precio}"></td> -->
 							<!-- 							<td sec:authorize="hasRole('ROLE_ADMIN')"><a -->
 							<!-- 								class="btn btn-primary btn-xs" -->
 							<!-- 								th:href="@{'/factura/ver/' + ${factura.id}}" th:text="'detalle'"></a></td> -->
-							<td sec:authorize="hasRole('ROLE_ADMIN')"><a
-								class="btn btn-danger btn-xs"
-								th:href="@{'/inventario/eliminar/' + ${producto.id}}"
-								th:text="'eliminar'"
-								onclick="return confirm('¿Estas seguro que desea eliminar la factura?');"></a></td>
+							<td sec:authorize="hasRole('ROLE_ADMIN')"><a class="btn btn-danger btn-xs"
+									th:href="@{'/inventario/eliminar/' + ${producto.id}}" th:text="'eliminar'"
+									onclick="return confirm('¿Estas seguro que desea eliminar la factura?');"></a></td>
 						</tr>
 					</tbody>
 
@@ -135,16 +119,14 @@
 			</div>
 		</div>
 		<!-- Modal -->
-		<div class="modal fade bd-example-modal-lg" id="historialmodal"
-			tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-			aria-hidden="true">
+		<div class="modal fade bd-example-modal-lg" id="historialmodal" tabindex="-1" role="dialog"
+			aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title" id="exampleModalLongTitle">Este es un
 							listado de los precios hechos en facturas recientemente</h5>
-						<button type="button" class="close" data-dismiss="modal"
-							aria-label="Close">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
 					</div>
@@ -167,8 +149,7 @@
 						</table>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary"
-							data-dismiss="modal">Cerrar</button>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
 
 					</div>
 				</div>
@@ -177,10 +158,10 @@
 	</div>
 
 	<footer th:replace="layout/layout :: footer"></footer>
-	<input type="hidden" id="urlAjaxprecios"
-		th:value="@{/producto/historialDePrecios/}" />
+	<input type="hidden" id="urlAjaxprecios" th:value="@{/producto/historialDePrecios/}" />
 	<input type="hidden" id="urlAjaxFactura" th:value="@{/factura/ver/}" />
 	<input type="hidden" id="urlAjaxCoti" th:value="@{/cotizacion/ver/}" />
 	<script th:replace="productos/js/historialdeprecios :: javascript"></script>
 </body>
+
 </html>

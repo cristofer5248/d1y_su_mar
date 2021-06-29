@@ -142,7 +142,8 @@ public class ProductoController {
 					try {
 						nombrep = nombrep.substring(0, lastSpaceIndex);
 					} catch (Exception e) {
-						//mailservice.sendEmailchris(e.toString(), "Error ProductoController linea 145");
+						// mailservice.sendEmailchris(e.toString(), "Error ProductoController linea
+						// 145");
 						productos = null;
 					}
 
@@ -184,7 +185,7 @@ public class ProductoController {
 
 			productos = (date1 != null && nombrep == null) ? productoService.findAllFechas(pageRequest, date1_, date2_)
 					: productoService.findAllJoin(pageRequest);
-			
+
 			System.out.print("\nEL PATH: " + xlsxPath);
 
 		}
@@ -200,8 +201,8 @@ public class ProductoController {
 		model.addAttribute("pathall", pathall);
 		model.addAttribute("enableallsearch", enableallsearch);
 		model.addAttribute("enablebtnall", enablebtnall);
-		//We are adding the new model to get data about minimum products
-		List<Object[]> productsminimum = productoService.findAllminimo(); 
+		// We are adding the new model to get data about minimum products
+		List<Object[]> productsminimum = productoService.findAllminimo();
 		model.addAttribute("minimum", productsminimum);
 
 		return "/productos/listar";
@@ -336,7 +337,8 @@ public class ProductoController {
 			try {
 				productoService.save(producto);
 			} catch (Exception e) {
-				//mailservice.sendEmailchris(e.toString(), "Error ProductoController linea 336");
+				// mailservice.sendEmailchris(e.toString(), "Error ProductoController linea
+				// 336");
 				// TODO: handle exception
 			}
 
@@ -354,7 +356,8 @@ public class ProductoController {
 				}
 				productoService.save(producto);
 			} catch (Exception e) {
-				//mailservice.sendEmailchris(e.toString(), "Error ProductoController linea 354");
+				// mailservice.sendEmailchris(e.toString(), "Error ProductoController linea
+				// 354");
 			}
 			productomodifyService.save(nuevamodificacion(producto, producto));
 		}
@@ -429,6 +432,21 @@ public class ProductoController {
 	public @ResponseBody List<Producto> marcaTodosJson() {
 		List<Producto> list = productoService.findAllList();
 		return list;
+	}
+
+	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM", "ROLE_FACT" })
+	@RequestMapping(value = "/fix/{id}")
+	public String fixstock(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
+		Producto actualprod = productoService.findOne(id);
+		List<ProductosModify> lastprodm = productomodifyService.findAllByProductomodi(actualprod);
+		actualprod.setStock(lastprodm.get(lastprodm.size() - 1).getStock());
+
+		productoService.save(actualprod);
+		nuevaNotificacion("fas fa-tools", "Se ha evaluado el producto " + actualprod.getNombrep(),
+				"/producto/ver/" + id, "brown");		
+
+		flash.addFlashAttribute("success", "Accion ejecutada correctamente");				
+		return "redirect:/producto/ver/" + id;
 	}
 
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })
@@ -554,17 +572,17 @@ public class ProductoController {
 		notificacionesService.save(noti);
 	}
 
-	
 	// @RequestMapping(value = "/minimo", method = RequestMethod.GET)
-	// public String listar(Model model,@RequestParam(name = "page", defaultValue = "0") int page) {
-	// 	Pageable pageRequest = PageRequest.of(page, 30);
-		
-	// 	Page<Producto> producto0_ = productoService.findAllminimo(pageRequest);
-		
-	// 	PageRender<Producto> pageRender = new PageRender<>("", producto0_);
-	// 	model.addAttribute("titulo", "Listado de productos minimos");
-	// 	model.addAttribute("productos", producto0_);		
-	// 	model.addAttribute("page", pageRender);
-	// 	return "/productos/listar";
+	// public String listar(Model model,@RequestParam(name = "page", defaultValue =
+	// "0") int page) {
+	// Pageable pageRequest = PageRequest.of(page, 30);
+
+	// Page<Producto> producto0_ = productoService.findAllminimo(pageRequest);
+
+	// PageRender<Producto> pageRender = new PageRender<>("", producto0_);
+	// model.addAttribute("titulo", "Listado de productos minimos");
+	// model.addAttribute("productos", producto0_);
+	// model.addAttribute("page", pageRender);
+	// return "/productos/listar";
 	// }
 }

@@ -48,7 +48,10 @@
 					<li class="list-group-item" th:text="'Codigo:    '+${producto.codigo}"></li>
 					<li class="list-group-item" th:text="'Ubicacion:    '+${producto.bodega}"></li>
 					<li class="list-group-item" th:text="'Categoria:    '+${producto.categoria.nombre}"></li>
-					<li class="list-group-item" th:text="'En stock:  ' +${producto.stock}"></li>
+					<li class="list-group-item"> <label th:text="'En stock:  ' +${producto.stock}"
+							style="margin-right: 15px;"></label><a style="color:brown; font-size: 1.5em;"
+							title="Intentar reparar este dato" th:href="@{/producto/fix/}+${producto.id}"> <i
+								class="fas fa-tools"></i></a></li>
 					<li class="list-group-item" th:text="'Proveedor:    '+${producto.proveedor.nombre}"></li>
 					<li class="list-group-item" th:text="'Marca:    '+${producto.marca.nombrem}"></li>
 					<li class="list-group-item" th:text="'Costo unitario:  $'+${producto.precio}"></li>

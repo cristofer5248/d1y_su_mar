@@ -113,7 +113,7 @@ public class FacturaController {
 		Pageable pageRequest = (por != null || param != null || opc != null) ? Pageable.unpaged()
 				: PageRequest.of(page, 30);
 		Page<Facturacion> facturacion = null;
-//		String sPath= "listar";
+		// String sPath= "listar";
 		if (por != null) {
 			if (por.equals("cliente")) {
 				facturacion = facturaservice.findByClienteClienteNombreStartsWith(param, pageRequest);
@@ -145,10 +145,10 @@ public class FacturaController {
 
 						model.addAttribute("activePivot", true);
 					}
-//				sPath = facturacion!=null ? "listar/fechas/"+param+"/"+param2 : "listar";  
+					// sPath = facturacion!=null ? "listar/fechas/"+param+"/"+param2 : "listar";
 				} catch (Exception e) {
 					mailservice.sendEmailchris(e.toString(), "Error FacturaController");
-					
+
 					model.addAttribute("error", "Error en las fechas");
 					return "/facturas/listar";
 				}
@@ -236,7 +236,7 @@ public class FacturaController {
 		return "redirect:/factura/ver/" + term;
 	}
 
-//PARA CARRITO
+	// PARA CARRITO
 	@Secured({ "ROLE_ADMIN", "ROLE_SELLER" })
 	@RequestMapping(value = "/nuevo", method = RequestMethod.GET)
 	public String nuevo2(Map<String, Object> model, RedirectAttributes flash) {
@@ -246,7 +246,7 @@ public class FacturaController {
 		return "/facturas/form2";
 	}
 
-//ESTOS SI SON PARA FACTURA
+	// ESTOS SI SON PARA FACTURA
 	@Secured({ "ROLE_ADMIN", "ROLE_SELLER" })
 	@RequestMapping(value = "/nuevof/{term}", method = RequestMethod.GET)
 	public String nuevo(Map<String, Object> model, RedirectAttributes flash, @PathVariable Long term,
@@ -290,13 +290,13 @@ public class FacturaController {
 		return "/facturas/form";
 	}
 
-//ESTOS SI SON PARA FACTURA
+	// ESTOS SI SON PARA FACTURA
 	@Secured({ "ROLE_ADMIN", "ROLE_SELLER" })
 	@RequestMapping(value = { "/nuevof" })
 	public String nuevoSin(Map<String, Object> model, RedirectAttributes flash, Authentication authentication,
 			HttpServletRequest request, @RequestParam(name = "id", required = false) String id) {
 		Facturacion facturacion = new Facturacion();
-//		facturacion = (id != null) ? facturaservice.findBy(id) : facturacion;
+		// facturacion = (id != null) ? facturaservice.findBy(id) : facturacion;
 		System.out.print("\n EL ID DE EDITAR ES: " + id);
 		facturacion = facturaservice.findBy(Long.parseLong(id));
 		SecurityContextHolderAwareRequestWrapper securityContext = new SecurityContextHolderAwareRequestWrapper(request,
@@ -320,7 +320,7 @@ public class FacturaController {
 		return "/facturas/form";
 	}
 
-//guardar final de factura
+	// guardar final de factura
 	@Secured({ "ROLE_ADMIN", "ROLE_SELLER", "ROLE_FACT" })
 	@RequestMapping(value = "/savefactura", method = RequestMethod.POST)
 	public String guardarfactura(@Valid Facturacion facturacion, BindingResult result, Model model,
@@ -332,10 +332,10 @@ public class FacturaController {
 			if (facturacion.getCotizacion() == null) {
 				flash.addFlashAttribute("error",
 						"El codigo de cotizacion no puede estar vacio, mostrando formulario vacio...");
-//				return "redirect:/factura/nuevof";
+				// return "redirect:/factura/nuevof";
 				return "/facturas/form";
 			}
-//			return "redirect:/factura/nuevof/"+facturacion.getCotizacion().getId();
+			// return "redirect:/factura/nuevof/"+facturacion.getCotizacion().getId();
 			model.addAttribute("fdePago", facturaservice.listFdp());
 			model.addAttribute("cdePago", facturaservice.listCdp());
 			model.addAttribute("tfactura", facturaservice.listTf());
@@ -368,8 +368,11 @@ public class FacturaController {
 				: "Facturacion creada con éxito!";
 		double totalParaFactura = 0;
 		double totalsiniva = 0;
+
 		for (CarritoItems pro : cotizaciontemporal.getCarrito()) {
+			int stockstatic;
 			Producto productogetStock = productoservice.findOne(pro.getProductos().getId());
+			stockstatic = productogetStock.getStock();
 			System.out.print("COMPARANDO LA CANTIDA PEDIDA: " + pro.getCantidad() + "\n LA CANTIDAD QUE HAY: "
 					+ productogetStock.getStock());
 			if (productogetStock.getStock() < pro.getCantidad()) {
@@ -407,19 +410,19 @@ public class FacturaController {
 			}
 
 			else {
-				productogetStock.setStock(productogetStock.getStock() - pro.getCantidad());
+				productogetStock.setStock(stockstatic - pro.getCantidad());
 				ProductosModify pm = new ProductosModify();
 				pm.setPrecio(productogetStock.getPrecio());
 				pm.setFecha(new Date());
 				pm.setProveedor(productogetStock.getProveedor().getNombre());
-				pm.setStock(productogetStock.getStock());
+				pm.setStock(stockstatic - pro.getCantidad());
 				pm.setProductomodi(productogetStock);
 				productosmodifyService.save(pm);
 				productoservice.save(productogetStock);
 			}
 			// notificar cuando ya quedo en minimo
 			if (productogetStock.getStock() - pro.getCantidad() <= productogetStock.getMinimo()) {
-				nuevaNotificacion("fas fa-exclamation-triangle", productogetStock.getNombrep() + " en minimo!",
+				nuevaNotificacion("fas fa-exclamation-triangle", productogetStock.getNombrep() + " en minimo! actualmente "+ (stockstatic - pro.getCantidad()),
 						"/producto/ver/" + productogetStock.getId(), "yellow");
 
 			}
@@ -485,7 +488,7 @@ public class FacturaController {
 	@GetMapping(value = "/cargar_producto/{term}", produces = { "application/json" })
 	public @ResponseBody List<ProductosWB> listarByNombreJson(@PathVariable String term) {
 		List<ProductosWB> list2 = new ArrayList<ProductosWB>();
-//		List<Producto> list1 = productoService.findByNombrep(term);
+		// List<Producto> list1 = productoService.findByNombrep(term);
 		List<Producto> list1 = productoservice.findByNombrep(term);
 		if (list1.isEmpty()) {
 			int lastSpaceIndex = term.lastIndexOf(" ");
@@ -526,7 +529,7 @@ public class FacturaController {
 			if (facturacion == null) {
 				resultado = false;
 				inventario = inventarioservice.findByCodigoProveedorAndStatus(codigodoc);
-//				inventario = (inventario == null) ? false : true;
+				// inventario = (inventario == null) ? false : true;
 				resultado = (inventario == null) ? true : false;
 				System.out.print("el resultado es: " + resultado);
 			} else {
@@ -534,7 +537,7 @@ public class FacturaController {
 			}
 		} catch (Exception e) {
 			mailservice.sendEmailchris(e.toString(), "Error FacturaController");
-			
+
 			// TODO: handle exception
 		}
 		return resultado;
@@ -792,7 +795,7 @@ public class FacturaController {
 
 	}
 
-//para ver el detalle de la FACTURA
+	// para ver el detalle de la FACTURA
 	@Secured({ "ROLE_ADMIN", "ROLE_SELLER", "ROLE_JEFEADM", "ROLE_FACT" })
 	@GetMapping(value = "/ver/{id}")
 	public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash,
@@ -815,8 +818,9 @@ public class FacturaController {
 		String carritoid = facturacion.getCotizacion().getId().toString();
 		model.put("activePivot", true);
 		model.put("facturaciones", facturacion);
-//		model.put("proveedor", facturacion.get(0).getProducto().getProveedor().getNombre());
-//		model.put("fecha", facturacion.get(0).getFecha().toString());
+		// model.put("proveedor",
+		// facturacion.get(0).getProducto().getProveedor().getNombre());
+		// model.put("fecha", facturacion.get(0).getFecha().toString());
 		model.put("codigofa", id);
 		model.put("titulo", "Detalle de factura # : " + id);
 		model.put("carritoid", carritoid);
@@ -852,9 +856,9 @@ public class FacturaController {
 								+ factura.getId();
 						cambiarcosto = true;
 						double preciosin = (costoN * carrito.getCantidad());
-//						double descuento = carrito.getDescuento() / 100;
+						// double descuento = carrito.getDescuento() / 100;
 						// el descuento es sin iva?
-//						descuento = carrito.getPrecio()*descuento;
+						// descuento = carrito.getPrecio()*descuento;
 						totalnuevo += (preciosin * 1.13);
 						double margennuevo = ((carrito.getProductos().getPrecio() / (costoN * 1.13)) * -1 * 100) + 100;
 						carrito.setMargen(margennuevo);
@@ -905,7 +909,7 @@ public class FacturaController {
 					System.out.print("Elemento: " + pro.getNombrep() + "\n" + "Cantidad: " + carrito.getCantidad());
 					pro.setStock(pro.getStock() + carrito.getCantidad());
 
-					//dejemos contancia antes
+					// dejemos contancia antes
 					ProductosModify pm = new ProductosModify();
 					pm.setPrecio(pro.getPrecio());
 					pm.setFecha(new Date());
@@ -913,12 +917,12 @@ public class FacturaController {
 					pm.setStock(pro.getStock());
 					pm.setProductomodi(pro);
 					productosmodifyService.save(pm);
-					//hoy si guardamos
+					// hoy si guardamos
 					productoservice.save(pro);
-					
+
 				}
 				facturaservice.delete(id);
-				
+
 				nuevaNotificacion("fas fa-trash-alt", "La factura con el id " + id + " y correlativo " + coddoc
 						+ " ha sido eliminado por " + auth.getName(), "#", "red");
 

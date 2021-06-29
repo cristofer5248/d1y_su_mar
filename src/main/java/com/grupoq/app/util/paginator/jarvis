@@ -16,7 +16,7 @@ if [[ "$op" == "Y" ]]; then
 
 	whoami
 
-	cd /home/chris/Documents/dysumar_git/d1y_su_mar/
+	cd /home/dysumarftp/GIT/d1y_su_mar
 
 	git fetch --all
 
@@ -38,7 +38,7 @@ if [[ "$op2" == "Y" ]]; then
 
 whoami
 
-cd /home/chris/Documents/dysumar_git/d1y_su_mar/
+cd /home/dysumarftp/GIT/d1y_su_mar
 
 mvn clean
 
@@ -54,7 +54,7 @@ whoami
 
 echo "Deteniendo tomcat"
 
-systemctl stop tomcat
+service tomcat stop
 
 
 
@@ -64,7 +64,7 @@ sleep 5
 
 echo "El estado de tomcat: "
 
-systemctl status tomcat
+service tomcat status
 
 sleep 5
 
@@ -108,7 +108,7 @@ pwd /opt/tomcat/webapps/
 
 whoami
 
-cp /home/chris/Documents/dysumar_git/d1y_su_mar/target/dobleq-5.1.war /opt/tomcat/webapps/ROOT.war
+cp /home/dysumarftp/GIT/d1y_su_mar/target/dobleq-5.1.war /opt/tomcat/webapps/ROOT.war
 
 whoami
 
@@ -130,7 +130,7 @@ echo "."
 
 whoami
 
-systemctl start tomcat
+service tomcat start 
 
 sleep 5
 

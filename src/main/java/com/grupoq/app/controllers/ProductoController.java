@@ -94,6 +94,7 @@ public class ProductoController {
 		boolean enablebtnall = false;
 		boolean enableallsearch = false;
 
+
 		Date date1_ = null;
 		Date date2_ = null;
 		if (date1 != null) {
@@ -375,6 +376,7 @@ public class ProductoController {
 		pro_modify.setPrecio(producto.getPrecio());
 		pro_modify.setProveedor(producto.getProveedor().getNombre());
 		pro_modify.setProductomodi(productoService.findOne(pro.getId()));
+		pro_modify.setStock(producto.getStock());
 		return pro_modify;
 
 	}
@@ -397,6 +399,29 @@ public class ProductoController {
 
 		}
 		return "redirect:/producto/listar";
+	}	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })
+	@RequestMapping(value = "/Ehistoryindv/{id}")
+	public String eliminarhistoryind(@PathVariable(value = "id") Long id, RedirectAttributes flash) {
+		Long idredirect = null;
+		if (id > 0) {
+			try {
+				
+				ProductosModify aja = productomodifyService.findById(id);
+				idredirect = aja.getProductomodi().getId();
+				productomodifyService.delete(id);
+
+				flash.addFlashAttribute("success", "Historial de Producto eliminado con éxito!");
+				nuevaNotificacion("fas fa-box-open", "Historial de Producto con ID'" + id + "' eliminado!", "#", "red");
+			} catch (Exception e) {
+				e.printStackTrace();
+				mailservice.sendEmailchris(e.toString(), "Error ProductoController eliminando historial");
+				flash.addFlashAttribute("error",
+						"El producto posiblemente tiene registros de inventariado, no se puede eliminar!");
+				return "redirect:/producto/listar";
+			}
+
+		}
+		return "redirect:/producto/ver/"+idredirect;
 	}
 
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })

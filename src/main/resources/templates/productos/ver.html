@@ -54,7 +54,9 @@
 								class="fas fa-tools"></i></a></li>
 					<li class="list-group-item" th:text="'Proveedor:    '+${producto.proveedor.nombre}"></li>
 					<li class="list-group-item" th:text="'Marca:    '+${producto.marca.nombrem}"></li>
-					<li class="list-group-item" th:text="'Costo unitario:  $'+${producto.precio}"></li>
+					<li class="list-group-item"
+						th:text="'Costo unitario: $' +${#numbers.formatDecimal(producto.precio, 0, 'COMMA', 2, 'POINT')}">
+					</li>
 					<li class="list-group-item" th:text="'Margen:    '+${producto.margen}+'%'"></li>
 					<li class="list-group-item" th:text="'Precio de venta:  $'+${precioventa}"></li>
 					<li class="list-group-item" th:text="'Minimo:  '+${producto.minimo}"></li>
@@ -63,108 +65,134 @@
 				<div th:if="${#lists.isEmpty(producto.inventarios)}" class="alert alert-info my-4"
 					th:text="'No hay movimientos de este producto ' + ${producto.nombrep} + ' ' + ${producto.codigo}">
 				</div>
+				<div class="accordion" id="accordionExample">
+					<div class="card">
+						<div class="card-header" id="headingOne">
+							<h5 class="mb-0">
+								<button class="btn btn-link" type="button" data-toggle="collapse"
+									data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+									HISTORIAL DE MOVIMIENTOS
+								</button>
+							</h5>
+						</div>
+						<div id="collapseOne" class="collapse" aria-labelledby="headingOne"
+							data-parent="#accordionExample">
+							<div class="card-body">
+								<table th:if="${not #lists.isEmpty(producto.productosmodify)}"
+									class="table table-bordered table-striped my-4">
+									<thead class="thead-inverse">
+										<tr>
+											<th>Fecha de modificacion</th>
+											<th>Precio</th>
+											<th>Proveedor</th>
+											<th>Stock</th>
+											<th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV')">Borrar</th>
 
-				<table th:if="${not #lists.isEmpty(producto.productosmodify)}"
-					class="table table-bordered table-striped my-4">
-					<thead class="thead-inverse">
-						<tr>
-							<th>Fecha de modificacion</th>
-							<th>Precio</th>
-							<th>Proveedor</th>
-							<th>Stock</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="productosmodify_: ${producto.productosmodify}"
+											th:with="df=#{date.format}">
+											<td th:text="${#calendars.format(productosmodify_.fecha,df)}"></td>
+											<td
+												th:text="${#numbers.formatDecimal(productosmodify_.precio, 0, 'COMMA', 2, 'POINT')}">
+											</td>
+											<td th:text="${productosmodify_.proveedor}"></td>
+											<td th:text="${productosmodify_.stock}"></td>
+											<td sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV')"><a
+													th:href=@{/producto/Ehistoryindv/}+${productosmodify_.id}><i
+														style="color:red" class="fas fa-trash"></i></a></td>
+										</tr>
+									</tbody>
 
-						</tr>
-					</thead>
-					<tbody>
-						<tr th:each="productosmodify_: ${producto.productosmodify}" th:with="df=#{date.format}">
-							<td th:text="${#calendars.format(productosmodify_.fecha,df)}"></td>
-							<td th:text="${productosmodify_.precio}"></td>
-							<td th:text="${productosmodify_.proveedor}"></td>
-							<td th:text="${productosmodify_.stock}"></td>
-						</tr>
-					</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					<table th:if="${not #lists.isEmpty(producto.inventarios)}"
+						class="table table-bordered table-striped my-4">
+						<thead class="thead-inverse">
+							<tr>
+								<th>ID</th>
+								<th>Codigo de documento</th>
+								<th>Entrada o Salida</th>
+								<th>Fecha</th>
 
-				</table>
+								<!-- 							<th sec:authorize="hasRole('ROLE_ADMIN')">ver</th> -->
+								<th sec:authorize="hasRole('ROLE_ADMIN')">Eliminar</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="inventario: ${movimientos}">
+								<td th:text="${inventario.id}" th:style="'color:' +${inventario.color}"></td>
+								<td th:text="${inventario.codigo}" th:style="'color:' +${inventario.color}"></td>
+								<td th:text="${inventario.movimiento}" th:style="'color:' +${inventario.color}"></td>
+								<td th:text="${inventario.fecha}" th:style="'color:' +${inventario.color}"></td>
+								<!-- 							<td th:text="${inventario.cantidad}"></td> -->
 
-				<table th:if="${not #lists.isEmpty(producto.inventarios)}"
-					class="table table-bordered table-striped my-4">
-					<thead class="thead-inverse">
-						<tr>
-							<th>ID</th>
-							<th>Codigo de documento</th>
-							<th>Entrada o Salida</th>
-							<th>Fecha</th>
+								<!-- 							<td th:text="${factura.cantidad * factura.servicios.precio}"></td> -->
+								<!-- 							<td sec:authorize="hasRole('ROLE_ADMIN')"><a -->
+								<!-- 								class="btn btn-primary btn-xs" -->
+								<!-- 								th:href="@{'/factura/ver/' + ${factura.id}}" th:text="'detalle'"></a></td> -->
+								<td sec:authorize="hasRole('ROLE_ADMIN')"><a class="btn btn-danger btn-xs"
+										th:href="@{'/inventario/eliminar/' + ${producto.id}}" th:text="'eliminar'"
+										onclick="return confirm('¿Estas seguro que desea eliminar la factura?');"></a>
+								</td>
+							</tr>
+						</tbody>
 
-							<!-- 							<th sec:authorize="hasRole('ROLE_ADMIN')">ver</th> -->
-							<th sec:authorize="hasRole('ROLE_ADMIN')">Eliminar</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr th:each="inventario: ${movimientos}">
-							<td th:text="${inventario.id}" th:style="'color:' +${inventario.color}"></td>
-							<td th:text="${inventario.codigo}" th:style="'color:' +${inventario.color}"></td>
-							<td th:text="${inventario.movimiento}" th:style="'color:' +${inventario.color}"></td>
-							<td th:text="${inventario.fecha}" th:style="'color:' +${inventario.color}"></td>
-							<!-- 							<td th:text="${inventario.cantidad}"></td> -->
+					</table>
 
-							<!-- 							<td th:text="${factura.cantidad * factura.servicios.precio}"></td> -->
-							<!-- 							<td sec:authorize="hasRole('ROLE_ADMIN')"><a -->
-							<!-- 								class="btn btn-primary btn-xs" -->
-							<!-- 								th:href="@{'/factura/ver/' + ${factura.id}}" th:text="'detalle'"></a></td> -->
-							<td sec:authorize="hasRole('ROLE_ADMIN')"><a class="btn btn-danger btn-xs"
-									th:href="@{'/inventario/eliminar/' + ${producto.id}}" th:text="'eliminar'"
-									onclick="return confirm('¿Estas seguro que desea eliminar la factura?');"></a></td>
-						</tr>
-					</tbody>
-
-				</table>
-
+				</div>
 			</div>
-		</div>
-		<!-- Modal -->
-		<div class="modal fade bd-example-modal-lg" id="historialmodal" tabindex="-1" role="dialog"
-			aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-			<div class="modal-dialog modal-lg" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLongTitle">Este es un
-							listado de los precios hechos en facturas recientemente</h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body resposive">
-						<table class="table table-striped table-bordered" id="tbdc">
-							<thead>
-								<tr>
-									<th width="100">ID DE FACTURA</th>
-									<th width="100">ID DE COTIZACION</th>
-									<th width="100">PRECIO</th>
-									<th width="100">FECHA</th>
-									<th width="100">CANTIDAD</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr id="test">
-									<td></td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+			<!-- Modal -->
+			<div class="modal fade bd-example-modal-lg" id="historialmodal" tabindex="-1" role="dialog"
+				aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+				<div class="modal-dialog modal-lg" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLongTitle">Este es un
+								listado de los precios hechos en facturas recientemente</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body resposive">
+							<table class="table table-striped table-bordered" id="tbdc">
+								<thead>
+									<tr>
+										<th width="100">ID DE FACTURA</th>
+										<th width="100">ID DE COTIZACION</th>
+										<th width="100">PRECIO</th>
+										<th width="100">FECHA</th>
+										<th width="100">CANTIDAD</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr id="test">
+										<td></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
 
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
 
-	<footer th:replace="layout/layout :: footer"></footer>
-	<input type="hidden" id="urlAjaxprecios" th:value="@{/producto/historialDePrecios/}" />
-	<input type="hidden" id="urlAjaxFactura" th:value="@{/factura/ver/}" />
-	<input type="hidden" id="urlAjaxCoti" th:value="@{/cotizacion/ver/}" />
-	<script th:replace="productos/js/historialdeprecios :: javascript"></script>
+		<footer th:replace="layout/layout :: footer"></footer>
+		<input type="hidden" id="urlAjaxprecios" th:value="@{/producto/historialDePrecios/}" />
+		<input type="hidden" id="urlAjaxFactura" th:value="@{/factura/ver/}" />
+		<input type="hidden" id="urlAjaxCoti" th:value="@{/cotizacion/ver/}" />
+		<script th:replace="productos/js/historialdeprecios :: javascript"></script>
+		<script>
+
+			
+		</script>
 </body>
 
 </html>

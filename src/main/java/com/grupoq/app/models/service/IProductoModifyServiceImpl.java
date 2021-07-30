@@ -27,4 +27,16 @@ public class IProductoModifyServiceImpl implements IProductoModifyService {
 		return productomodifyservice.findAllByProductomodi(id);
 	}
 
+	@Override
+	public void delete(Long id) {
+		productomodifyservice.deleteById(id);
+		
+	}
+
+	@Override
+	public ProductosModify findById(Long id) {
+		// TODO Auto-generated method stub
+		return productomodifyservice.findById(id).orElse(null);
+	}
+
 }

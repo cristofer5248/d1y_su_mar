@@ -8,5 +8,7 @@ import com.grupoq.app.models.entity.ProductosModify;
 public interface IProductoModifyService {
 	public void save(ProductosModify productosmodify);
 	public List<ProductosModify>  findAllByProductomodi(Producto id);
+	public void delete(Long id);
+	public ProductosModify findById(Long id);
 
 }

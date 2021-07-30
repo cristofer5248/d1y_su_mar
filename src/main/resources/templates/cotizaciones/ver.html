@@ -94,7 +94,7 @@
 							<td th:text="${carritos.productos.nombrep}"></td>
 							<td th:text="${carritos.productos.marca.nombrem}"></td>
 							<td th:text="${carritos.productos.proveedor.nombre}"></td>
-							<td th:text="'$'+${carritos.productos.precio}"></td>
+							<td th:text="'$'+${#numbers.formatDecimal(carritos.productos.precio, 0, 'COMMA', 2, 'POINT')}"></td>
 							<td th:text="${carritos.margen}+'%'"></td>
 							<td sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_JEFEADM')"><button
 									data-toggle="modal" th:value="${carritos.id}"

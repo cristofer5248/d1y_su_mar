@@ -89,7 +89,7 @@
 											th:text="${producto.id}"></a></td>
 									<td class="tddata" th:text="${producto.codigo}"></td>
 									<td class="tddata" th:text="${producto.nombrep}"></td>
-									<td class="tddata" th:text="'$'+${producto.precio}"></td>
+									<td class="tddata" th:text="'$'+${#numbers.formatDecimal(producto.precio, 0, 'COMMA', 2, 'POINT')}"></td>
 									<td class="tddata" th:text="${producto.marca.nombrem}"></td>
 									<td class="tddata" th:text="${producto.bodega}"></td>
 									<td class="tddata" th:text="${producto.categoria.nombre}"></td>

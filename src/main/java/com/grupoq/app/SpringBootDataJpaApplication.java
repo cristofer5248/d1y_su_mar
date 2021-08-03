@@ -20,12 +20,13 @@ public class SpringBootDataJpaApplication extends SpringBootServletInitializer i
 	private BCryptPasswordEncoder passwordEncoder;
 	
 	public static void main(String[] args) {
+		TimeZone.setDefault(TimeZone.getTimeZone("America/Costa_Rica"));
 		SpringApplication.run(SpringBootDataJpaApplication.class, args);		
 	}
 	@Override
 	public void run(String... args)throws Exception{
 		//probador
-		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+		// TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
 		String password="12345";
 		for(int i=0; i<4; i++) {
 			String bcryptPassword = passwordEncoder.encode(password);

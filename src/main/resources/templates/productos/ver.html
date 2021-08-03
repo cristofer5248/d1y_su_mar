@@ -113,7 +113,7 @@
 						class="table table-bordered table-striped my-4">
 						<thead class="thead-inverse">
 							<tr>
-								<th>ID</th>
+								<!-- <th>ID</th> -->
 								<th>Codigo de documento</th>
 								<th>Entrada o Salida</th>
 								<th>Fecha</th>
@@ -124,10 +124,11 @@
 						</thead>
 						<tbody>
 							<tr th:each="inventario: ${movimientos}">
-								<td th:text="${inventario.id}" th:style="'color:' +${inventario.color}"></td>
-								<td th:text="${inventario.codigo}" th:style="'color:' +${inventario.color}"></td>
+								<!-- <td th:text="${inventario.id}" th:style="'color:' +${inventario.color}"></td> -->
+								<td><a th:href="${inventario.url}" th:text="${inventario.codigo}"
+										th:style="'color:' +${inventario.color}"></a></td>
 								<td th:text="${inventario.movimiento}" th:style="'color:' +${inventario.color}"></td>
-								<td th:text="${inventario.fecha}" th:style="'color:' +${inventario.color}"></td>
+								<td th:text="${#dates.format(inventario.fecha, 'dd-MM-yyyy')}" th:style="'color:' +${inventario.color}"></td>
 								<!-- 							<td th:text="${inventario.cantidad}"></td> -->
 
 								<!-- 							<td th:text="${factura.cantidad * factura.servicios.precio}"></td> -->
@@ -191,7 +192,7 @@
 		<script th:replace="productos/js/historialdeprecios :: javascript"></script>
 		<script>
 
-			
+
 		</script>
 </body>
 

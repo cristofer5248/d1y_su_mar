@@ -36,7 +36,7 @@
 						<tr th:each="noti: ${notificaciones}">
 							<td><label th:class="${noti.icono}" th:style="'color:'+${noti.color}"></label><a
 								th:href="@{''+${noti.url}}" th:text="${noti.nombre}"></a></td>
-							<td th:text="${noti.fecha}"></td>
+							<td th:text="${#dates.format(noti.fecha, 'dd-MM-yyyy HH:mm:ss')}"></td>
 							<!-- <td	th:if="${#request.isUserInRole('ADMIN')} OR ${#request.isUserInRole('SELLER')}"><a
 								th:href="@{'/noti/nuevo/' + ${noti.idm}}">
 									<div class='icon'>

@@ -9,14 +9,16 @@ public class EntradasYsalidas {
 	public int movimiento;
 	public Date fecha;
 	public String color;
+	public String url;
 
-	public EntradasYsalidas(Long id, String codigo, int movimiento, Date fecha, String color) {
+	public EntradasYsalidas(Long id, String codigo, int movimiento, Date fecha, String color, String url) {
 		super();
 		this.id = id;
 		this.codigo = codigo;
 		this.movimiento = movimiento;
 		this.fecha = fecha;
 		this.color = color;
+		this.url = url;
 	}
 
 	public EntradasYsalidas() {
@@ -61,6 +63,14 @@ public class EntradasYsalidas {
 
 	public void setColor(String color) {
 		this.color = color;
+	}
+
+	public String getUrl() {
+		return this.url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 }

@@ -1,10 +1,14 @@
 package com.grupoq.app.controllers;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.text.ParseException;
 
@@ -93,7 +97,6 @@ public class ProductoController {
 		Pageable pageRequest;
 		boolean enablebtnall = false;
 		boolean enableallsearch = false;
-
 
 		Date date1_ = null;
 		Date date2_ = null;
@@ -399,13 +402,15 @@ public class ProductoController {
 
 		}
 		return "redirect:/producto/listar";
-	}	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })
+	}
+
+	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })
 	@RequestMapping(value = "/Ehistoryindv/{id}")
 	public String eliminarhistoryind(@PathVariable(value = "id") Long id, RedirectAttributes flash) {
 		Long idredirect = null;
 		if (id > 0) {
 			try {
-				
+
 				ProductosModify aja = productomodifyService.findById(id);
 				idredirect = aja.getProductomodi().getId();
 				productomodifyService.delete(id);
@@ -421,7 +426,7 @@ public class ProductoController {
 			}
 
 		}
-		return "redirect:/producto/ver/"+idredirect;
+		return "redirect:/producto/ver/" + idredirect;
 	}
 
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })
@@ -468,15 +473,25 @@ public class ProductoController {
 
 		productoService.save(actualprod);
 		nuevaNotificacion("fas fa-tools", "Se ha evaluado el producto " + actualprod.getNombrep(),
-				"/producto/ver/" + id, "brown");		
+				"/producto/ver/" + id, "brown");
 
-		flash.addFlashAttribute("success", "Accion ejecutada correctamente");				
+		flash.addFlashAttribute("success", "Accion ejecutada correctamente");
 		return "redirect:/producto/ver/" + id;
 	}
 
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })
 	@GetMapping(value = "/ver/{id}")
 	public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
+		LocalDateTime now = LocalDateTime.now();  
+		System.out.println(dtf.format(now));
+		TimeZone zone = TimeZone.getDefault();
+        System.out.println(zone.getDisplayName());
+        System.out.println(zone.getID());
+		ZoneId z = ZoneId.systemDefault();
+		String output = z.toString();
+		System.out.print(output);
+		
 
 		// Taller taller = clienteService.findByIdTallerWithClienteWithFactura(id);
 		// List<?> taller = facturaService.probando(id);
@@ -496,6 +511,7 @@ public class ProductoController {
 			entr_salidas.setId(producto.getInventarios().get(i).getId());
 			entr_salidas.setMovimiento(producto.getInventarios().get(i).getStock());
 			entr_salidas.setColor("blue");
+			entr_salidas.setUrl("/inventario/ver/" + producto.getInventarios().get(i).getStock());
 			entra_list.add(entr_salidas);
 		}
 		List<NotadeCredito> notitas = notadecreditoService.findByCodigodoc(id);
@@ -512,6 +528,7 @@ public class ProductoController {
 				}
 
 				entr_salidas.setColor("blue");
+
 				entra_list.add(entr_salidas);
 			}
 		}
@@ -522,6 +539,7 @@ public class ProductoController {
 			entr_salidas.setFecha(lista.get(i).getFecha());
 			entr_salidas.setId(lista.get(i).getId());
 			entr_salidas.setColor("green");
+			entr_salidas.setUrl("/factura/ver/" + lista.get(i).getId());
 			for (CarritoItems carrito : lista.get(i).getCotizacion().getCarrito()) {
 				if (carrito.getProductos().getId() == Long.parseLong(id.toString())) {
 					entr_salidas.setMovimiento(carrito.getCantidad() * -1);

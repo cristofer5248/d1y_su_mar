@@ -363,6 +363,7 @@ public class FacturaController {
 			facturacion.setStatus(2);
 		} else {
 			facturacion.setStatus(1);
+			
 		}
 		String mensajeFlash = (facturacion.getId() != null) ? "factura editada con éxito!"
 				: "Facturacion creada con éxito!";
@@ -371,14 +372,16 @@ public class FacturaController {
 
 		for (CarritoItems pro : cotizaciontemporal.getCarrito()) {
 			int stockstatic;
+			
 			Producto productogetStock = productoservice.findOne(pro.getProductos().getId());
+			//por si en alguna razon esta accion se repite para el mismo producto, detener!
 			stockstatic = productogetStock.getStock();
 			System.out.print("COMPARANDO LA CANTIDA PEDIDA: " + pro.getCantidad() + "\n LA CANTIDAD QUE HAY: "
 					+ productogetStock.getStock());
-			if (productogetStock.getStock() < pro.getCantidad()) {
-				if (productogetStock.getStock() < 0) {
+			if (stockstatic < pro.getCantidad()) {
+				if (stockstatic < 0) {
 					productogetStock.setStock(productogetStock.getStock() - pro.getCantidad());
-					model.addAttribute("error", "Stock insuficiente, se encuentra en numeros negativos");
+					model.addAttribute("error", "Stock insuficiente, se encuentra en numeros negativos, QUEDARA NEGATIVO!");
 					// aqui debo cambiar el estado del carrito segun el que tiene insuficientes en
 					// stock
 					System.out.print("ENTRANDO A LA CONDICION DE NUMEROS NEGATIVOS EN STOCK Y PONER SEST STATUS FALSE");
@@ -399,7 +402,7 @@ public class FacturaController {
 					pm.setPrecio(productogetStock.getPrecio());
 					pm.setFecha(new Date());
 					pm.setProveedor(productogetStock.getProveedor().getNombre());
-					pm.setStock(productogetStock.getStock());
+					pm.setStock(stockstatic - pro.getCantidad());
 					pm.setProductomodi(productogetStock);
 					productosmodifyService.save(pm);
 					productoservice.save(productogetStock);

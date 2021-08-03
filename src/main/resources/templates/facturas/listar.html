@@ -111,7 +111,7 @@
 							<td th:text="${factura.tipoFactura.nombre}"></td>
 							<td th:if="${factura.cliente.cliente.agente}" th:text="'SI'"></td>
 							<td th:if="!${factura.cliente.cliente.agente}" th:text="'NO'"></td>
-							<td th:text="${factura.fecha}"></td>
+							<td th:text="${#dates.format(factura.fecha, 'dd-MM-yyyy')}"></td>
 
 
 <!-- 							<td th:if="${factura.cliente.cliente.agente}" -->

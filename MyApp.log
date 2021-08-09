@@ -1773,3 +1773,5 @@ EL PATH: ?page=0
 2021-08-08 19:31:49,165 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer                 - LiveReload server is running on port 35729
 2021-08-08 19:31:49,175 [restartedMain] INFO  o.apache.coyote.http11.Http11NioProtocol           - Starting ProtocolHandler ["http-nio-80"]
 2021-08-08 19:31:49,202 [restartedMain] INFO  o.s.b.w.embedded.tomcat.TomcatWebServer            - Tomcat started on port(s): 80 (http) with context path ''
+2021-08-08 19:31:49,203 [restartedMain] INFO  c.g.app.SpringBootDataJpaApplication               - Started SpringBootDataJpaApplication in 1.498 seconds (JVM running for 1790.248)
+2021-08-08 19:31:49,495 [restartedMain] INFO  o.s.b.d.a.ConditionEvaluationDeltaLoggingListener  - Condition evaluation unchanged

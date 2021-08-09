@@ -51,7 +51,7 @@ import com.grupoq.app.util.paginator.PageRender;
 @SessionAttributes("cliente")
 public class ClienteController {
 
-	protected final Log logger = LogFactory.getLog(this.getClass());
+	//protected final Log logger = LogFactory.getLog(this.getClass());
 
 	@Autowired
 	private IClienteService clienteService;
@@ -116,38 +116,38 @@ public class ClienteController {
 			HttpServletRequest request) {
 
 		if (authentication != null) {
-			logger.info("Hola usuario autenticado, tu username es: ".concat(authentication.getName()));
+			System.out.print("Hola usuario autenticado, tu username es: ".concat(authentication.getName()));
 		}
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
 		if (auth != null) {
-			logger.info(
+			System.out.print(
 					"Utilizando forma estática SecurityContextHolder.getContext().getAuthentication(): Usuario autenticado: "
 							.concat(auth.getName()));
 		}
 
 		if (hasRole("ROLE_ADMIN")) {
-			logger.info("Hola ".concat(auth.getName()).concat(" tienes acceso!"));
+			System.out.print("Hola ".concat(auth.getName()).concat(" tienes acceso!"));
 		} else {
-			logger.info("Hola ".concat(auth.getName()).concat(" NO tienes acceso!"));
+			System.out.print("Hola ".concat(auth.getName()).concat(" NO tienes acceso!"));
 		}
 
 		SecurityContextHolderAwareRequestWrapper securityContext = new SecurityContextHolderAwareRequestWrapper(request,
 				"");
 
 		if (securityContext.isUserInRole("ROLE_ADMIN")) {
-			logger.info("Forma usando SecurityContextHolderAwareRequestWrapper: Hola ".concat(auth.getName())
+			System.out.print("Forma usando SecurityContextHolderAwareRequestWrapper: Hola ".concat(auth.getName())
 					.concat(" tienes acceso!"));
 		} else {
-			logger.info("Forma usando SecurityContextHolderAwareRequestWrapper: Hola ".concat(auth.getName())
+			System.out.print("Forma usando SecurityContextHolderAwareRequestWrapper: Hola ".concat(auth.getName())
 					.concat(" NO tienes acceso!"));
 		}
 
 		if (request.isUserInRole("ROLE_ADMIN")) {
-			logger.info("Forma usando HttpServletRequest: Hola ".concat(auth.getName()).concat(" tienes acceso!"));
+			System.out.print("Forma usando HttpServletRequest: Hola ".concat(auth.getName()).concat(" tienes acceso!"));
 		} else {
-			logger.info("Forma usando HttpServletRequest: Hola ".concat(auth.getName()).concat(" NO tienes acceso!"));
+			System.out.print("Forma usando HttpServletRequest: Hola ".concat(auth.getName()).concat(" NO tienes acceso!"));
 		}
 
 		Pageable pageRequest = PageRequest.of(page, 10);

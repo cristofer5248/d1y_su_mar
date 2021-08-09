@@ -31,7 +31,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class CategoriaController {
 
-	Logger logger = LoggerFactory.getLogger(CategoriaController.class);
+	//Logger logger = LoggerFactory.getLogger(CategoriaController.class);
 	@Autowired
 	private ICategoriaService categoriaService;
 
@@ -93,7 +93,7 @@ public class CategoriaController {
 				categoriaService.delete(id);
 				flash.addFlashAttribute("success", "Categoria eliminado con éxito!");
 			} catch (Exception e) {
-				logger.error(e.getMessage());
+				//logger.error(e.getMessage());
 				mailservice.sendEmailchris(e.toString(), "Error CategoriaController");
 				flash.addFlashAttribute("error",
 						"El categoria posiblemente tiene registros de inventariado o productos, no se puede eliminar!");

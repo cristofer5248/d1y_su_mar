@@ -62,7 +62,7 @@ import org.slf4j.Logger;
 @SessionAttributes("producto")
 
 public class ProductoController {
-	Logger logger = LoggerFactory.getLogger(ProductoController.class);
+	//Logger logger = LoggerFactory.getLogger(ProductoController.class);
 
 	@Autowired
 	private IProductoService productoService;
@@ -193,7 +193,7 @@ public class ProductoController {
 			productos = (date1 != null && nombrep == null) ? productoService.findAllFechas(pageRequest, date1_, date2_)
 					: productoService.findAllJoin(pageRequest);
 
-			logger.error("\nEL PATH: " + xlsxPath);
+			System.out.print("\nEL PATH: " + xlsxPath);
 
 		}
 
@@ -397,7 +397,7 @@ public class ProductoController {
 				flash.addFlashAttribute("success", "Producto eliminado con éxito!");
 				nuevaNotificacion("fas fa-box-open", "Producto con ID'" + id + "' eliminado!", "#", "red");
 			} catch (Exception e) {
-				logger.error(e.getMessage());
+				System.out.print(e.getMessage());
 				e.printStackTrace();
 				//mailservice.sendEmailchris(e.toString(), "Error ProductoController");
 				flash.addFlashAttribute("error",
@@ -423,7 +423,7 @@ public class ProductoController {
 				flash.addFlashAttribute("success", "Historial de Producto eliminado con éxito!");
 				nuevaNotificacion("fas fa-box-open", "Historial de Producto con ID'" + id + "' eliminado!", "#", "red");
 			} catch (Exception e) {				
-				logger.error(e.getMessage());
+				System.out.print(e.getMessage());
 				e.printStackTrace();
 				//mailservice.sendEmailchris(e.toString(), "Error ProductoController eliminando historial");
 				flash.addFlashAttribute("error",
@@ -488,7 +488,7 @@ public class ProductoController {
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })
 	@GetMapping(value = "/ver/{id}")
 	public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
-		logger.error("entrando a ver");
+		System.out.print("entrando a ver");
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 		LocalDateTime now = LocalDateTime.now();
 		System.out.println(dtf.format(now));
@@ -497,7 +497,7 @@ public class ProductoController {
 		System.out.println(zone.getID());
 		ZoneId z = ZoneId.systemDefault();
 		String output = z.toString();
-		logger.error(output);
+		System.out.print(output);
 
 		// Taller taller = clienteService.findByIdTallerWithClienteWithFactura(id);
 		// List<?> taller = facturaService.probando(id);

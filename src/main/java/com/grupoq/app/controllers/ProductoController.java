@@ -54,12 +54,15 @@ import com.grupoq.app.models.service.IProductoService;
 import com.grupoq.app.models.service.IUsuarioService;
 import com.grupoq.app.models.service.MailSenderService;
 import com.grupoq.app.util.paginator.PageRender;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 @Controller
 @RequestMapping("/producto")
 @SessionAttributes("producto")
 
 public class ProductoController {
+	Logger logger = LoggerFactory.getLogger(ProductoController.class);
 
 	@Autowired
 	private IProductoService productoService;
@@ -190,7 +193,7 @@ public class ProductoController {
 			productos = (date1 != null && nombrep == null) ? productoService.findAllFechas(pageRequest, date1_, date2_)
 					: productoService.findAllJoin(pageRequest);
 
-			System.out.print("\nEL PATH: " + xlsxPath);
+			logger.error("\nEL PATH: " + xlsxPath);
 
 		}
 
@@ -394,7 +397,9 @@ public class ProductoController {
 				flash.addFlashAttribute("success", "Producto eliminado con éxito!");
 				nuevaNotificacion("fas fa-box-open", "Producto con ID'" + id + "' eliminado!", "#", "red");
 			} catch (Exception e) {
-				mailservice.sendEmailchris(e.toString(), "Error ProductoController");
+				logger.error(e.getMessage());
+				e.printStackTrace();
+				//mailservice.sendEmailchris(e.toString(), "Error ProductoController");
 				flash.addFlashAttribute("error",
 						"El producto posiblemente tiene registros de inventariado, no se puede eliminar!");
 				return "redirect:/producto/listar";
@@ -417,9 +422,10 @@ public class ProductoController {
 
 				flash.addFlashAttribute("success", "Historial de Producto eliminado con éxito!");
 				nuevaNotificacion("fas fa-box-open", "Historial de Producto con ID'" + id + "' eliminado!", "#", "red");
-			} catch (Exception e) {
+			} catch (Exception e) {				
+				logger.error(e.getMessage());
 				e.printStackTrace();
-				mailservice.sendEmailchris(e.toString(), "Error ProductoController eliminando historial");
+				//mailservice.sendEmailchris(e.toString(), "Error ProductoController eliminando historial");
 				flash.addFlashAttribute("error",
 						"El producto posiblemente tiene registros de inventariado, no se puede eliminar!");
 				return "redirect:/producto/listar";
@@ -482,16 +488,16 @@ public class ProductoController {
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })
 	@GetMapping(value = "/ver/{id}")
 	public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
-		LocalDateTime now = LocalDateTime.now();  
+		logger.error("entrando a ver");
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+		LocalDateTime now = LocalDateTime.now();
 		System.out.println(dtf.format(now));
 		TimeZone zone = TimeZone.getDefault();
-        System.out.println(zone.getDisplayName());
-        System.out.println(zone.getID());
+		System.out.println(zone.getDisplayName());
+		System.out.println(zone.getID());
 		ZoneId z = ZoneId.systemDefault();
 		String output = z.toString();
-		System.out.print(output);
-		
+		logger.error(output);
 
 		// Taller taller = clienteService.findByIdTallerWithClienteWithFactura(id);
 		// List<?> taller = facturaService.probando(id);

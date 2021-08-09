@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +31,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class CategoriaController {
 
+	Logger logger = LoggerFactory.getLogger(CategoriaController.class);
 	@Autowired
 	private ICategoriaService categoriaService;
 
@@ -90,6 +93,7 @@ public class CategoriaController {
 				categoriaService.delete(id);
 				flash.addFlashAttribute("success", "Categoria eliminado con éxito!");
 			} catch (Exception e) {
+				logger.error(e.getMessage());
 				mailservice.sendEmailchris(e.toString(), "Error CategoriaController");
 				flash.addFlashAttribute("error",
 						"El categoria posiblemente tiene registros de inventariado o productos, no se puede eliminar!");

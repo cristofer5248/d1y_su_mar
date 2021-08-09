@@ -125,7 +125,7 @@ public class FacturaController {
 			}
 			if (por.equals("fechas")) {
 				try {
-					System.out.print("Entro a 'fecha'\n");
+					logger.error("Entro a 'fecha'\n");
 					Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(param);
 					Date date2 = new SimpleDateFormat("yyyy-MM-dd").parse(param2);
 					if (opc.equals("vendedor")) {
@@ -185,7 +185,7 @@ public class FacturaController {
 			Facturacion facturacion = facturaservice.findBy(term);
 			List<CarritoItems> carrito = facturacion.getCotizacion().getCarrito();
 
-			System.out.print("\nRecorriendo: \n");
+			logger.error("\nRecorriendo: \n");
 			boolean cambiarStatus = true;
 
 			for (CarritoItems caObj : carrito) {
@@ -218,7 +218,7 @@ public class FacturaController {
 		try {
 			Facturacion facturacion = facturaservice.findBy(term);
 
-			System.out.print("\nRecorriendo: \n");
+			logger.error("\nRecorriendo: \n");
 			boolean cambiarStatus = true;
 			facturacion.setStatus(4);
 			if (cambiarStatus) {
@@ -268,7 +268,7 @@ public class FacturaController {
 		}
 		facturacion.setCotizacion(cotizacion);
 		if (facturacion.getCotizacion() != null) {
-			System.out.print(
+			logger.error(
 					"La cotizacion no esta vacia, es mas este tiene el id \n" + facturacion.getCotizacion().getId());
 		}
 
@@ -297,7 +297,7 @@ public class FacturaController {
 			HttpServletRequest request, @RequestParam(name = "id", required = false) String id) {
 		Facturacion facturacion = new Facturacion();
 		// facturacion = (id != null) ? facturaservice.findBy(id) : facturacion;
-		System.out.print("\n EL ID DE EDITAR ES: " + id);
+		logger.error("\n EL ID DE EDITAR ES: " + id);
 		facturacion = facturaservice.findBy(Long.parseLong(id));
 		SecurityContextHolderAwareRequestWrapper securityContext = new SecurityContextHolderAwareRequestWrapper(request,
 				"");
@@ -376,7 +376,7 @@ public class FacturaController {
 			Producto productogetStock = productoservice.findOne(pro.getProductos().getId());
 			//por si en alguna razon esta accion se repite para el mismo producto, detener!
 			stockstatic = productogetStock.getStock();
-			System.out.print("COMPARANDO LA CANTIDA PEDIDA: " + pro.getCantidad() + "\n LA CANTIDAD QUE HAY: "
+			logger.error("COMPARANDO LA CANTIDA PEDIDA: " + pro.getCantidad() + "\n LA CANTIDAD QUE HAY: "
 					+ productogetStock.getStock());
 			if (stockstatic < pro.getCantidad()) {
 				if (stockstatic < 0) {
@@ -384,7 +384,7 @@ public class FacturaController {
 					model.addAttribute("error", "Stock insuficiente, se encuentra en numeros negativos, QUEDARA NEGATIVO!");
 					// aqui debo cambiar el estado del carrito segun el que tiene insuficientes en
 					// stock
-					System.out.print("ENTRANDO A LA CONDICION DE NUMEROS NEGATIVOS EN STOCK Y PONER SEST STATUS FALSE");
+					logger.error("ENTRANDO A LA CONDICION DE NUMEROS NEGATIVOS EN STOCK Y PONER SEST STATUS FALSE");
 					pro.setStatus(false);
 
 					// aqui
@@ -397,7 +397,7 @@ public class FacturaController {
 					facturacion.setStatus(3);
 				} else {
 					productogetStock.setStock(productogetStock.getStock() - pro.getCantidad());
-					System.out.print("ENTRANDO A LA CONDICION DE NUMEROS NEGATIVOS EN STOCK Y PONER SEST STATUS TRUE");
+					logger.error("ENTRANDO A LA CONDICION DE NUMEROS NEGATIVOS EN STOCK Y PONER SEST STATUS TRUE");
 					ProductosModify pm = new ProductosModify();
 					pm.setPrecio(productogetStock.getPrecio());
 					pm.setFecha(new Date());
@@ -436,7 +436,7 @@ public class FacturaController {
 
 			totalsiniva += pro.getPrecio() * pro.getCantidad();
 
-			System.out.print("\n" + totalParaFactura + "\n");
+			logger.error("\n" + totalParaFactura + "\n");
 		}
 
 		facturacion.setTotaRegistrado(totalParaFactura > 113 && facturacion.getCliente().getCliente().getAgente()
@@ -445,7 +445,7 @@ public class FacturaController {
 		// duplicaremos la cotizacin para despues no haber errores
 		boolean cotiRepeated = facturaservice.cotizacionRepetida(facturacion.getCotizacion().getId()) > 0 ? true
 				: false;
-		System.out.print("El estado es " + cotiRepeated);
+		logger.error("El estado es " + cotiRepeated);
 		if (cotiRepeated) {
 			Cotizacion nCotizacion = new Cotizacion();
 			nCotizacion.setFecha(new Date());
@@ -497,7 +497,7 @@ public class FacturaController {
 			int lastSpaceIndex = term.lastIndexOf(" ");
 			String term2 = term.substring(lastSpaceIndex + 1, term.length());
 			term = term.substring(0, lastSpaceIndex);
-			System.out.print("\n PRODUCTO: " + term + " MARCA: " + term2 + " indexlast " + lastSpaceIndex);
+			logger.error("\n PRODUCTO: " + term + " MARCA: " + term2 + " indexlast " + lastSpaceIndex);
 			list1 = productoservice.findByNombrepYMarca(term, term2);
 		}
 		for (Producto veamos : list1) {
@@ -534,7 +534,7 @@ public class FacturaController {
 				inventario = inventarioservice.findByCodigoProveedorAndStatus(codigodoc);
 				// inventario = (inventario == null) ? false : true;
 				resultado = (inventario == null) ? true : false;
-				System.out.print("el resultado es: " + resultado);
+				logger.error("el resultado es: " + resultado);
 			} else {
 				resultado = true;
 			}
@@ -717,7 +717,7 @@ public class FacturaController {
 		String mensajeFlash;
 		/*
 		 * para probar que el switch funciona if(tipoC==1) {
-		 * System.out.print("\n"+tipoC+"\n"); return "redirect:/factura/listar"; }
+		 * logger.error("\n"+tipoC+"\n"); return "redirect:/factura/listar"; }
 		 */
 
 		if (itemId == null || itemId.length == 0) {
@@ -733,7 +733,7 @@ public class FacturaController {
 		boolean icotizacion = true;
 		Random random = new Random();
 		for (int i = 0; i < itemId.length; i++) {
-			System.out.print("La cantidad es: " + cantidad[i] + " \n");
+			logger.error("La cantidad es: " + cantidad[i] + " \n");
 			int x = random.nextInt(900) + 100;
 			CarritoItems carrito = new CarritoItems();
 			Producto producto = productoservice.findOne(itemId[i]);
@@ -809,8 +809,8 @@ public class FacturaController {
 			flash.addFlashAttribute("error", "El ingreso con ese codigo no existe en la base de datos");
 			return "redirect:/facturacion/listar";
 		}
-		System.out.print("\n usuario1 " + auth.getName());
-		System.out.print("\n usuario2 " + facturacion.getaCuentade().getUsername());
+		logger.error("\n usuario1 " + auth.getName());
+		logger.error("\n usuario2 " + facturacion.getaCuentade().getUsername());
 
 		if (!facturacion.getaCuentade().getUsername().equals(auth.getName()) && !(request.isUserInRole("ROLE_ADMIN")
 				|| request.isUserInRole("ROLE_JEFEADM") || request.isUserInRole("ROLE_FACT"))) {
@@ -840,7 +840,7 @@ public class FacturaController {
 			@RequestParam(name = "costoN") double costoN, Map<String, Object> model, RedirectAttributes flash,
 			Authentication auth, HttpServletRequest request) {
 
-		System.out.print("\n VEAMOS EL codigoItemCarrito :" + codigoItemCarrito + " costo " + costoN + " el id: " + id);
+		logger.error("\n VEAMOS EL codigoItemCarrito :" + codigoItemCarrito + " costo " + costoN + " el id: " + id);
 		String pathredirect = "/factura/listar/";
 		boolean cambiarcosto = false;
 		double totalnuevo = 0.0;
@@ -875,7 +875,7 @@ public class FacturaController {
 
 				}
 				if (cambiarcosto) {
-					System.out.print("\ncuantas veces paso" + totalnuevo);
+					logger.error("\ncuantas veces paso" + totalnuevo);
 					double totalnuevosin = totalnuevo / 1.13;
 					totalnuevo = (totalnuevosin > 113.00 & factura.getCliente().getCliente().getAgente())
 							? totalnuevo - (totalnuevosin * 0.01)
@@ -909,7 +909,7 @@ public class FacturaController {
 				String coddoc = fac.getCodigofactura();
 				for (CarritoItems carrito : fac.getCotizacion().getCarrito()) {
 					Producto pro = productoservice.findOne(carrito.getProductos().getId());
-					System.out.print("Elemento: " + pro.getNombrep() + "\n" + "Cantidad: " + carrito.getCantidad());
+					logger.error("Elemento: " + pro.getNombrep() + "\n" + "Cantidad: " + carrito.getCantidad());
 					pro.setStock(pro.getStock() + carrito.getCantidad());
 
 					// dejemos contancia antes
@@ -944,7 +944,7 @@ public class FacturaController {
 	@RequestMapping(value = "/statusChange", method = RequestMethod.POST)
 	public String finalizandoFactura(@RequestParam(name = "id") Long id, @RequestParam(name = "codigo") String codigo,
 			@RequestParam(name = "ndr") int ndr, RedirectAttributes flash) {
-		System.out.print("\n VEAMOS EL ID :" + codigo);
+		logger.error("\n VEAMOS EL ID :" + codigo);
 		String redirecpage = "redirect:/factura/listar/";
 		if (id > 0 && codigo != null) {
 			try {

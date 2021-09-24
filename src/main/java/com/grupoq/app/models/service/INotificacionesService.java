@@ -11,6 +11,7 @@ public interface INotificacionesService {
 
 	public List<Notificaciones> findTop15ByOrderByIdDesc();
 	public Page<Notificaciones> findAll(Pageable page);
+	public Page<Notificaciones> findByNombreContaining(Pageable page, String nombre);
 	public void save (Notificaciones notificaciones);
 	
 }

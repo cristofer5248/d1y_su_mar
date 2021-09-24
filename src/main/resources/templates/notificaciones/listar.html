@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+
 <head th:replace="layout/layout :: head"></head>
 <link rel='stylesheet prefetch'
 	href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
-<link rel='stylesheet prefetch'
-	href='https://fonts.googleapis.com/css?family=Roboto:100,300,400'>
+<link rel='stylesheet prefetch' href='https://fonts.googleapis.com/css?family=Roboto:100,300,400'>
 
 
 <link rel="stylesheet" th:href="@{/css/searchbar.css}" />
+
 <body>
 
 	<header th:replace="layout/layout :: header"></header>
@@ -19,10 +19,20 @@
 			<label class="h2" th:text="${titulo}"></label>
 			<div class="card-header"></div>
 			<div class="card-body">
-
+				<div class="card-title">
+					<a class="btn btn-primary btn-xs" style="color: white" th:if="${enablebtnall}"
+						th:href="@{/producto/listar}">Volver </a>
+					<form class="searchbox" id="formsearch" action="">
+						<input type="search" placeholder="Introducir parametro de busqueda......"
+							class="searchbox-input" onkeyup="buttonUp();" id="btn-search" required> <select
+							class="custom-select mr-sm-2" id="opcSearch" style="margin-left: 10px; height: 3.3em;">
+							<option value="nombre">Nombre</option>
+						</select> <input type="button" id="vamonos" class="searchbox-submit" value="GO"> <span
+							class="searchbox-icon">Buscar</span>
+					</form>
+				</div>
 				<div class="card-title"></div>
-				<table id="example"
-					class="table table-striped table-bordered table-sm">
+				<table id="example" class="table table-striped table-bordered table-sm">
 					<thead class="thead-inverse">
 						<tr>
 							<th>Descripcion</th>
@@ -35,7 +45,7 @@
 					<tbody>
 						<tr th:each="noti: ${notificaciones}">
 							<td><label th:class="${noti.icono}" th:style="'color:'+${noti.color}"></label><a
-								th:href="@{''+${noti.url}}" th:text="${noti.nombre}"></a></td>
+									th:href="@{''+${noti.url}}" th:text="${noti.nombre}"></a></td>
 							<td th:text="${#dates.format(noti.fecha, 'dd-MM-yyyy HH:mm:ss')}"></td>
 							<!-- <td	th:if="${#request.isUserInRole('ADMIN')} OR ${#request.isUserInRole('SELLER')}"><a
 								th:href="@{'/noti/nuevo/' + ${noti.idm}}">
@@ -60,15 +70,20 @@
 	</div>
 
 	<footer th:replace="layout/layout :: footer"></footer>
+	<script th:src="@{/js/searchbar.js}"></script>
+	<input type="hidden" id="urlenviar" th:value="@{/notificaciones/listar/}" />
 
 	<!-- 	<script th:src="@{/js/searchbargeneric.js}"></script> -->
-	<!-- <script>
-		$('#example').DataTable({
-			"paging" : false,
-
-			"searching" : true,
-			"info" : false
+	<script>
+		var datefilter = $('#datefilter');
+		datefilter.click(function () {
+			location.href = $("#urlenviar").val()+"/busqueda/";
+				+ $("#filterstart").val(); 
+				// "/" + $("#filterend").val()+ "/fechas";
+			console.log($("#urlenviar").val() + "/" + $("#filterstart").val()
+				+ "/" + $("#filterend").val() + "/fechas");
 		});
-	</script> -->
+	</script>
 </body>
+
 </html>

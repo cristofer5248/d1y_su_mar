@@ -32,7 +32,7 @@ public class JpaUserDetailsService implements UserDetailsService {
 		// TODO Auto-generated method stub
 		Usuario usuario = usuarioDao.findByUsername(username);
 		if (usuario == null) {
-			logger.error("No existe el usuario '" + username + "'");
+			//logger.error("No existe el usuario '" + username + "'");
 			throw new UsernameNotFoundException("Username " + username + "no existe en el sistema");
 		}
 		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
@@ -41,7 +41,7 @@ public class JpaUserDetailsService implements UserDetailsService {
 			authorities.add(new SimpleGrantedAuthority(role.getAuthority()));
 		}
 		if (authorities.isEmpty()) {
-			logger.error("Error en el login: usuario '" + username + "' no tiene roles asignados!");
+			//logger.error("Error en el login: usuario '" + username + "' no tiene roles asignados!");
 			throw new UsernameNotFoundException("Error en el login: usuario '" + username + "' no tiene roles asignados!");
 		}
 		return new User(usuario.getUsername(), usuario.getPassword(), usuario.getEnabled(), true, true, true,

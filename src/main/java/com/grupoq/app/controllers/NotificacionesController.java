@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,16 +32,19 @@ public class NotificacionesController {
 		return list;
 	}
 
-	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String listar(Model model,@RequestParam(name = "page", defaultValue = "0") int page) {
-//		List<Notificaciones> notificaciones = notificacionesService.findTop15ByOrderByIdDesc();
+	@RequestMapping(value = {"/","/listar/{op}/{nombrep}"}, method = RequestMethod.GET)
+	public String listar(Model model, @RequestParam(name = "page", defaultValue = "0") int page,
+			@PathVariable(value = "nombrep", required = false) String nombre) {
+		// List<Notificaciones> notificaciones =
+		// notificacionesService.findTop15ByOrderByIdDesc();
 		Pageable pageRequest = PageRequest.of(page, 30);
-		
-		Page<Notificaciones> notificaciones = notificacionesService.findAll(pageRequest);
-		
+
+		Page<Notificaciones> notificaciones = nombre == null ? notificacionesService.findAll(pageRequest)
+				: notificacionesService.findByNombreContaining(pageRequest, nombre);
+
 		PageRender<Notificaciones> pageRender = new PageRender<>("", notificaciones);
 		model.addAttribute("titulo", "Listado de movimientos actuales");
-		model.addAttribute("notificaciones", notificaciones);		
+		model.addAttribute("notificaciones", notificaciones);
 		model.addAttribute("page", pageRender);
 		return "/notificaciones/listar";
 	}

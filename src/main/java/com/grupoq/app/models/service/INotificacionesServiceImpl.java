@@ -33,5 +33,10 @@ public class INotificacionesServiceImpl implements INotificacionesService {
 		// TODO Auto-generated method stub
 		return notificacionesDao.findByOrderByIdDesc(page);
 	}
+
+	@Override
+	public Page<Notificaciones> findByNombreContaining(Pageable page, String nombre) {		
+		return notificacionesDao.findByNombreContainingAndOrderByIdDesc(page, nombre);
+	}
 	
 }

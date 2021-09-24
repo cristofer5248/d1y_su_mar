@@ -62,7 +62,7 @@ import org.slf4j.Logger;
 @SessionAttributes("producto")
 
 public class ProductoController {
-	//Logger logger = LoggerFactory.getLogger(ProductoController.class);
+	// Logger logger = LoggerFactory.getLogger(ProductoController.class);
 
 	@Autowired
 	private IProductoService productoService;
@@ -351,7 +351,13 @@ public class ProductoController {
 
 			if (producto.getPrecio() != precioold || producto.getProveedor() != preveedorold) {
 				productomodifyService.save(nuevamodificacion(producto, pro));
-				nuevaNotificacion("fas fa-box-open", "Producto '" + producto.getNombrep() + "' agregado o modificado",
+				String detalleprod = pro.getId() + ">" + pro.getCodigo() + ">" + pro.getBodega() + ">" + pro.getFecha()
+						+ ">" + pro.getMargen() + ">" + pro.getMinimo() + ">" + pro.getPrecio() + ">" + pro.getStock()
+						+ ">" + pro.getCategoria().getNombre() + ">" + pro.getMarca().getNombrem() + ">"
+						+ pro.getPresentacion().getDetalle() + ">" + pro.getProveedor().getNombre();
+						detalleprod = (detalleprod.length() > 100) ? detalleprod.substring(0, 50) : detalleprod;
+				nuevaNotificacion("fas fa-box-open",
+						"Producto '" + producto.getNombrep() + "' agregado o modificado. Datos: " ,
 						"/producto/ver/" + producto.getId(), "blue");
 				flash.addFlashAttribute("success", mensajeFlash);
 			}
@@ -370,7 +376,14 @@ public class ProductoController {
 		}
 
 		status.setComplete();
-		nuevaNotificacion("fas fa-box-open", "Producto '" + producto.getNombrep() + "' agregado o modificado",
+		String detalleprod = pro.getId() + ">" + pro.getCodigo() + ">" + pro.getBodega() + ">" + pro.getFecha() + ">"
+				+ pro.getMargen() + ">" + pro.getMinimo() + ">" + pro.getPrecio() + ">" + pro.getStock() + ">"
+				+ pro.getCategoria().getNombre() + ">" + pro.getMarca().getNombrem() + ">"
+				+ pro.getPresentacion().getDetalle() + ">" + pro.getProveedor().getNombre();
+				System.out.print(detalleprod);
+		detalleprod = (detalleprod.length() > 100) ? detalleprod.substring(0, 50) : detalleprod;
+		nuevaNotificacion("fas fa-box-open",
+				"Producto '" + producto.getNombrep() + "' agregado o modificado. Datos: ",
 				"/producto/ver/" + producto.getId(), "blue");
 		flash.addFlashAttribute("success", mensajeFlash);
 		return "redirect:/producto/listar";
@@ -399,7 +412,7 @@ public class ProductoController {
 			} catch (Exception e) {
 				System.out.print(e.getMessage());
 				e.printStackTrace();
-				//mailservice.sendEmailchris(e.toString(), "Error ProductoController");
+				// mailservice.sendEmailchris(e.toString(), "Error ProductoController");
 				flash.addFlashAttribute("error",
 						"El producto posiblemente tiene registros de inventariado, no se puede eliminar!");
 				return "redirect:/producto/listar";
@@ -422,10 +435,11 @@ public class ProductoController {
 
 				flash.addFlashAttribute("success", "Historial de Producto eliminado con éxito!");
 				nuevaNotificacion("fas fa-box-open", "Historial de Producto con ID'" + id + "' eliminado!", "#", "red");
-			} catch (Exception e) {				
+			} catch (Exception e) {
 				System.out.print(e.getMessage());
 				e.printStackTrace();
-				//mailservice.sendEmailchris(e.toString(), "Error ProductoController eliminando historial");
+				// mailservice.sendEmailchris(e.toString(), "Error ProductoController eliminando
+				// historial");
 				flash.addFlashAttribute("error",
 						"El producto posiblemente tiene registros de inventariado, no se puede eliminar!");
 				return "redirect:/producto/listar";

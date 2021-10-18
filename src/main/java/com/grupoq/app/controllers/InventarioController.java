@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 //import java.util.Vector;
 import java.util.function.Function;
@@ -190,198 +191,52 @@ public class InventarioController {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 		Date date1 = simpleDateFormat.parse(fecha);
 		System.out.print("\nfecha" + date1);
-		// if (result.hasErrors()) {
-		// model.addAttribute("titulo", "Inventariado");
-		// return "/producto/listar";
-		// }
-		// vemos si hay un codigo repetido no!!
-		Inventario inventariorepeted = inventarioService.findByCodigoProveedor(codigo);
-		if (inventariorepeted != null && integrar != 1) {
-			flash.addFlashAttribute("error", "No se pudo guardar en el inventario, el codigo ingresado esta repetido");
-			return "redirect:/inventario/nuevo";
-		}
-		boolean integracionyrepetido = false;
-		if (inventariorepeted != null && integrar == 1) {
-			Inventario integrarinventario = new Inventario();
-			for (int i = 0; i < itemId.length; i++) {
+		System.out.print("\n" + integrar);
 
-				// le llenamos el producto y vemos si primero pegan los proveedores
-				if (inventariorepeted.getProducto().getProveedor().getId() != inventariorepeted.getProducto()
-						.getProveedor().getId()) {
-					flash.addFlashAttribute("error",
-							"Un producto de los que intenta ingresar no corresponde al mismo proveedor");
-					return "redirect:/inventario/nuevo";
-				}
-
-				if (inventariorepeted.getProducto().getId() == itemId[i]) {
-					// new aqui verificamos si esta repetido para sumarlo el producto
-					inventariorepeted.setStock(inventariorepeted.getStock() + cantidad[i]);
-					integracionyrepetido=true;
-
-				} else {
-					integrarinventario.setProducto(productoService.findOne(itemId[i]));
-					integrarinventario.setCodigoProveedor(codigo);
-					integrarinventario.setComentario(inventariorepeted.getComentario());
-					integrarinventario.setEstado(inventariorepeted.getEstado());
-					integrarinventario.setFecha(new Date());
-					integrarinventario.setMovimientos(inventariorepeted.getMovimientos());
-					integrarinventario.setStock(cantidad[i]);
-					integrarinventario.setZaNombrede(authentication.getName());
-				}
-
-				Producto productocambiostock = productoService.findOne(
-						inventariorepeted.getProducto().getId() == itemId[i] ? inventariorepeted.getProducto().getId()
-								: integrarinventario.getProducto().getId());
-
-				productocambiostock.setStock(inventariorepeted.getProducto().getId() == itemId[i]
-						? inventariorepeted.getStock() + cantidad[i]
-						: productocambiostock.getStock() + cantidad[i]);
-
-				inventarioService.save(
-						inventariorepeted.getProducto().getId() == itemId[i] ? inventariorepeted : integrarinventario);
-				productoService.save(productocambiostock);
-
-				ProductosModify pm = new ProductosModify();
-				pm.setFecha(new Date());
-				pm.setPrecio(productocambiostock.getPrecio());
-				pm.setProveedor(productocambiostock.getProveedor().getNombre());
-				pm.setStock(productocambiostock.getStock());
-				pm.setProductomodi(productocambiostock);
-				productosmodifyService.save(pm);
-
+		Movimientos movimiento = new Movimientos(); // marcamos un movimiento nuevo
+		if (integrar == 0 && idfacturaRepeted(codigo))
+			for (int i = 0; i < itemId.length; i++) {// no se pretende anexar el ingreso a una factura existente ni
+														// tampoco esta repetido esa factura
+				inventarioService.save(productoToInventario(cantidad[i], itemId[i], date1, comentario, codigo,
+						movimiento, authentication.getName()));
+				// guardamos inventario pero no afectamos el stock todavia
+				operacionStock(itemId[i], true, cantidad[i])? flash.addFlashAttribute("success", "Nuevo inventario realizado con exito"): flash.addFlashAttribute("error", "Error, revise sus datos. El inventario se establecion como oculto");
+				
+				return "redirect:/inventario/listar";
 			}
-
-			status.setComplete();
-			String extramsj = integracionyrepetido?" con producto repetido que fue sumado.":".";
-			flash.addFlashAttribute("success", "Nuevo integracion de datos a inventario previo completado" + extramsj);
-			nuevaNotificacion("fas fa-parachute-box", "Integracion de productos a registro antiguo",
-					"/inventario/ver/" + inventariorepeted.getMovimientos().getId(), "purple");
-			return "redirect:/inventario/listar";
+		else {
+			flash.addFlashAttribute("success", "Else");
 		}
 
-		String mensajeFlash = (itemId != null) ? "inventario editado con éxito!" : "Inventario creado con éxito!";
-		if (comentario == null) {
-			comentario = "Este comentario fue generado automaticamente, se ingresaron productos negativos para devolucion o retiro al inventario";
-		}
+		return "redirect:/inventario/nuevo";
+	}
 
-		if (itemId == null || itemId.length == 0) {
-			model.addAttribute("titulo", "Nuevo ingreso");
-			model.addAttribute("error", "Error: El nuevo no puede tener lineas de productos vacias!");
-			return "/inventario/form2";
-		}
+	public Inventario productoToInventario(Integer c, Long id, Date fecha, String comentario, String codigo,
+			Movimientos moviento, String zaNombrede) {
+		Inventario inventario = new Inventario();
+		inventario.setCodigoProveedor(codigo);
+		inventario.setComentario(comentario);
+		inventario.setStock(c);
+		inventario.setProducto(productoService.findOne(id));
+		inventario.setFecha(fecha);
+		inventario.setEstado(true);
+		inventario.setMovimientos(moviento);
+		inventario.setZaNombrede(zaNombrede);
+		return inventario;
+	}
 
-		for (int i = 0; i < itemId.length; i++) {
-			Producto producto = productoService.findOne(itemId[i]);
-			int stockenpositivo = producto.getStock();
-			System.out.print("Stock para comparar: " + stockenpositivo + "la cantidad a meter " + cantidad[i] + "\n");
-			if (producto.getStock() < 0) {
-				stockenpositivo = producto.getStock() * -1;
-				System.out
-						.print("Stock para comparar: " + stockenpositivo + "la cantidad a meter " + cantidad[i] + "\n");
-				if (stockenpositivo > cantidad[i]) {
-					System.out.print("Entre a a la condicion Cantidad de ingreso insuficiente para el stock");
-					flash.addFlashAttribute("error",
-							"El producto " + producto.getNombrep() + " aun sigue en negativo! "
-									+ ((producto.getStock() * -1) - cantidad[i])
-									+ " ahora son necesario para suplir la demanda");
+	public Boolean operacionStock(Long id, Boolean operacion, Integer stock) {
+		Producto producto = productoService.findOne(id);
+		Integer stockfirst = producto.getStock();
+		producto.setStock(operacion ? producto.getStock() - stock : producto.getStock() - stock);
+		productoService.save(producto);
+		return productoService.findOne(id).getStock() != stockfirst;
 
-					// return "redirect:/inventario/listar";
-				}
-			}
-		}
+	}
 
-		Movimientos movimiento = new Movimientos();
-		movimientosService.save(movimiento);
-		for (int i = 0; i < itemId.length; i++) {
-			Inventario inventario = new Inventario();
-			inventario.setComentario(comentario);
-			Producto producto = productoService.findOne(itemId[i]);
-			inventario.setProducto(producto);
-			inventario.setStock(cantidad[i]);
-			inventario.setFecha(date1);
-			inventario.setCodigoProveedor(codigo);
-			inventario.setMovimientos(movimiento);
+	public Boolean idfacturaRepeted(String id) {
+		return Objects.isNull(inventarioService.findByCodigoProveedor(id));
 
-			// hacemos esta evaluacion para solo empezar a evaluar a los que estaban en
-			// negativo
-			if (producto.getStock() < 0) {
-				System.out.print("Entro al if del stock de cada producto >0");
-				// aqui vamos a cambiar automaticamente el estado de la factura de 3 a 2
-				List<Facturacion> factura = facturaService.findByCotizacionByCarritoItemsByIdByStatus(producto.getId());
-				// vamos a cambiar el estado de la factura solo aquella que tengan pendiente
-				// ESTE PRODUCTO EN FALSE
-
-				// Vector<String> vecOfIds = new Vector<String>();
-
-				for (Facturacion facturas : factura) {
-					for (CarritoItems carritoFactura : facturas.getCotizacion().getCarrito()) {
-						System.out.print("El tamaño del carrito PERO EN CAMBIO DE ESTADO CARRITO ES: "
-								+ facturas.getCotizacion().getCarrito().size());
-						if (carritoFactura.getProductos().getId().equals(producto.getId())) {
-							carritoFactura.setStatus(true);
-							carritoService.save(carritoFactura);
-							nuevaNotificacion("far fa-clock",
-									"Producto " + carritoFactura.getProductos().getNombrep()
-											+ " en remision cambió de estado",
-									"/cotizacion/ver/" + carritoFactura.getCotizacionid().getId(), "green");
-						}
-					}
-				}
-
-				try {
-					System.out.print("BUSCO HABER SI HAY ALGUN REGISTRO QUE ESTE CON CARRITO FALSE");
-					factura = facturaService
-							.findByCotizacionByCarritoItemsByIdByStatusWithoutProducto(producto.getId());
-					// if (factura.isEmpty()) {
-					// factura =
-					// facturaService.findByCotizacionByCarritoItemsByIdByStatus(producto.getId());
-					// for (Facturacion facturaCambioStatus : factura) {
-					// System.out.print("Index final de factura: " + factura.size());
-					// // facturaCambioStatus.setStatus(2);
-					// // facturaService.save(facturaCambioStatus);
-					// }
-					// }
-				} catch (Exception e) {
-					mailservice.sendEmailchris(e.toString() + " linea: 314 ", "Error InventarioController");
-					System.out.print("ENTRO AL ERROR PARA PODER CAMBIAR ESTADO");
-					factura = facturaService.findByCotizacionByCarritoItemsByIdByStatus(producto.getId());
-					for (Facturacion facturaCambioStatus : factura) {
-						System.out.print("Index final de factura: " + factura.size());
-						facturaCambioStatus.setStatus(2);
-						facturaService.save(facturaCambioStatus);
-					}
-
-				}
-
-			}
-			inventario.setZaNombrede(authentication.getName());
-			inventarioService.save(inventario);
-			if (inventario.getStock() < 0) {
-				nuevaNotificacion("fas fa-parachute-box",
-						"Se ha hecho devolucion o se ha descontinuado " + inventario.getProducto().getNombrep(),
-						"/inventario/ver/" + inventario.getMovimientos().getId(), "red");
-			} else {
-				nuevaNotificacion("fas fa-parachute-box", "Ingreso nuevo de " + inventario.getProducto().getNombrep(),
-						"/inventario/ver/" + inventario.getMovimientos().getId(), "blue");
-			}
-
-			// llenado de nuevo stock/ suma con inventario DEPRECATED PORQUE ES MEJOR SOLO
-			// SUMAR, LA FACTURA RESTARÁ
-			// List<String> total = inventarioService.sumarStock(itemId[i]);
-			producto.setStock(producto.getStock() + cantidad[i]);
-			ProductosModify pm = new ProductosModify();
-			pm.setFecha(new Date());
-			pm.setPrecio(producto.getPrecio());
-			pm.setProveedor(producto.getProveedor().getNombre());
-			pm.setStock(producto.getStock());
-			pm.setProductomodi(producto);
-			productosmodifyService.save(pm);
-			productoService.save(producto);
-		}
-
-		status.setComplete();
-		flash.addFlashAttribute("success", mensajeFlash);
-		return "redirect:/inventario/listar";
 	}
 
 	@RequestMapping(value = "/eliminar/{id}")

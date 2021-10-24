@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="layout/layout :: head"></head>
+
 <body>
 
 	<header th:replace="layout/layout :: header"></header>
@@ -12,20 +14,16 @@
 			<div class="card-body">
 
 				<div th:object="${inventario}" th:remove="tag">
-					<ul th:if="${#fields.hasErrors('*')}" class="alert alert-danger"
-						role="alert">
+					<ul th:if="${#fields.hasErrors('*')}" class="alert alert-danger" role="alert">
 						<li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
 					</ul>
 				</div>
 
-				<form th:action="@{/inventario/save}" method="post" id="carritoform"
-					enctype="multipart/form-data">
+				<form th:action="@{/inventario/save}" method="post" id="carritoform" enctype="multipart/form-data">
 					<div class="form-group row">
-						<label for="proveedor" class="col-sm-2 col-form-label"
-							th:text="Proveedor"></label>
+						<label for="proveedor" class="col-sm-2 col-form-label" th:text="Proveedor"></label>
 						<div class="col-sm-6">
-							<select id="cargar_proveedor" name="cargar_proveedor"
-								class="custom-select mr-sm-2">
+							<select id="cargar_proveedor" name="cargar_proveedor" class="custom-select mr-sm-2">
 							</select>
 						</div>
 					</div>
@@ -40,40 +38,36 @@
 						<label for="integrar" th:text="'Integrar a un documento'"
 							class="col-sm-2 col-form-label"></label>
 						<div class="col-sm-4">
-							<label class="switch"> <input type="checkbox"
-								onchange="integrarinput();" id="integrarcheck" /> <span
-								class="slider round"></span>
-							</label><input type="number" name="integrar" id="integrar"
-								style="visibility: hidden" />
+							<label class="switch"> <input type="checkbox" onchange="integrarinput();"
+									id="integrarcheck" /> <span class="slider round"></span>
+							</label><input type="number" name="integrar" id="integrar" style="visibility: hidden" />
 						</div>
 
 					</div>
 					<div class="form-group row">
 						<label for="fecha" class="col-sm-2 col-form-label">Fecha</label>
 						<div class="col-sm-6">
-							<input type="text" id="mydate" name="fecha" class="form-control"
-								required="required">
+							<input type="text" id="mydate" name="fecha" class="form-control" required="required">
 						</div>
 					</div>
 					<div class="form-group row">
 						<label for="cargar_producto" class="col-sm-2 col-form-label"
 							th:text="'Busqueda de Productos'"></label>
 						<div class="col-sm-6">
-							<input type="text" name="cargar_producto" id="cargar_producto"
-								class="form-control" disabled />
+							<input type="text" name="cargar_producto" id="cargar_producto" class="form-control"
+								disabled />
 						</div>
 					</div>
-					<div class="form-group row" style="visibility: hidden"
-						id="concepto">
+					<div class="form-group row" id="concepto">
 						<label for="fecha" class="col-sm-2 col-form-label">Concepto</label>
 						<div class="col-sm-6">
 							<input type="text" name="comentario" id="conceptotxt"
+								placeholder="Ocupe este apartado para poder ingresar algun comentario o ingresar el concepto"
 								class="form-control">
 						</div>
 					</div>
 					<table th:replace="inventario/plantilla-items.html ::itemsFactura"></table>
-					<table id="cargarItemProductos"
-						class="table table-sm-striped table-hover">
+					<table id="cargarItemProductos" class="table table-sm-striped table-hover">
 						<thead>
 							<tr>
 								<th>Nombre</th>
@@ -92,8 +86,7 @@
 					</h5>
 					<div class="form-group row">
 						<div class="col-sm-6">
-							<input type="submit" th:value="${titulo}" id="submit"
-								class="btn btn-secondary" disabled />
+							<input type="submit" th:value="${titulo}" id="submit" class="btn btn-secondary" disabled />
 						</div>
 					</div>
 				</form>
@@ -102,26 +95,24 @@
 	</div>
 
 	<footer th:replace="layout/layout :: footer"></footer>
-	<input type="hidden" id="urlAjaxproveedor"
-		th:value="@{/descuento/cargar_producto/}" />
-	<input type="hidden" id="urlAjaxproveedorselect"
-		th:value="@{/proveedor/cargar_proveedor}" />
+	<input type="hidden" id="urlAjaxproveedor" th:value="@{/descuento/cargar_producto/}" />
+	<input type="hidden" id="urlAjaxproveedorselect" th:value="@{/proveedor/cargar_proveedor}" />
 	<script>
 		$('#mydate').datepicker({
-			format : "yyyy-mm-dd"
+			format: "yyyy-mm-dd"
 		});
 	</script>
 	<script th:replace="inventario/js/autocomplete :: javascript"></script>
 	<script>
 		$('#integrar').val(0);
-		$(document).ready(function() {
+		$(document).ready(function () {
 			// Warning
-			$(window).on('beforeunload', function() {
+			$(window).on('beforeunload', function () {
 				return "Any changes will be lost";
 			});
 
 			// Form Submit
-			$(document).on("submit", "#carritoform", function(event) {
+			$(document).on("submit", "#carritoform", function (event) {
 				// disable warning
 				$(window).off('beforeunload');
 			});
@@ -136,4 +127,5 @@
 	</script>
 
 </body>
+
 </html>

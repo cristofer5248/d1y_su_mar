@@ -192,23 +192,66 @@ public class InventarioController {
 		Date date1 = simpleDateFormat.parse(fecha);
 		System.out.print("\nfecha" + date1);
 		System.out.print("\n" + integrar);
+		Boolean agregarStock = true;
 
-		Movimientos movimiento = new Movimientos(); // marcamos un movimiento nuevo
-		if (integrar == 0 && idfacturaRepeted(codigo))
+		// marcamos un movimiento nuevo
+		// (donde idfacturaRepeted devuelve true si esta vacio)
+		if (integrar == 0 && idfacturaRepeted(codigo)) {
+			Movimientos movimiento = new Movimientos();
+			movimientosService.save(movimiento);
 			for (int i = 0; i < itemId.length; i++) {// no se pretende anexar el ingreso a una factura existente ni
-														// tampoco esta repetido esa factura
+				// tampoco esta repetido esa factura
+				// guardamos inventario pero no afectamos el stock todavia
+				printinlog("Operacion de registro en inventario iniciada...\n");
 				inventarioService.save(productoToInventario(cantidad[i], itemId[i], date1, comentario, codigo,
 						movimiento, authentication.getName()));
-				// guardamos inventario pero no afectamos el stock todavia
-				operacionStock(itemId[i], true, cantidad[i])? flash.addFlashAttribute("success", "Nuevo inventario realizado con exito"): flash.addFlashAttribute("error", "Error, revise sus datos. El inventario se establecion como oculto");
-				
-				return "redirect:/inventario/listar";
+				printinlog("Completada la accion sin errores\n");
+				printinlog("Operacion de inventario que altera el stock iniciada...\n");
+				agregarStock = operacionStock(itemId[i], cantidad[i] > 0 ? true : false, cantidad[i]);
+				printinlog("Operacion exitosa...\n");
+
 			}
-		else {
+			flash.addFlashAttribute(agregarStock ? "success" : "error",
+					agregarStock ? "Nuevo inventario realizado con exito"
+							: "revise sus datos. El inventario se establecion como oculto");
+			return "redirect:/inventario/listar";
+		} else if (integrar == 1 && !idfacturaRepeted(codigo)) {
+			printinlog("Inciando la busqueda de la factura en inventario...\n");
+			List<Inventario> inventarioviejo = inventarioService.findByIdCodigoProveedor(codigo);
+			Movimientos movimientoviejo = inventarioviejo.get(0).getMovimientos();
+			printinlog("La busqueda arroja una factura con " + inventarioviejo.size()
+					+ " productos, Internamente, el movimiento es el numero " + movimientoviejo.getId()+"'\n");
+			flash.addFlashAttribute("success",
+					addWhenItprodIsAlreadyThere(inventarioviejo, itemId) ? "Si hay" : "NO HAY");
+			
+			
+			for (int i = 0; i < itemId.length; i++) {// se pretende anexar el ingreso a
+			//una factura existente // factura existente // guardamos inventario pero no
+			//afectamos el stock todavia
+			
+			 
+			inventarioService.save(productoToInventario(cantidad[i], itemId[i], date1,
+			comentario, codigo, movimientoviejo, authentication.getName())); // Operacion stock 
+			agregarStock = operacionStock(itemId[i], cantidad[i] > 0 ? true :
+			false, cantidad[i]); return "redirect:/inventario/nuevo"; }
+			 
+			return "redirect:/inventario/nuevo";
+		} else {
 			flash.addFlashAttribute("success", "Else");
 		}
 
 		return "redirect:/inventario/nuevo";
+	}
+
+	public Boolean addWhenItprodIsAlreadyThere(List<Inventario> inventarioOld, Long[] idps) {
+		//arreglar esto
+		for (Inventario inv : inventarioOld) {
+			for (int j = 0; j < idps.length; j++) {
+				// = inv.getProducto().getId().equals(idps[j]);
+				printinlog("Comparando id de movimiento: "+inv.getProducto().getId() +" y "+idps[j]+"\n");
+			}
+		}
+		return true;
 	}
 
 	public Inventario productoToInventario(Integer c, Long id, Date fecha, String comentario, String codigo,
@@ -217,18 +260,27 @@ public class InventarioController {
 		inventario.setCodigoProveedor(codigo);
 		inventario.setComentario(comentario);
 		inventario.setStock(c);
-		inventario.setProducto(productoService.findOne(id));
+		// imprimimos info del producto antes de guardar
+		Producto producto_temp = productoService.findOne(id);
+		inventario.setProducto(producto_temp);
 		inventario.setFecha(fecha);
 		inventario.setEstado(true);
 		inventario.setMovimientos(moviento);
 		inventario.setZaNombrede(zaNombrede);
+		printinlog("Producto:" + producto_temp.getNombrep() + " id:" + producto_temp.getId() + " Stock actual:"
+				+ producto_temp.getStock() + "\n");
+		
 		return inventario;
 	}
 
 	public Boolean operacionStock(Long id, Boolean operacion, Integer stock) {
 		Producto producto = productoService.findOne(id);
 		Integer stockfirst = producto.getStock();
-		producto.setStock(operacion ? producto.getStock() - stock : producto.getStock() - stock);
+		Integer stockoperacion = operacion ? stockfirst + stock : stockfirst - stock;
+		printinlog("Producto: " + producto.getNombrep() + " id:" + producto.getId() + " stock antes:" + stockfirst
+				+ " stock ahora:" + stockoperacion + "\n");
+
+		producto.setStock(stockoperacion);
 		productoService.save(producto);
 		return productoService.findOne(id).getStock() != stockfirst;
 
@@ -236,7 +288,6 @@ public class InventarioController {
 
 	public Boolean idfacturaRepeted(String id) {
 		return Objects.isNull(inventarioService.findByCodigoProveedor(id));
-
 	}
 
 	@RequestMapping(value = "/eliminar/{id}")
@@ -278,6 +329,7 @@ public class InventarioController {
 
 		model.put("inventarios", movimientos);
 		model.put("proveedor", movimientos.getInventario().get(0).getCodigoProveedor());
+		model.put("proveedor1", movimientos.getInventario().get(0).getProducto().getProveedor().getNombre());
 		model.put("comentario", movimientos.getInventario().get(0).getComentario());
 		model.put("fecha", movimientos.getInventario().get(0).getFecha());
 		model.put("codigopro", id);
@@ -312,5 +364,9 @@ public class InventarioController {
 		}
 		String macAddress = String.join("-", hexadecimal);
 		return macAddress;
+	}
+
+	public void printinlog(String texto) {
+		System.out.print(texto);
 	}
 }

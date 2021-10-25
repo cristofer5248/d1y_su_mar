@@ -3,7 +3,8 @@ package com.grupoq.app.controllers;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -79,6 +80,9 @@ public class InventarioController {
 	@Autowired
 	private IProductoModifyService productosmodifyService;
 
+	private List<Inventario> invenetarioOld = null;
+	protected final Log logger = LogFactory.getLog(this.getClass());
+
 	@RequestMapping(value = { "/listar", "/listar/{date1}/{date2}", "/listar/{codigo}" }, method = RequestMethod.GET)
 	public String listar(@PathVariable(value = "codigo", required = false) String codigo,
 			@PathVariable(value = "date1", required = false) String date1,
@@ -131,13 +135,6 @@ public class InventarioController {
 		model.addAttribute("page", pageRender);
 		model.addAttribute("enableallsearch", enableallsearch);
 		model.addAttribute("pathall", pathexcel);
-
-		// try {
-		// System.out.print(getClientIPAddress());
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
 		return "/inventario/listar";
 	}
 
@@ -217,59 +214,67 @@ public class InventarioController {
 			return "redirect:/inventario/listar";
 		} else if (integrar == 1 && !idfacturaRepeted(codigo)) {
 			printinlog("Inciando la busqueda de la factura en inventario...\n");
-			List<Inventario> inventarioviejo = inventarioService.findByIdCodigoProveedor(codigo);
-			Movimientos movimientoviejo = inventarioviejo.get(0).getMovimientos();
-			printinlog("La busqueda arroja una factura con " + inventarioviejo.size()
-					+ " productos, Internamente, el movimiento es el numero " + movimientoviejo.getId()+"'\n");
-			flash.addFlashAttribute("success",
-					addWhenItprodIsAlreadyThere(inventarioviejo, itemId) ? "Si hay" : "NO HAY");
-			
-			
+			invenetarioOld = inventarioService.findByIdCodigoProveedor(codigo);
+			Movimientos movimientoviejo = invenetarioOld.get(0).getMovimientos();
+			printinlog("La busqueda arroja una factura con " + invenetarioOld.size()
+					+ " productos, Internamente, el movimiento es el numero " + movimientoviejo.getId() + "'\n");
+
 			for (int i = 0; i < itemId.length; i++) {// se pretende anexar el ingreso a
-			//una factura existente // factura existente // guardamos inventario pero no
-			//afectamos el stock todavia
-			
-			 
-			inventarioService.save(productoToInventario(cantidad[i], itemId[i], date1,
-			comentario, codigo, movimientoviejo, authentication.getName())); // Operacion stock 
-			agregarStock = operacionStock(itemId[i], cantidad[i] > 0 ? true :
-			false, cantidad[i]); return "redirect:/inventario/nuevo"; }
-			 
-			return "redirect:/inventario/nuevo";
+				// una factura existente guardamos inventario pero no afectamos el stock todavia
+				inventarioService.save(productoToInventario(cantidad[i], itemId[i], date1, comentario, codigo,
+						movimientoviejo, authentication.getName())); // Operacion stock
+				agregarStock = operacionStock(itemId[i], cantidad[i] > 0 ? true : false, cantidad[i]);
+			}
+			flash.addFlashAttribute("success", "Integracion con exito");
+			return "redirect:/inventario/listar";
 		} else {
-			flash.addFlashAttribute("success", "Else");
+			flash.addFlashAttribute("success", "Revise sus datos porfavor");
 		}
 
 		return "redirect:/inventario/nuevo";
 	}
 
-	public Boolean addWhenItprodIsAlreadyThere(List<Inventario> inventarioOld, Long[] idps) {
-		//arreglar esto
-		for (Inventario inv : inventarioOld) {
-			for (int j = 0; j < idps.length; j++) {
-				// = inv.getProducto().getId().equals(idps[j]);
-				printinlog("Comparando id de movimiento: "+inv.getProducto().getId() +" y "+idps[j]+"\n");
+	public Inventario addWhenItprodIsAlreadyThere(Long idps) {
+		Inventario invold = null;
+		if (invenetarioOld != null) {
+			for (Inventario inv : invenetarioOld) {
+				printinlog("Comparando id de movimiento: " + inv.getProducto().getId() + " y " + idps + "\n");
+				invold = inv.getProducto().getId().equals(idps) ? inv : invold;
+				printinlog(inv.getProducto().getId().equals(idps)?"¡Se encontro coincidencia! -> Producto "+inv.getProducto().getNombrep()+"\n":"");
 			}
+		}else{
+			printinlog("No hay comparacion...");
 		}
-		return true;
+		return invold;
 	}
 
 	public Inventario productoToInventario(Integer c, Long id, Date fecha, String comentario, String codigo,
 			Movimientos moviento, String zaNombrede) {
-		Inventario inventario = new Inventario();
-		inventario.setCodigoProveedor(codigo);
-		inventario.setComentario(comentario);
-		inventario.setStock(c);
-		// imprimimos info del producto antes de guardar
-		Producto producto_temp = productoService.findOne(id);
-		inventario.setProducto(producto_temp);
-		inventario.setFecha(fecha);
-		inventario.setEstado(true);
-		inventario.setMovimientos(moviento);
-		inventario.setZaNombrede(zaNombrede);
-		printinlog("Producto:" + producto_temp.getNombrep() + " id:" + producto_temp.getId() + " Stock actual:"
-				+ producto_temp.getStock() + "\n");
-		
+		Inventario inventario = addWhenItprodIsAlreadyThere(id);
+		if (!Objects.isNull(inventario)) {
+			int stockold_temp = inventario.getStock();
+			inventario.setStock(stockold_temp + c);
+			inventario.setFecha(fecha);
+			printinlog("Producto:" + inventario.getProducto().getNombrep() + " id:" + inventario.getProducto().getId()
+					+ " Stock actual:" + inventario.getProducto().getStock() + "\n");
+			printinlog("Actualizando un registro de inventario...Cantidad anterior: " + stockold_temp
+					+ " Cantidad ahora:" + stockold_temp + c+"\n");
+		} else {
+			inventario = new Inventario();
+			inventario.setStock(c);
+			inventario.setFecha(fecha);
+			inventario.setCodigoProveedor(codigo);
+			inventario.setComentario(comentario);
+			// imprimimos info del producto antes de guardar
+			Producto producto_temp = productoService.findOne(id);
+			inventario.setProducto(producto_temp);
+			inventario.setEstado(true);
+			inventario.setMovimientos(moviento);
+			inventario.setZaNombrede(zaNombrede);
+
+			printinlog("Producto:" + producto_temp.getNombrep() + " id:" + producto_temp.getId() + " Stock actual:"
+					+ producto_temp.getStock() + "\n");
+		}
 		return inventario;
 	}
 
@@ -279,11 +284,25 @@ public class InventarioController {
 		Integer stockoperacion = operacion ? stockfirst + stock : stockfirst - stock;
 		printinlog("Producto: " + producto.getNombrep() + " id:" + producto.getId() + " stock antes:" + stockfirst
 				+ " stock ahora:" + stockoperacion + "\n");
-
 		producto.setStock(stockoperacion);
 		productoService.save(producto);
+		addProductomodify(producto, new Date(), producto.getPrecio(), producto.getProveedor().getNombre(),
+				stockoperacion);
 		return productoService.findOne(id).getStock() != stockfirst;
 
+	}
+
+	public void addProductomodify(Producto producto, Date fecha, Double precio, String proveedor, int stock) {
+		ProductosModify pm = new ProductosModify();
+		printinlog("Iniciando el ingreso al historial de productos...| PRODUCTO: " + producto.getNombrep()
+				+ "|Ultimo stock: " + stock + "\n");
+		pm.setFecha(fecha);
+		pm.setPrecio(precio);
+		pm.setProductomodi(producto);
+		pm.setProveedor(proveedor);
+		pm.setStock(stock);
+		printinlog("Ingreso completo al historial de productos...\n");
+		productosmodifyService.save(pm);
 	}
 
 	public Boolean idfacturaRepeted(String id) {
@@ -297,12 +316,16 @@ public class InventarioController {
 			Inventario inventarioTemp = inventarioService.findById(id);
 			if (inventarioTemp != null) {
 				int stockDeInventario = inventarioTemp.getStock();
-				System.out.print("Codigo para eliminar de inventario /n " + stockDeInventario);
+				System.out.print("Codigo para eliminar de inventario \n" + stockDeInventario);
 				// Producto productoTemp = inventarioTemp.getProducto();
 				// int stockTemp = productoTemp.getStock() - stockDeInventario;
 				// productoTemp.setStock(stockTemp);
 				// productoService.save(productoTemp);
 				inventarioService.delete(id);
+				Integer stockold = inventarioTemp.getStock();
+				operacionStock(inventarioTemp.getProducto().getId(), false, stockold);
+				addProductomodify(inventarioTemp.getProducto(), new Date(), inventarioTemp.getProducto().getPrecio(),
+						inventarioTemp.getProducto().getProveedor().getNombre(), stockold + inventarioTemp.getProducto().getStock());
 				flash.addFlashAttribute("success", "Inventariado eliminado con éxito!");
 			}
 		}
@@ -368,5 +391,6 @@ public class InventarioController {
 
 	public void printinlog(String texto) {
 		System.out.print(texto);
+		logger.debug(texto);
 	}
 }

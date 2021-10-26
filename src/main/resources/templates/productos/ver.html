@@ -55,7 +55,7 @@
 					<li class="list-group-item" th:text="'Proveedor:    '+${producto.proveedor.nombre}"></li>
 					<li class="list-group-item" th:text="'Marca:    '+${producto.marca.nombrem}"></li>
 					<li class="list-group-item"
-						th:text="'Costo unitario: $' +${#numbers.formatDecimal(producto.precio, 0, 'COMMA', 2, 'POINT')}">
+						th:text="'Costo unitario: $' +${producto.precio}">
 					</li>
 					<li class="list-group-item" th:text="'Margen:    '+${producto.margen}+'%'"></li>
 					<li class="list-group-item" th:text="'Precio de venta:  $'+${precioventa}"></li>
@@ -95,7 +95,7 @@
 											th:with="df=#{date.format}">
 											<td th:text="${#calendars.format(productosmodify_.fecha,df)}"></td>
 											<td
-												th:text="${#numbers.formatDecimal(productosmodify_.precio, 0, 'COMMA', 2, 'POINT')}">
+												th:text="${productosmodify_.precio}">
 											</td>
 											<td th:text="${productosmodify_.proveedor}"></td>
 											<td th:text="${productosmodify_.stock}"></td>

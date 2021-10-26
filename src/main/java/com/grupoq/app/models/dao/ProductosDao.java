@@ -13,13 +13,13 @@ import com.grupoq.app.models.entity.Producto;
 
 public interface ProductosDao extends PagingAndSortingRepository<Producto, Long> {
 	//@Query("select p from Producto p join fetch p.proveedor prv join fetch p.marca m join fetch p.presentacion pre where p.nombrep like %?1%")
-	@Query(value = "select * from productos p inner join marca m on p.marca_idm=m.idm inner join categorias c on p.categoria_id=c.id inner join proveedor prov on p.proveedor_id=prov.id inner join presentacion pre on p.presentacion_id=pre.id where p.nombrep like %?1% order by p.nombrep like ?2% desc", nativeQuery =true)
+	@Query(value = "select * from productos p inner join marca m on p.marca_idm=m.idm inner join categorias c on p.categoria_id=c.id inner join proveedor prov on p.proveedor_id=prov.id inner join presentacion pre on p.presentacion_id=pre.id where p.nombrep like %?1% and p.status!=0 order by p.nombrep like ?2% desc", nativeQuery =true)
 	public List<Producto> findByNombrep(String term, String term2);
 
 	@Query(value = "(select p.idp,p.nombrep,p.minimo,f.create_at, p.stock from facturacion f inner join carrito_items c on f.cotizacion_id=c.id inner join productos p on c.productos_idp=p.idp where p.stock<p.minimo group by p.idp)union (select p2.idp, p2.nombrep,p2.minimo, i.create_at,p2.stock from inventario i inner join productos p2 on i.producto_idp=p2.idp where p2.stock<p2.minimo group by p2.idp)", nativeQuery =true)
 	public List<Object[]> findByMinimo();
 	
-	@Query("select p from Producto p join fetch p.proveedor prv join fetch p.marca m join fetch p.presentacion pre where p.nombrep like %?1% and m.nombrem like %?2%")
+	@Query("select p from Producto p join fetch p.proveedor prv join fetch p.marca m join fetch p.presentacion pre where p.nombrep like %?1% and p.status!=0 and  p.status=true and m.nombrem like %?2%")
 	public List<Producto> findByNombrepYMarca(String term, String term2);
 	
 	@Query(value = "select p from Producto p join fetch p.proveedor prv join fetch p.marca m join fetch p.presentacion pre where p.nombrep like %?1% and m.nombrem like %?2%", countQuery = "select count(p) from Producto p join p.proveedor prv join p.marca m join p.presentacion pre where p.nombrep like %?1% and m.nombrem like %?2%")

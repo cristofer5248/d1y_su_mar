@@ -73,11 +73,12 @@
 								<th id="thproveedor">Proveedor</th>
 								<th>Unidad</th>
 								<th>Stock</th>
-								<th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV','ROLE_JEFEADM')">OP</th>
+								<th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV','ROLE_JEFEADM')">A/D</th>
 								<!--descuentos es arriba -->
-								<th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV','ROLE_JEFEADM')">OP</th>
-								<th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV')">OP</th>
-								<th>OP</th>
+								<th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV','ROLE_JEFEADM')">E</th>
+								<th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV')">E</th>
+								<th>B</th>
+								<th>O</th>
 							</tr>
 						</thead>
 						<tbody id="trtable">
@@ -89,7 +90,7 @@
 											th:text="${producto.id}"></a></td>
 									<td class="tddata" th:text="${producto.codigo}"></td>
 									<td class="tddata" th:text="${producto.nombrep}"></td>
-									<td class="tddata" th:text="'$'+${#numbers.formatDecimal(producto.precio, 0, 'COMMA', 2, 'POINT')}"></td>
+									<td class="tddata" th:text="'$'+${producto.precio}"></td>
 									<td class="tddata" th:text="${producto.marca.nombrem}"></td>
 									<td class="tddata" th:text="${producto.bodega}"></td>
 									<td class="tddata" th:text="${producto.categoria.nombre}"></td>
@@ -144,7 +145,16 @@
 											</button>
 										</div>
 									</td>
-
+									<td sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV','ROLE_JEFEADM')"><a
+											th:href="@{/producto/ocultar/} + ${producto.id}"
+											onclick="return confirm('¿Esta seguro?');">
+											<div class='icon'>
+												<i class='fa fa-eye-slash'></i>
+											</div>
+											<div class="text delete" style="position: absolute;">
+												<span>Ocultar/Aparecer</span>
+											</div>
+										</a></td>
 
 								</tr>
 						</tbody>
@@ -208,7 +218,7 @@
 											<th width="100">FECHA</th>
 										</tr>
 									</thead>
-									<tbody>									
+									<tbody>
 										<tr th:each="producto: ${minimum}">
 											<td><a th:href="@{/producto/ver/} + ${producto[0]}"><i
 														class="fas fa-solid fa-eye"></i></a>
@@ -306,7 +316,7 @@
 		$(document).ready(function () {
 			$('#minimumtable').DataTable({
 				"paging": true,
-				"order": [ 4, "desc" ],
+				"order": [4, "desc"],
 				"searching": true,
 				"info": false
 			});

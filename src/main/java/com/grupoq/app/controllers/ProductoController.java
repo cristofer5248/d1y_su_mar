@@ -233,7 +233,7 @@ public class ProductoController {
 		productos = productoService.findAllJoinFalse(pageRequest);
 
 		PageRender<Producto> pageRender = new PageRender<>("listarS", productos);
-		model.addAttribute("titulo", "Listado de solicitud de productos");
+		model.addAttribute("titulo", "Listado productos solicitados o que han sido ocultos");
 		model.addAttribute("enablebtnall", true);
 		model.addAttribute("productos", productos);
 		model.addAttribute("page", pageRender);
@@ -355,9 +355,9 @@ public class ProductoController {
 						+ ">" + pro.getMargen() + ">" + pro.getMinimo() + ">" + pro.getPrecio() + ">" + pro.getStock()
 						+ ">" + pro.getCategoria().getNombre() + ">" + pro.getMarca().getNombrem() + ">"
 						+ pro.getPresentacion().getDetalle() + ">" + pro.getProveedor().getNombre();
-						detalleprod = (detalleprod.length() > 100) ? detalleprod.substring(0, 50) : detalleprod;
+				detalleprod = (detalleprod.length() > 100) ? detalleprod.substring(0, 50) : detalleprod;
 				nuevaNotificacion("fas fa-box-open",
-						"Producto '" + producto.getNombrep() + "' agregado o modificado. Datos: " ,
+						"Producto '" + producto.getNombrep() + "' agregado o modificado. Datos: ",
 						"/producto/ver/" + producto.getId(), "blue");
 				flash.addFlashAttribute("success", mensajeFlash);
 			}
@@ -380,10 +380,9 @@ public class ProductoController {
 				+ pro.getMargen() + ">" + pro.getMinimo() + ">" + pro.getPrecio() + ">" + pro.getStock() + ">"
 				+ pro.getCategoria().getNombre() + ">" + pro.getMarca().getNombrem() + ">"
 				+ pro.getPresentacion().getDetalle() + ">" + pro.getProveedor().getNombre();
-				System.out.print(detalleprod);
+		System.out.print(detalleprod);
 		detalleprod = (detalleprod.length() > 100) ? detalleprod.substring(0, 50) : detalleprod;
-		nuevaNotificacion("fas fa-box-open",
-				"Producto '" + producto.getNombrep() + "' agregado o modificado. Datos: ",
+		nuevaNotificacion("fas fa-box-open", "Producto '" + producto.getNombrep() + "' agregado o modificado. Datos: ",
 				"/producto/ver/" + producto.getId(), "blue");
 		flash.addFlashAttribute("success", mensajeFlash);
 		return "redirect:/producto/listar";
@@ -623,6 +622,19 @@ public class ProductoController {
 		presentacionservice.save(presentacion);
 		return presentacion.getId();
 
+	}
+
+	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })
+	@RequestMapping(value = "/ocultar/{id}")
+	public String ocultar(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
+		Producto actualprod = productoService.findOne(id);
+		actualprod.setStatus(actualprod.isStatus()?false:true);
+		productoService.save(actualprod);
+		nuevaNotificacion("fas fa-tools", "El producto se ha ocultado" + actualprod.getNombrep(),
+				"/producto/ver/" + id, "brown");
+
+		flash.addFlashAttribute("success", "Accion de ocultar exitosa");
+		return "redirect:/producto/listarS";
 	}
 
 	public void nuevaNotificacion(String icono, String nombre, String url, String color) {

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <meta charset="UTF-8">
+
 <head th:replace="layout/layout :: head"></head>
 <link rel="stylesheet" th:href="@{/css/tbwoborder.css}" />
 <meta charset="UTF-8">
+
 <body>
 
 	<header th:replace="layout/layout :: header"></header>
@@ -32,26 +33,22 @@
 					<!-- 						th:href="@{'/taller/form/' + ${producto.id}}" -->
 					<!-- 						th:text="'Nuevo requerimiento'"></a> -->
 					<a class="btn btn-primary btn-xs" href="javascript: history.go(-1)"><i
-						class="fas fa-arrow-left"></i> Volver </a> <a
-						class="btn btn-danger btn-xs"
+							class="fas fa-arrow-left"></i> Volver </a> <a class="btn btn-danger btn-xs"
 						th:href="@{/factura/eliminar/}+${codigofa}"
 						sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_FACT','ROLE_JEFEADM')"
 						onclick="return confirm('Estas seguro que quieres eliminar?');">
 						<i class="far fa-trash-alt"></i>
-					</a> <a class="btn btn-primary btn-xs"
-						th:href="@{/factura/editar/}+${codigofa}"
+					</a> <a class="btn btn-primary btn-xs" th:href="@{/factura/editar/}+${codigofa}"
 						sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_FACT','ROLE_JEFEADM')">
 						<i class="fas fa-edit"></i>
-					</a> <a class="btn btn-success btn-xs"
-						th:if="${facturaciones.status==3}"
+					</a> <a class="btn btn-success btn-xs" th:if="${facturaciones.status==3}"
 						th:href="@{/factura/checkstock/}+${codigofa}"
 						sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_FACT','ROLE_JEFEADM')"
 						th:text="'Evaluar existencias'"></a> <a
 						th:if="${facturaciones.status==2 || facturaciones.status==1 || facturaciones.status==4 }"
-						class="btn btn-success btn-xs" data-toggle="modal"
-						data-target="#exampleModal2" style="color: white;"
-						sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_FACT')"
-						onclick="meterid();" th:text="'Procesar'"></a>
+						class="btn btn-success btn-xs" data-toggle="modal" data-target="#exampleModal2"
+						style="color: white;" sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_FACT')" onclick="meterid();"
+						th:text="'Procesar'"></a>
 
 
 				</h4>
@@ -61,14 +58,12 @@
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title">PROCESAR REMISIÓN</h5>
-								<button type="button" class="close" data-dismiss="modal"
-									aria-label="Close">
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 									<span aria-hidden="true">&times;</span>
 								</button>
 							</div>
 							<div class="modal-body">
-								<form id="statuschangeform"
-									th:action="@{/factura/statusChange/}" method="post">
+								<form id="statuschangeform" th:action="@{/factura/statusChange/}" method="post">
 									<div class="form-group">
 										<input id="idinput" type="hidden" name="id" /> <label>Codigo
 											unico de remisión:</label> <input id="codigoinput" type="text"
@@ -88,8 +83,7 @@
 							<div class="modal-footer">
 								<button type="submit" class="btn btn-primarm yhgy"
 									onclick="cambiarcodigo()">Enviar</button>
-								<button type="button" class="btn btn-secondary"
-									data-dismiss="modal">Cerrar</button>
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
 							</div>
 						</div>
 					</div>
@@ -97,56 +91,42 @@
 
 				<ul class="list-group">
 					<li id="idli" class="list-group-item active" th:text="${codigofa}"></li>
-					<li th:if="${facturaciones.status==1}" class="list-group-item"
-						style="color: green" th:text="'Estado :    APROBADO'"></li>
-					<li th:if="${facturaciones.status==3}" class="list-group-item"
-						style="color: red"
+					<li th:if="${facturaciones.status==1}" class="list-group-item" style="color: green"
+						th:text="'Estado :    APROBADO'"></li>
+					<li th:if="${facturaciones.status==3}" class="list-group-item" style="color: red"
 						th:text="'Estado :    EN ESPERA (Stock insuficiente)'"></li>
-					<li th:if="${facturaciones.status==2}" class="list-group-item"
-						style="color: #F05E23"
+					<li th:if="${facturaciones.status==2}" class="list-group-item" style="color: #F05E23"
 						th:text="'Estado :    EN ESPERA a facturacion'"></li>
-					<li th:if="${facturaciones.status==4}" class="list-group-item"
-						style="color: blue" th:text="'Estado :    Como nota de remision'"></li>
-					<li th:if="${facturaciones.status==5}" class="list-group-item"
-						style="color: red"
+					<li th:if="${facturaciones.status==4}" class="list-group-item" style="color: blue"
+						th:text="'Estado :    Como nota de remision'"></li>
+					<li th:if="${facturaciones.status==5}" class="list-group-item" style="color: red"
 						th:text="'Estado :    Anulada con codigo: '+${correlativo}"></li>
-					<li th:if="${facturaciones.status==5}" class="list-group-item"><a
-						class="btn btn-danger"
-						th:href="@{'/notadecredito/verb/'}+ ${facturaciones.codigofactura}"
-						th:text="'VER NOTA DE CREDITO'">></a></li>
-					<li class="list-group-item"
-						th:text="'Factura con correlativo:    '+${correlativo}"></li>
-					<li class="list-group-item"
-						th:text="'Cliente: '+  ${facturaciones.cliente.cliente.nombre}"></li>
-					<li class="list-group-item"
-						th:text="'NIT: '+  ${facturaciones.cliente.cliente.dui}"></li>
-					<li class="list-group-item"
-						th:text="'Giro: '+  ${facturaciones.cliente.cliente.giro.detalles}"></li>
-					<li class="list-group-item"
-						th:text="'Direccion: '+  ${facturaciones.cliente.direcciones.nombre}"></li>
-					<li class="list-group-item"
-						th:text="'A cuenta de: '+  ${facturaciones.aCuentade.username}"></li>
-					<li class="list-group-item"
-						th:text="'Factura : '+  ${facturaciones.tipoFactura.nombre}"></li>
-					<li class="list-group-item"
-						th:text="'Pago: ' +${facturaciones.condicionesDPago.nombre}"></li>
+					<li th:if="${facturaciones.status==5}" class="list-group-item"><a class="btn btn-danger"
+							th:href="@{'/notadecredito/verb/'}+ ${facturaciones.codigofactura}"
+							th:text="'VER NOTA DE CREDITO'">></a></li>
+					<li class="list-group-item" th:text="'Factura con correlativo:    '+${correlativo}"></li>
+					<li class="list-group-item" th:text="'Cliente: '+  ${facturaciones.cliente.cliente.nombre}"></li>
+					<li class="list-group-item" th:text="'NIT: '+  ${facturaciones.cliente.cliente.dui}"></li>
+					<li class="list-group-item" th:text="'Giro: '+  ${facturaciones.cliente.cliente.giro.detalles}">
+					</li>
+					<li class="list-group-item" th:text="'Direccion: '+  ${facturaciones.cliente.direcciones.nombre}">
+					</li>
+					<li class="list-group-item" th:text="'A cuenta de: '+  ${facturaciones.aCuentade.username}"></li>
+					<li class="list-group-item" th:text="'Factura : '+  ${facturaciones.tipoFactura.nombre}"></li>
+					<li class="list-group-item" th:text="'Pago: ' +${facturaciones.condicionesDPago.nombre}"></li>
 					<!-- 					<li class="list-group-item" -->
 					<!-- 						th:text="'Pago: ' +${facturaciones.formadepago.nombre}"></li> -->
-					<li class="list-group-item"
-						th:text="'Fecha: ' +${facturaciones.cotizacion.fecha}"></li>
+					<li class="list-group-item" th:text="'Fecha: ' +${facturaciones.cotizacion.fecha}"></li>
 
 					<li class="list-group-item" style="font-weight: bold"
 						th:text="'COMENTARIO: ' +${facturaciones.detalles}"></li>
-					<li class="list-group-item"
-						sec:authorize="hasAnyRole('ROLE_ADMIN')"
+					<li class="list-group-item" sec:authorize="hasAnyRole('ROLE_ADMIN')"
 						th:text="'Status en tabla cotizacion: ' +${facturaciones.cotizacion.aprobado}"></li>
-					<li class="list-group-item"
-						sec:authorize="hasAnyRole('ROLE_ADMIN')"
+					<li class="list-group-item" sec:authorize="hasAnyRole('ROLE_ADMIN')"
 						th:text="'Status en tabla cotizacion: ' +${facturaciones.status}"></li>
-					<li class="btn-warning"><a
-						class="list-group-item btn btn-warning"
-						th:text="'VER CARRITO DE ITEMS'" style="background-color: orange"
-						th:href="@{'/cotizacion/ver/'+${carritoid}+'/'+${codigofa}}"></a></li>
+					<li class="btn-warning"><a class="list-group-item btn btn-warning" th:text="'VER CARRITO DE ITEMS'"
+							style="background-color: orange"
+							th:href="@{'/cotizacion/ver/'+${carritoid}+'/'+${codigofa}}"></a></li>
 				</ul>
 
 				<!-- <div th:if="${#lists.isEmpty(factura)}"
@@ -178,31 +158,27 @@
 						<tbody>
 							<tr th:each="carritos: ${facturaciones.cotizacion.carrito}">
 								<td th:text="${facturaciones.id}"></td>
-								<td><a
-									th:href="@{/cotizacion/ver/} + ${carritos.cotizacionid.id}"
-									title="Aqui puedes ir directamente a la cotizacion nada mas"
-									class="btn btn-warning" target="_blank"
-									style="visibility: hidden"
-									th:text="${carritos.cotizacionid.id}"></a></td>
-								<td><a
-									th:href="@{/producto/ver/} + ${carritos.productos.id}"
-									title="Aqui puedes ir directamente a ver el producto"
-									class="btn btn-warning" target="_blank" style="font-size: 10px"
-									th:text="${carritos.productos.id}"></a></td>
+								<td><a th:href="@{/cotizacion/ver/} + ${carritos.cotizacionid.id}"
+										title="Aqui puedes ir directamente a la cotizacion nada mas"
+										class="btn btn-warning" target="_blank" style="visibility: hidden"
+										th:text="${carritos.cotizacionid.id}"></a></td>
+								<td><a th:href="@{/producto/ver/} + ${carritos.productos.id}"
+										title="Aqui puedes ir directamente a ver el producto" class="btn btn-warning"
+										target="_blank" style="font-size: 10px" th:text="${carritos.productos.id}"></a>
+								</td>
 								<td th:text="${carritos.productos.nombrep}"></td>
 								<td th:text="${carritos.productos.proveedor.nombre}"></td>
 								<td th:text="${carritos.productos.marca.nombrem}"></td>
-								<td th:text="'$'+${#numbers.formatDecimal(carritos.productos.precio, 0, 'COMMA', 2, 'POINT')}"></td>
-								<td th:text="${carritos.margen}+'%'"></td>
-								<!-- 								<td	th:text="'$'+${#numbers.formatDecimal(((carritos.productos.precio)/((100-carritos.margen)/100)),0,'COMMA',3,'POINT')}"></td> -->
 								<td
-									th:text="'$'+${#numbers.formatDecimal((carritos.precio),0,'COMMA',3,'POINT')}"></td>
-								<td th:if="${carritos.descuento<1}"
-									th:text="${carritos.descuento*100}+'%'"></td>
+									th:text="'$'+${carritos.productos.precio}">
+								</td>yyy
+								<td th:text="${carritos.margen}+'%'"></td>
+								<!-- 								<td	th:text="'$'+${((carritos.productos.precio)/((100-carritos.margen)/100)),0,'COMMA',3,'POINT')}"></td> -->
+								<td th:text="'$'+${(carritos.precio)}"></td>
+								<td th:if="${carritos.descuento<1}" th:text="${carritos.descuento*100}+'%'"></td>
 								<td th:if="${carritos.descuento==1}" th:text="'NO'"></td>
 								<td th:text="${carritos.cantidad}"></td>
-								<td
-									th:text="${#numbers.formatDecimal((carritos.precio*1.13*carritos.cantidad),0, 'COMMA', 3, 'POINT')}"></td>
+								<td th:text="${(carritos.precio*1.13*carritos.cantidad)}"></td>
 								<!-- 								<td sec:authorize="hasAnyRole('ROLE_ADMIN')" -->
 								<!-- 									th:text="${carritos.status}"></td> -->
 								<td th:text="${carritos.productos.stock}"></td>
@@ -229,8 +205,7 @@
 	</div>
 
 	<footer th:replace="layout/layout :: footer"></footer>
-	<input type="hidden" id="urlenviar"
-		th:value="@{/factura/statusChange/}" />
+	<input type="hidden" id="urlenviar" th:value="@{/factura/statusChange/}" />
 	<script>
 		function enviarcodigo() {
 
@@ -240,7 +215,7 @@
 		function cambiarAction() {
 
 			$('#statuschangeform').attr('action',
-					$("#urlenviar").val() + $("#codigoinput").val());
+				$("#urlenviar").val() + $("#codigoinput").val());
 		}
 		function meterid() {
 
@@ -261,38 +236,38 @@
 	</script>
 	<script th:inline="javascript" th:if="${!activePivot}">
 		$('#carrito').DataTable({
-			"paging" : false,
+			"paging": false,
 
-			"searching" : false,
-			"info" : false
+			"searching": false,
+			"info": false
 		});
 	</script>
 	<script th:inline="javascript" th:if="${activePivot}">
 		$('#carrito').DataTable(
-				{
-					"paging" : false,
+			{
+				"paging": false,
 
-					"searching" : false,
-					"info" : false,
-					rowGroup : {
-						startRender : null,
-						endRender : function(rows, group) {
-							var salaryAvg = rows.data().pluck(11).reduce(
-									function(a, b) {
-										return parseFloat(a) + parseFloat(b);
-									});
+				"searching": false,
+				"info": false,
+				rowGroup: {
+					startRender: null,
+					endRender: function (rows, group) {
+						var salaryAvg = rows.data().pluck(11).reduce(
+							function (a, b) {
+								return parseFloat(a) + parseFloat(b);
+							});
 
-							return $('<tr/>').append(
-									'<td colspan="11" class="totalclass">Cotizacion: '
-											+ group + '</td>')
+						return $('<tr/>').append(
+							'<td colspan="11" class="totalclass">Cotizacion: '
+							+ group + '</td>')
 
 							.append(
-									'<td class="totalclass">' + salaryAvg
-											+ '</td>');
-						},
-						dataSrc : 1
-					}
-				});
+								'<td class="totalclass">' + salaryAvg
+								+ '</td>');
+					},
+					dataSrc: 1
+				}
+			});
 	</script>
 	<script>
 		function cambiarcodigo() {
@@ -304,4 +279,5 @@
 	</script>
 
 </body>
+
 </html>

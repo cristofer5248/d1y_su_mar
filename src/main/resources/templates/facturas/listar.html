@@ -121,7 +121,7 @@
 								
 								
 							<td
-								th:text="'$'+${#numbers.formatDecimal(factura.ventastotales,0, 'COMMA', 2, 'POINT')}"></td>
+								th:text="'$'+${factura.ventastotales}"></td>
 							<!-- 								th:text="${factura.totaRegistrado}"></td> -->
 							<!-- 							<td
 								th:if="${#request.isUserInRole('SELLER')}"><a

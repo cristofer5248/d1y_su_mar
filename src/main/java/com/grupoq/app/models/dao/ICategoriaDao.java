@@ -10,4 +10,5 @@ public interface ICategoriaDao extends CrudRepository<Categoria,Long> {
 
 	public List<Categoria> findByNombreStartsWith(String nombre);
 	public Categoria findByNombre(String nombre);
+	public List<Categoria> findAllByOrderByNombreAsc();
 }

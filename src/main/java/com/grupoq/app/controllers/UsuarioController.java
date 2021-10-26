@@ -6,8 +6,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+//import org.apache.commons.logging.Log;
+//import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -42,7 +42,7 @@ import com.grupoq.app.util.paginator.PageRender;
 @RequestMapping("/user")
 @SessionAttributes("usuario")
 public class UsuarioController {
-	protected final Log logger = LogFactory.getLog(this.getClass());
+	//protected final Log logger = LogFactory.getLog(this.getClass());
 
 	@Autowired
 	private IUsuarioService usuarioService;
@@ -60,7 +60,7 @@ public class UsuarioController {
 			Authentication authentication, HttpServletRequest request) {
 
 		if (authentication != null) {
-			logger.info("Hola usuario autenticado, tu username es: ".concat(authentication.getName()));
+			//logger.info("Hola usuario autenticado, tu username es: ".concat(authentication.getName()));
 		}
 
 //		Authentication auth = SecurityContextHolder.getContext().getAuthentication();

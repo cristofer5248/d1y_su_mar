@@ -17,7 +17,7 @@ public class ICategoriaServiceImpl implements ICategoriaService {
 	@Override
 	public List<Categoria> findAll() {
 		// TODO Auto-generated method stub
-		return (List<Categoria>) categoriaDao.findAll();
+		return (List<Categoria>) categoriaDao.findAllByOrderByNombreAsc();
 	}
 
 	@Override

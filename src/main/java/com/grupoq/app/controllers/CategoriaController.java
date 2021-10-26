@@ -1,5 +1,6 @@
 package com.grupoq.app.controllers;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +42,7 @@ public class CategoriaController {
 	@GetMapping(value = "/cargar_categoria", produces = { "application/json" })
 	public @ResponseBody List<Categoria> celulasTodosJson() {
 		List<Categoria> list = categoriaService.findAll();
+		
 		return list;
 	}
 

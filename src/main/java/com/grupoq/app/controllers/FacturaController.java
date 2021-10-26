@@ -11,8 +11,8 @@ import java.util.Random;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+//import org.apache.commons.logging.Log;
+//import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -99,7 +99,7 @@ public class FacturaController {
 	@Autowired
 	private IProductoModifyService productosmodifyService;
 
-	protected final Log logger = LogFactory.getLog(this.getClass());
+	//protected final Log logger = LogFactory.getLog(this.getClass());
 
 	@Secured({ "ROLE_ADMIN", "ROLE_JEFEADM", "ROLE_FACT", "ROLE_SELLER" })
 	@RequestMapping(value = { "/listar", "/listar/{por}/{param}/{param2}/{opc}",

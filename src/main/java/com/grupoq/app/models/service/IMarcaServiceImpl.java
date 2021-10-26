@@ -19,7 +19,7 @@ public class IMarcaServiceImpl implements IMarcaService {
 	@Override
 	public List<Marca> findAll() {
 		// TODO Auto-generated method stub
-		return (List<Marca>) marcaDao.findAll();
+		return (List<Marca>) marcaDao.findAllByOrderByNombremAsc();
 	}
 
 	@Override

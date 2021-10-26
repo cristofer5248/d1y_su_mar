@@ -3,8 +3,8 @@ package com.grupoq.app.controllers;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+//import org.apache.commons.logging.Log;
+//import org.apache.commons.logging.LogFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -81,7 +81,7 @@ public class InventarioController {
 	private IProductoModifyService productosmodifyService;
 
 	private List<Inventario> invenetarioOld = null;
-	protected final Log logger = LogFactory.getLog(this.getClass());
+	//protected final Log logger = LogFactory.getLog(this.getClass());
 
 	@RequestMapping(value = { "/listar", "/listar/{date1}/{date2}", "/listar/{codigo}" }, method = RequestMethod.GET)
 	public String listar(@PathVariable(value = "codigo", required = false) String codigo,
@@ -391,6 +391,6 @@ public class InventarioController {
 
 	public void printinlog(String texto) {
 		System.out.print(texto);
-		logger.debug(texto);
+		//logger.debug(texto);
 	}
 }

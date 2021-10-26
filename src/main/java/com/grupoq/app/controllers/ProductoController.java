@@ -302,6 +302,16 @@ public class ProductoController {
 	// model.put("nullchecker", 1);
 	// return "/templates/productos/productoform";
 	// }
+	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_SELLER" })
+	@RequestMapping(value = "/savestock", method = RequestMethod.POST)
+	public String guardarStock(@Valid Producto producto, BindingResult result, Model model, RedirectAttributes flash,
+			SessionStatus status) {
+		Producto pro = producto;
+		productoService.save(pro);
+		//productomodifyService.save(nuevamodificacion(pro, pro));
+		return "redirect:/producto/editar/"+pro.getId();
+
+	}
 
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_SELLER" })
 	@RequestMapping(value = "/productosave", method = RequestMethod.POST)
@@ -377,18 +387,17 @@ public class ProductoController {
 
 		status.setComplete();
 		try {
-			String detalleprod = pro.getId() + ">" + pro.getCodigo() + ">" + pro.getBodega() + ">" + pro.getFecha() + ">"
-				+ pro.getMargen() + ">" + pro.getMinimo() + ">" + pro.getPrecio() + ">" + pro.getStock() + ">"
-				+ pro.getCategoria().getNombre() + ">" + pro.getMarca().getNombrem() + ">"
-				+ pro.getPresentacion().getDetalle() + ">" + pro.getProveedor().getNombre();
-		printLogger(detalleprod);
-		detalleprod = (detalleprod.length() > 100) ? detalleprod.substring(0, 50) : detalleprod;
-		printLogger("Notificacion hecha...");
-		flash.addFlashAttribute("success", mensajeFlash);
-		} 		
-		catch (Exception e) {
+			String detalleprod = pro.getId() + ">" + pro.getCodigo() + ">" + pro.getBodega() + ">" + pro.getFecha()
+					+ ">" + pro.getMargen() + ">" + pro.getMinimo() + ">" + pro.getPrecio() + ">" + pro.getStock() + ">"
+					+ pro.getCategoria().getNombre() + ">" + pro.getMarca().getNombrem() + ">"
+					+ pro.getPresentacion().getDetalle() + ">" + pro.getProveedor().getNombre();
+			printLogger(detalleprod);
+			detalleprod = (detalleprod.length() > 100) ? detalleprod.substring(0, 50) : detalleprod;
+			printLogger("Notificacion hecha...");
 			flash.addFlashAttribute("success", mensajeFlash);
-			e.printStackTrace();			
+		} catch (Exception e) {
+			flash.addFlashAttribute("success", mensajeFlash);
+			e.printStackTrace();
 			printLogger("Notificacion no realizada. algo ha salido mal...null");
 			return "redirect:/producto/listar";
 		}
@@ -640,10 +649,10 @@ public class ProductoController {
 	@RequestMapping(value = "/ocultar/{id}")
 	public String ocultar(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
 		Producto actualprod = productoService.findOne(id);
-		actualprod.setStatus(actualprod.isStatus()?false:true);
+		actualprod.setStatus(actualprod.isStatus() ? false : true);
 		productoService.save(actualprod);
-		nuevaNotificacion("fas fa-tools", "El producto se ha ocultado" + actualprod.getNombrep(),
-				"/producto/ver/" + id, "brown");
+		nuevaNotificacion("fas fa-tools", "El producto se ha ocultado" + actualprod.getNombrep(), "/producto/ver/" + id,
+				"brown");
 
 		flash.addFlashAttribute("success", "Accion de ocultar exitosa");
 		return "redirect:/producto/listarS";
@@ -672,7 +681,7 @@ public class ProductoController {
 	// model.addAttribute("page", pageRender);
 	// return "/productos/listar";
 	// }
-	public void printLogger(String txt){
-		System.out.print(txt+"\n");
+	public void printLogger(String txt) {
+		System.out.print(txt + "\n");
 	}
 }

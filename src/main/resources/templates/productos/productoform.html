@@ -99,6 +99,7 @@
 							<!-- 							</select> -->
 						</div>
 					</div>
+
 					<div class="form-group row">
 						<label for="minimo" class="col-sm-2 col-form-label" th:text="Minimo"></label>
 						<div class="col-sm-6">
@@ -127,6 +128,9 @@
 								th:errors="*{proveedor}"></small>
 						</div>
 					</div>
+					<button type="button" class="btn btn-primary" data-toggle="modal" id="stockbtn"
+						sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV')" data-target="#modalstock">Modificar
+						stock</button><br></br>
 
 					<div class="form-group row">
 						<div class="col-sm-6">
@@ -185,6 +189,49 @@
 			</div>
 		</div>
 	</div>
+	<!-- Modal para stock-->
+	<div class="modal fade" id="modalstock" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">Modificar stock ⚠</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+
+					<form th:action="@{/producto/savestock}" th:object="${producto}" method="post"
+						enctype="multipart/form-data">
+						
+							
+								<div class="form-group row">
+									<label for="stock" class="col-sm-2 col-form-label" th:text="Stock"></label>
+									<div class="col-sm-6">
+										<input class="form-control" th:field="*{stock}" type="number" step="1"
+											 />
+
+										<!-- 							<select th:field="*{margen}" id="cargar_margen" -->
+										<!-- 								name="cargar_margen" class="custom-select mr-sm-2"> -->
+										<!-- 							</select> -->
+									</div>
+								</div>												
+							</div>
+							
+								
+									<input type="submit" th:value="'Actualizar'"
+										onclick="return confirm('Esta seguro? El precio debe ser un precio SIN IVA.')"
+										class="btn btn-secondary" />
+								
+							
+					</form>
+
+				</div>
+
+			</div>
+		</div>
+	</div>
 	<!-- Modal para presentacion-->
 	<div class="modal fade" id="modalpresentacion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
 		aria-hidden="true">
@@ -220,6 +267,7 @@
 	<input type="hidden" id="urlAjaxcategoria" th:value="@{/categoria/cargar_categoria}" />
 	<input type="hidden" id="urlAjaxmarca" th:value="@{/marca/cargar_marca}" />
 	<input type="hidden" id="urlAjaxmargen" th:value="@{/margen/cargar_margen}" />
+	<input type="hidden" id="urlAjaxstock" th:value="@{/producto/savestock/}" />
 	<input type="hidden" id="urlAjaxpresentacion" th:value="@{/presentacion/cargar_presentacion}" />
 	<input type="hidden" id="urlAjaxproveedor" th:value="@{/proveedor/cargar_proveedor}" />
 	<input type="hidden" id="urlPresentacion" th:value="@{/producto/saveExpress/}" />

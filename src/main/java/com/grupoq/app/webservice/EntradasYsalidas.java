@@ -10,8 +10,9 @@ public class EntradasYsalidas {
 	public Date fecha;
 	public String color;
 	public String url;
+	public String concepto;
 
-	public EntradasYsalidas(Long id, String codigo, int movimiento, Date fecha, String color, String url) {
+	public EntradasYsalidas(Long id, String codigo, int movimiento, Date fecha, String color, String url, String concepto) {
 		super();
 		this.id = id;
 		this.codigo = codigo;
@@ -19,6 +20,7 @@ public class EntradasYsalidas {
 		this.fecha = fecha;
 		this.color = color;
 		this.url = url;
+		this.concepto = concepto;
 	}
 
 	public EntradasYsalidas() {
@@ -73,4 +75,7 @@ public class EntradasYsalidas {
 		this.url = url;
 	}
 
+	public void setConcepto(String concepto){
+		this.concepto = concepto;
+	}
 }

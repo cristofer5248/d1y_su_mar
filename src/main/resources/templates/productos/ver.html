@@ -116,6 +116,7 @@
 								<!-- <th>ID</th> -->
 								<th>Codigo de documento</th>
 								<th>Entrada o Salida</th>
+								<th>Concepto</th>
 								<th>Fecha</th>
 
 								<!-- 							<th sec:authorize="hasRole('ROLE_ADMIN')">ver</th> -->
@@ -128,6 +129,7 @@
 								<td><a th:href="${inventario.url}" th:text="${inventario.codigo}"
 										th:style="'color:' +${inventario.color}"></a></td>
 								<td th:text="${inventario.movimiento}" th:style="'color:' +${inventario.color}"></td>
+								<td th:text="${inventario.concepto}" th:style="'color:' +${inventario.color}"></td>
 								<td th:text="${#dates.format(inventario.fecha, 'dd-MM-yyyy')}" th:style="'color:' +${inventario.color}"></td>
 								<!-- 							<td th:text="${inventario.cantidad}"></td> -->
 

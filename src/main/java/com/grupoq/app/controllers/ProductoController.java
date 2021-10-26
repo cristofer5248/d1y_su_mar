@@ -376,15 +376,25 @@ public class ProductoController {
 		}
 
 		status.setComplete();
-		String detalleprod = pro.getId() + ">" + pro.getCodigo() + ">" + pro.getBodega() + ">" + pro.getFecha() + ">"
+		try {
+			String detalleprod = pro.getId() + ">" + pro.getCodigo() + ">" + pro.getBodega() + ">" + pro.getFecha() + ">"
 				+ pro.getMargen() + ">" + pro.getMinimo() + ">" + pro.getPrecio() + ">" + pro.getStock() + ">"
 				+ pro.getCategoria().getNombre() + ">" + pro.getMarca().getNombrem() + ">"
 				+ pro.getPresentacion().getDetalle() + ">" + pro.getProveedor().getNombre();
-		System.out.print(detalleprod);
+		printLogger(detalleprod);
 		detalleprod = (detalleprod.length() > 100) ? detalleprod.substring(0, 50) : detalleprod;
-		nuevaNotificacion("fas fa-box-open", "Producto '" + producto.getNombrep() + "' agregado o modificado. Datos: ",
-				"/producto/ver/" + producto.getId(), "blue");
+		printLogger("Notificacion hecha...");
 		flash.addFlashAttribute("success", mensajeFlash);
+		} 		
+		catch (Exception e) {
+			flash.addFlashAttribute("success", mensajeFlash);
+			e.printStackTrace();			
+			printLogger("Notificacion no realizada. algo ha salido mal...null");
+			return "redirect:/producto/listar";
+		}
+		flash.addFlashAttribute("success", mensajeFlash);
+		nuevaNotificacion("fas fa-box-open", "Producto '" + producto.getNombrep() + "' agregado o modificado. ",
+				"/producto/ver/" + producto.getId(), "blue");
 		return "redirect:/producto/listar";
 	}
 
@@ -531,6 +541,7 @@ public class ProductoController {
 			entr_salidas.setMovimiento(producto.getInventarios().get(i).getStock());
 			entr_salidas.setColor("blue");
 			entr_salidas.setUrl("/inventario/ver/" + producto.getInventarios().get(i).getStock());
+			entr_salidas.setConcepto(producto.getInventarios().get(i).getComentario());
 			entra_list.add(entr_salidas);
 		}
 		List<NotadeCredito> notitas = notadecreditoService.findByCodigodoc(id);
@@ -540,6 +551,7 @@ public class ProductoController {
 				entr_salidas.setCodigo("NDC - " + notitas.get(i).getCodigodoc());
 				entr_salidas.setFecha(notitas.get(i).getFecha());
 				entr_salidas.setId(notitas.get(i).getId());
+				entr_salidas.setConcepto("-");
 				for (CarritoItems carritostocker : notitas.get(i).getCarrito().getCarrito()) {
 					entr_salidas.setMovimiento(
 							(carritostocker.getProductos().equals(producto)) ? carritostocker.getCantidad() : 0);
@@ -660,4 +672,7 @@ public class ProductoController {
 	// model.addAttribute("page", pageRender);
 	// return "/productos/listar";
 	// }
+	public void printLogger(String txt){
+		System.out.print(txt+"\n");
+	}
 }

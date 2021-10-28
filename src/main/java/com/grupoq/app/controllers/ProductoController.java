@@ -193,7 +193,7 @@ public class ProductoController {
 			productos = (date1 != null && nombrep == null) ? productoService.findAllFechas(pageRequest, date1_, date2_)
 					: productoService.findAllJoin(pageRequest);
 
-			System.out.print("\nEL PATH: " + xlsxPath);
+			
 
 		}
 
@@ -517,7 +517,7 @@ public class ProductoController {
 		return "redirect:/producto/ver/" + id;
 	}
 
-	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })
+	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM","ROLE_FACT","ROLE_SELLER" })
 	@GetMapping(value = "/ver/{id}")
 	public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
 		System.out.print("entrando a ver");

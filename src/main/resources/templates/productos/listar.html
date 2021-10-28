@@ -63,7 +63,7 @@
 					<table class="table table-striped table-bordered table-sm" id="example">
 						<thead class="thead-inverse">
 							<tr>
-								<th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV','ROLE_JEFEADM')">id</th>
+								<th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV','ROLE_JEFEADM','ROLE_SELLER')">id</th>
 								<th>Codigo</th>
 								<th>Nombre</th>
 								<th>Costo</th>
@@ -78,14 +78,14 @@
 								<th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV','ROLE_JEFEADM')">E</th>
 								<th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV')">E</th>
 								<th>B</th>
-								<th>O</th>
+								<th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV','ROLE_JEFEADM')">O</th>
 							</tr>
 						</thead>
 						<tbody id="trtable">
 							<div>
 								<tr th:each="producto: ${productos}"
 									th:style="${producto.asegurar}==true? 'color: red' : 'color: black'">
-									<td sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV','ROLE_JEFEADM')"><a
+									<td sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV','ROLE_JEFEADM','ROLE_SELLER')"><a
 											class="btn btn-primary btn-xs" th:href="@{/producto/ver/} + ${producto.id}"
 											th:text="${producto.id}"></a></td>
 									<td class="tddata" th:text="${producto.codigo}"></td>

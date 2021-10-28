@@ -26,6 +26,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javassist.bytecode.stackmap.BasicBlock.Catch;
+
 import com.grupoq.app.models.entity.CarritoItems;
 import com.grupoq.app.models.entity.Cotizacion;
 import com.grupoq.app.models.entity.Descuento;
@@ -99,7 +102,7 @@ public class FacturaController {
 	@Autowired
 	private IProductoModifyService productosmodifyService;
 
-	//protected final Log logger = LogFactory.getLog(this.getClass());
+	// protected final Log logger = LogFactory.getLog(this.getClass());
 
 	@Secured({ "ROLE_ADMIN", "ROLE_JEFEADM", "ROLE_FACT", "ROLE_SELLER" })
 	@RequestMapping(value = { "/listar", "/listar/{por}/{param}/{param2}/{opc}",
@@ -125,7 +128,7 @@ public class FacturaController {
 			}
 			if (por.equals("fechas")) {
 				try {
-					//logger.error("Entro a 'fecha'\n");
+					// logger.error("Entro a 'fecha'\n");
 					Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(param);
 					Date date2 = new SimpleDateFormat("yyyy-MM-dd").parse(param2);
 					if (opc.equals("vendedor")) {
@@ -185,7 +188,7 @@ public class FacturaController {
 			Facturacion facturacion = facturaservice.findBy(term);
 			List<CarritoItems> carrito = facturacion.getCotizacion().getCarrito();
 
-			//logger.error("\nRecorriendo: \n");
+			// logger.error("\nRecorriendo: \n");
 			boolean cambiarStatus = true;
 
 			for (CarritoItems caObj : carrito) {
@@ -218,7 +221,7 @@ public class FacturaController {
 		try {
 			Facturacion facturacion = facturaservice.findBy(term);
 
-			//logger.error("\nRecorriendo: \n");
+			// logger.error("\nRecorriendo: \n");
 			boolean cambiarStatus = true;
 			facturacion.setStatus(4);
 			if (cambiarStatus) {
@@ -268,8 +271,9 @@ public class FacturaController {
 		}
 		facturacion.setCotizacion(cotizacion);
 		if (facturacion.getCotizacion() != null) {
-			//logger.error(
-			//		"La cotizacion no esta vacia, es mas este tiene el id \n" + facturacion.getCotizacion().getId());
+			// logger.error(
+			// "La cotizacion no esta vacia, es mas este tiene el id \n" +
+			// facturacion.getCotizacion().getId());
 		}
 
 		SecurityContextHolderAwareRequestWrapper securityContext = new SecurityContextHolderAwareRequestWrapper(request,
@@ -297,7 +301,7 @@ public class FacturaController {
 			HttpServletRequest request, @RequestParam(name = "id", required = false) String id) {
 		Facturacion facturacion = new Facturacion();
 		// facturacion = (id != null) ? facturaservice.findBy(id) : facturacion;
-		//logger.error("\n EL ID DE EDITAR ES: " + id);
+		// logger.error("\n EL ID DE EDITAR ES: " + id);
 		facturacion = facturaservice.findBy(Long.parseLong(id));
 		SecurityContextHolderAwareRequestWrapper securityContext = new SecurityContextHolderAwareRequestWrapper(request,
 				"");
@@ -363,7 +367,7 @@ public class FacturaController {
 			facturacion.setStatus(2);
 		} else {
 			facturacion.setStatus(1);
-			
+
 		}
 		String mensajeFlash = (facturacion.getId() != null) ? "factura editada con éxito!"
 				: "Facturacion creada con éxito!";
@@ -372,19 +376,22 @@ public class FacturaController {
 
 		for (CarritoItems pro : cotizaciontemporal.getCarrito()) {
 			int stockstatic;
-			
+
 			Producto productogetStock = productoservice.findOne(pro.getProductos().getId());
-			//por si en alguna razon esta accion se repite para el mismo producto, detener!
+			// por si en alguna razon esta accion se repite para el mismo producto, detener!
 			stockstatic = productogetStock.getStock();
-			//logger.error("COMPARANDO LA CANTIDA PEDIDA: " + pro.getCantidad() + "\n LA CANTIDAD QUE HAY: "
-			//		+ productogetStock.getStock());
+			// logger.error("COMPARANDO LA CANTIDA PEDIDA: " + pro.getCantidad() + "\n LA
+			// CANTIDAD QUE HAY: "
+			// + productogetStock.getStock());
 			if (stockstatic < pro.getCantidad()) {
 				if (stockstatic < 0) {
 					productogetStock.setStock(productogetStock.getStock() - pro.getCantidad());
-					model.addAttribute("error", "Stock insuficiente, se encuentra en numeros negativos, QUEDARA NEGATIVO!");
+					model.addAttribute("error",
+							"Stock insuficiente, se encuentra en numeros negativos, QUEDARA NEGATIVO!");
 					// aqui debo cambiar el estado del carrito segun el que tiene insuficientes en
 					// stock
-					//logger.error("ENTRANDO A LA CONDICION DE NUMEROS NEGATIVOS EN STOCK Y PONER SEST STATUS FALSE");
+					// logger.error("ENTRANDO A LA CONDICION DE NUMEROS NEGATIVOS EN STOCK Y PONER
+					// SEST STATUS FALSE");
 					pro.setStatus(false);
 
 					// aqui
@@ -397,7 +404,8 @@ public class FacturaController {
 					facturacion.setStatus(3);
 				} else {
 					productogetStock.setStock(productogetStock.getStock() - pro.getCantidad());
-					//logger.error("ENTRANDO A LA CONDICION DE NUMEROS NEGATIVOS EN STOCK Y PONER SEST STATUS TRUE");
+					// logger.error("ENTRANDO A LA CONDICION DE NUMEROS NEGATIVOS EN STOCK Y PONER
+					// SEST STATUS TRUE");
 					ProductosModify pm = new ProductosModify();
 					pm.setPrecio(productogetStock.getPrecio());
 					pm.setFecha(new Date());
@@ -425,7 +433,8 @@ public class FacturaController {
 			}
 			// notificar cuando ya quedo en minimo
 			if (productogetStock.getStock() - pro.getCantidad() <= productogetStock.getMinimo()) {
-				nuevaNotificacion("fas fa-exclamation-triangle", productogetStock.getNombrep() + " en minimo! actualmente "+ (stockstatic - pro.getCantidad()),
+				nuevaNotificacion("fas fa-exclamation-triangle",
+						productogetStock.getNombrep() + " en minimo! actualmente " + (stockstatic - pro.getCantidad()),
 						"/producto/ver/" + productogetStock.getId(), "yellow");
 
 			}
@@ -436,7 +445,7 @@ public class FacturaController {
 
 			totalsiniva += pro.getPrecio() * pro.getCantidad();
 
-			//logger.error("\n" + totalParaFactura + "\n");
+			// logger.error("\n" + totalParaFactura + "\n");
 		}
 
 		facturacion.setTotaRegistrado(totalParaFactura > 113 && facturacion.getCliente().getCliente().getAgente()
@@ -445,7 +454,7 @@ public class FacturaController {
 		// duplicaremos la cotizacin para despues no haber errores
 		boolean cotiRepeated = facturaservice.cotizacionRepetida(facturacion.getCotizacion().getId()) > 0 ? true
 				: false;
-		//logger.error("El estado es " + cotiRepeated);
+		// logger.error("El estado es " + cotiRepeated);
 		if (cotiRepeated) {
 			Cotizacion nCotizacion = new Cotizacion();
 			nCotizacion.setFecha(new Date());
@@ -497,7 +506,8 @@ public class FacturaController {
 			int lastSpaceIndex = term.lastIndexOf(" ");
 			String term2 = term.substring(lastSpaceIndex + 1, term.length());
 			term = term.substring(0, lastSpaceIndex);
-			//logger.error("\n PRODUCTO: " + term + " MARCA: " + term2 + " indexlast " + lastSpaceIndex);
+			// logger.error("\n PRODUCTO: " + term + " MARCA: " + term2 + " indexlast " +
+			// lastSpaceIndex);
 			list1 = productoservice.findByNombrepYMarca(term, term2);
 		}
 		for (Producto veamos : list1) {
@@ -534,7 +544,7 @@ public class FacturaController {
 				inventario = inventarioservice.findByCodigoProveedorAndStatus(codigodoc);
 				// inventario = (inventario == null) ? false : true;
 				resultado = (inventario == null) ? true : false;
-				//logger.error("el resultado es: " + resultado);
+				// logger.error("el resultado es: " + resultado);
 			} else {
 				resultado = true;
 			}
@@ -733,7 +743,7 @@ public class FacturaController {
 		boolean icotizacion = true;
 		Random random = new Random();
 		for (int i = 0; i < itemId.length; i++) {
-			//logger.error("La cantidad es: " + cantidad[i] + " \n");
+			// logger.error("La cantidad es: " + cantidad[i] + " \n");
 			int x = random.nextInt(900) + 100;
 			CarritoItems carrito = new CarritoItems();
 			Producto producto = productoservice.findOne(itemId[i]);
@@ -809,8 +819,8 @@ public class FacturaController {
 			flash.addFlashAttribute("error", "El ingreso con ese codigo no existe en la base de datos");
 			return "redirect:/facturacion/listar";
 		}
-		//logger.error("\n usuario1 " + auth.getName());
-		//logger.error("\n usuario2 " + facturacion.getaCuentade().getUsername());
+		// logger.error("\n usuario1 " + auth.getName());
+		// logger.error("\n usuario2 " + facturacion.getaCuentade().getUsername());
 
 		if (!facturacion.getaCuentade().getUsername().equals(auth.getName()) && !(request.isUserInRole("ROLE_ADMIN")
 				|| request.isUserInRole("ROLE_JEFEADM") || request.isUserInRole("ROLE_FACT"))) {
@@ -840,7 +850,8 @@ public class FacturaController {
 			@RequestParam(name = "costoN") double costoN, Map<String, Object> model, RedirectAttributes flash,
 			Authentication auth, HttpServletRequest request) {
 
-		//logger.error("\n VEAMOS EL codigoItemCarrito :" + codigoItemCarrito + " costo " + costoN + " el id: " + id);
+		// logger.error("\n VEAMOS EL codigoItemCarrito :" + codigoItemCarrito + " costo
+		// " + costoN + " el id: " + id);
 		String pathredirect = "/factura/listar/";
 		boolean cambiarcosto = false;
 		double totalnuevo = 0.0;
@@ -875,7 +886,7 @@ public class FacturaController {
 
 				}
 				if (cambiarcosto) {
-					//logger.error("\ncuantas veces paso" + totalnuevo);
+					// logger.error("\ncuantas veces paso" + totalnuevo);
 					double totalnuevosin = totalnuevo / 1.13;
 					totalnuevo = (totalnuevosin > 113.00 & factura.getCliente().getCliente().getAgente())
 							? totalnuevo - (totalnuevosin * 0.01)
@@ -906,31 +917,43 @@ public class FacturaController {
 				flash.addFlashAttribute("success", "Facturacion eliminada con éxito!");
 				// aqui le ponemos reversa de factura hasta productos/inventarios
 				Facturacion fac = facturaservice.findBy(id);
+				printLogger("\n/////////////////////////\n Reversa de factura..."+new Date()+" \n Factura con id: " + id
+						+ "\n Codigo de factura: " + fac.getCodigofactura()+"\n Iterando para ver los productos de la factura..."+"\n Cantidad: "+fac.getCotizacion().getCarrito().size());
 				String coddoc = fac.getCodigofactura();
-				for (CarritoItems carrito : fac.getCotizacion().getCarrito()) {
+				int iCarrito=1;
+				for (CarritoItems carrito : fac.getCotizacion().getCarrito()) {					
 					Producto pro = productoservice.findOne(carrito.getProductos().getId());
-					//logger.error("Elemento: " + pro.getNombrep() + "\n" + "Cantidad: " + carrito.getCantidad());
-					pro.setStock(pro.getStock() + carrito.getCantidad());
 
-					// dejemos contancia antes
+					printLogger("PRODUCTO N "+iCarrito+" NOMBRE: "+pro.getNombrep()+"\n |Stock actual: "+pro.getStock()+" Se le sumaria: "+carrito.getCantidad()+" Quedaria: "+(pro.getStock()+carrito.getCantidad()));
+					Integer stocknew = pro.getStock()+carrito.getCantidad();
+					pro.setStock(stocknew);					
 					ProductosModify pm = new ProductosModify();
 					pm.setPrecio(pro.getPrecio());
 					pm.setFecha(new Date());
 					pm.setProveedor(pro.getProveedor().getNombre());
-					pm.setStock(pro.getStock());
+					pm.setStock(stocknew);
+					productoservice.save(pro);
+					printLogger("Se ha editado y guardado el stock en la operacion anterior");
 					pm.setProductomodi(pro);
 					productosmodifyService.save(pm);
-					// hoy si guardamos
-					productoservice.save(pro);
-
+					printLogger("Se registrado en el historial...");
+					iCarrito++;
 				}
+				try{	
+				printLogger("Borrando factura...");
 				facturaservice.delete(id);
+				printLogger("Accion completada");
+				}			
+				catch(Exception e){
+					e.printStackTrace();
+					printLogger("Algo salio mal. ERROR GRAVE QUE SE NECESITA REVISAR");
+				}
 
 				nuevaNotificacion("fas fa-trash-alt", "La factura con el id " + id + " y correlativo " + coddoc
 						+ " ha sido eliminado por " + auth.getName(), "#", "red");
 
 			} catch (Exception e) {
-				mailservice.sendEmailchris(e.toString(), "Error FacturaController");
+				mailservice.sendEmailchris(e.toString(), "Error FacturaController FAC_ELIMINAR | TIME: "+ new Date());
 				flash.addFlashAttribute("error",
 						"El Facturacion posiblemente tiene registros enlazados, no se puede eliminar!");
 				return "redirect:/factura/listar";
@@ -944,7 +967,7 @@ public class FacturaController {
 	@RequestMapping(value = "/statusChange", method = RequestMethod.POST)
 	public String finalizandoFactura(@RequestParam(name = "id") Long id, @RequestParam(name = "codigo") String codigo,
 			@RequestParam(name = "ndr") int ndr, RedirectAttributes flash) {
-		//logger.error("\n VEAMOS EL ID :" + codigo);
+		// logger.error("\n VEAMOS EL ID :" + codigo);
 		String redirecpage = "redirect:/factura/listar/";
 		if (id > 0 && codigo != null) {
 			try {
@@ -986,5 +1009,9 @@ public class FacturaController {
 
 		model.put("titulo", "Facturacion #" + id);
 		return "/facturas/form";
+	}
+
+	public void printLogger(String txt) {
+		System.out.print(txt + "\n");
 	}
 }

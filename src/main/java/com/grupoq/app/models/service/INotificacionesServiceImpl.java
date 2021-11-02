@@ -1,5 +1,6 @@
 package com.grupoq.app.models.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,5 +39,13 @@ public class INotificacionesServiceImpl implements INotificacionesService {
 	public Page<Notificaciones> findByNombreContaining(Pageable page, String nombre) {		
 		return notificacionesDao.findByNombreContainingAndOrderByIdDesc(page, nombre);
 	}
+
+	@Override
+	public List<Notificaciones> therenew(Date time, Date time2) {
+		// TODO Auto-generated method stub
+		return notificacionesDao.therenew(time, time2);
+	}
+
+
 	
 }

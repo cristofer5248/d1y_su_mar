@@ -1,5 +1,6 @@
 package com.grupoq.app.controllers;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,16 @@ public class NotificacionesController {
 		return list;
 	}
 
-	@RequestMapping(value = {"/","/listar/{op}/{nombrep}"}, method = RequestMethod.GET)
+	@GetMapping(value = "/givenews", produces = { "application/json" })
+	public @ResponseBody List<Notificaciones> verNuevo() {
+		Date date1 = new Date();	
+		Date date2 = new Date(System.currentTimeMillis() - 3600 * 1000);
+		System.out.printf("EL TIEMPO ES: " + date1 + " segundo " + date2);
+		List<Notificaciones> list = notificacionesService.therenew(date2, date1);
+		return list;
+	}
+
+	@RequestMapping(value = { "/", "/listar/{op}/{nombrep}" }, method = RequestMethod.GET)
 	public String listar(Model model, @RequestParam(name = "page", defaultValue = "0") int page,
 			@PathVariable(value = "nombrep", required = false) String nombre) {
 		// List<Notificaciones> notificaciones =

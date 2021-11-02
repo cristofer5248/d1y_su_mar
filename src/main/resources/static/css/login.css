@@ -248,3 +248,72 @@ a:hover {
         box-shadow: 3px 3px 15px rgba(88, 34, 160, 0.2);
     }
 }
+
+#cf {
+    position:relative;
+    height:281px;
+    width:450px;
+    margin:0 auto;
+  }
+  
+  #cf img {
+    position:absolute;
+    left:0;
+    -webkit-transition: opacity 1s ease-in-out;
+    -moz-transition: opacity 1s ease-in-out;
+    -o-transition: opacity 1s ease-in-out;
+    transition: opacity 1s ease-in-out;
+  }
+  @keyframes cf3FadeInOut {
+    0% {
+    opacity:1;
+  }
+  45% {
+  opacity:1;
+  }
+  55% {
+  opacity:0;
+  }
+  100% {
+  opacity:0;
+  }
+  }
+  
+  #cf3 img.top {
+  animation-name: cf3FadeInOut;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-duration: 10s;
+  animation-direction: alternate;
+  }
+  @keyframes cf4FadeInOut {
+    0% {
+      opacity:1;
+    }
+    17% {
+      opacity:1;
+    }
+    25% {
+      opacity:0;
+    }
+    92% {
+      opacity:0;
+    }
+    100% {
+      opacity:1;
+    }
+  }
+  
+  #cf4a img:nth-of-type(1) {
+    animation-delay: 6s;
+  }
+  #cf4a img:nth-of-type(2) {
+    animation-delay: 4s;
+  }
+  #cf4a img:nth-of-type(3) {
+    animation-delay: 2s;
+  }
+  #cf4a img:nth-of-type(4) {
+    animation-delay: 0;
+  }
+  

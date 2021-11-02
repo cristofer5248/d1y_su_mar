@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="layout/layout :: head"></head>
 <link rel="stylesheet" th:href="@{/css/login.css}" />
+<link rel="stylesheet" th:href="@{/css/jquery-ui.min.css}" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Document</title>
 <!-- <script src="https://kit.fontawesome.com/c0078485ae.js" -->
@@ -14,12 +15,12 @@
 
 	<img th:src="@{/images/wave-01.png}" alt="" class="wave">
 	<div class="container">
-		<div class="img">
-			<img th:src="@{/images/phone2.png}" alt="">
+		<div class="img cf">
+			<img class="top" th:src="@{/images/phone2.png}" id="img2" alt="">
 		</div>
 		<div class="login-container">
 			<form class="form-login" th:action="@{/login}" method="post">
-				<img class="avatar" th:src="@{/images/profile.png}" alt="">
+				<img class="avatar" th:src="@{/images/profile.png}" alt="" id="imgprofile">
 				<h2>BIENVENIDO</h2>
 				<div class="input-div one">
 					<div class="i">
@@ -27,7 +28,7 @@
 					</div>
 					<div>
 						<h5>Usuario</h5>
-						<input class="input" type="text" name="username"
+						<input class="input" type="text" name="username" id="usrtxt"
 							onclick="cleanh51();">
 					</div>
 				</div>
@@ -54,6 +55,10 @@
 
 </body>
 <!-- partial -->
+<script th:src="@{/js/jquery-3.2.1.min.js}"></script>
+<script th:src="@{/js/popper.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/jquery-ui.min.js}"></script>
 <script th:src="@{/js/login.js}"></script>
 
 

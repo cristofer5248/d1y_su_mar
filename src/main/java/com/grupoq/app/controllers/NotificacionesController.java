@@ -36,7 +36,7 @@ public class NotificacionesController {
 	@GetMapping(value = "/givenews", produces = { "application/json" })
 	public @ResponseBody List<Notificaciones> verNuevo() {
 		Date date1 = new Date();	
-		Date date2 = new Date(System.currentTimeMillis() - 3600 * 1000);
+		Date date2 = new Date(System.currentTimeMillis() - 60 * 1000);
 		System.out.printf("EL TIEMPO ES: " + date1 + " segundo " + date2);
 		List<Notificaciones> list = notificacionesService.therenew(date2, date1);
 		return list;

@@ -293,7 +293,7 @@ public class InventarioController {
 	public Boolean operacionStock(Long id, Boolean operacion, Integer stock) {
 		Producto producto = productoService.findOne(id);
 		Integer stockfirst = producto.getStock();
-		Integer stockoperacion = operacion ? stockfirst + stock : stockfirst - stock;
+		Integer stockoperacion = stockfirst + stock;
 		printinlog("Producto: " + producto.getNombrep() + " id:" + producto.getId() + " stock antes:" + stockfirst
 				+ " stock ahora:" + stockoperacion + "\n");
 		producto.setStock(stockoperacion);

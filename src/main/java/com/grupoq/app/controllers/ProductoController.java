@@ -549,7 +549,7 @@ public class ProductoController {
 			entr_salidas.setId(producto.getInventarios().get(i).getId());
 			entr_salidas.setMovimiento(producto.getInventarios().get(i).getStock());
 			entr_salidas.setColor("blue");
-			entr_salidas.setUrl("/inventario/ver/" + producto.getInventarios().get(i).getStock());
+			entr_salidas.setUrl("/inventario/ver/" + producto.getInventarios().get(i).getMovimientos().getId());
 			entr_salidas.setConcepto(producto.getInventarios().get(i).getComentario());
 			entra_list.add(entr_salidas);
 		}

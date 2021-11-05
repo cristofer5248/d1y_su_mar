@@ -34,6 +34,8 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import ch.qos.logback.core.rolling.helper.IntegerTokenConverter;
+
 import com.grupoq.app.models.entity.CarritoItems;
 import com.grupoq.app.models.entity.Facturacion;
 import com.grupoq.app.models.entity.Inventario;
@@ -81,7 +83,7 @@ public class InventarioController {
 	private IProductoModifyService productosmodifyService;
 
 	private List<Inventario> invenetarioOld = null;
-	//protected final Log logger = LogFactory.getLog(this.getClass());
+	// protected final Log logger = LogFactory.getLog(this.getClass());
 
 	@RequestMapping(value = { "/listar", "/listar/{date1}/{date2}", "/listar/{codigo}" }, method = RequestMethod.GET)
 	public String listar(@PathVariable(value = "codigo", required = false) String codigo,
@@ -240,9 +242,11 @@ public class InventarioController {
 			for (Inventario inv : invenetarioOld) {
 				printinlog("Comparando id de movimiento: " + inv.getProducto().getId() + " y " + idps + "\n");
 				invold = inv.getProducto().getId().equals(idps) ? inv : invold;
-				printinlog(inv.getProducto().getId().equals(idps)?"¡Se encontro coincidencia! -> Producto "+inv.getProducto().getNombrep()+"\n":"");
+				printinlog(inv.getProducto().getId().equals(idps)
+						? "¡Se encontro coincidencia! -> Producto " + inv.getProducto().getNombrep() + "\n"
+						: "");
 			}
-		}else{
+		} else {
 			printinlog("No hay comparacion...");
 		}
 		return invold;
@@ -255,10 +259,15 @@ public class InventarioController {
 			int stockold_temp = inventario.getStock();
 			inventario.setStock(stockold_temp + c);
 			inventario.setFecha(fecha);
+			int toti = stockold_temp + c;
 			printinlog("Producto:" + inventario.getProducto().getNombrep() + " id:" + inventario.getProducto().getId()
 					+ " Stock actual:" + inventario.getProducto().getStock() + "\n");
 			printinlog("Actualizando un registro de inventario...Cantidad anterior: " + stockold_temp
-					+ " Cantidad ahora:" + stockold_temp + c+"\n");
+					+ " Cantidad ahora:" + toti+ "\n");
+			nuevaNotificacion(
+					"fas fa-parachute-box", "Nuevo ingreso de " + inventario.getProducto().getNombrep()
+							+ " stock actual: " + toti,
+					"/inventario/ver/" + moviento.getId(), "blue");
 		} else {
 			inventario = new Inventario();
 			inventario.setStock(c);
@@ -271,9 +280,12 @@ public class InventarioController {
 			inventario.setEstado(true);
 			inventario.setMovimientos(moviento);
 			inventario.setZaNombrede(zaNombrede);
-
+			int toti = producto_temp.getStock() + c;
 			printinlog("Producto:" + producto_temp.getNombrep() + " id:" + producto_temp.getId() + " Stock actual:"
 					+ producto_temp.getStock() + "\n");
+			nuevaNotificacion("fas fa-parachute-box",
+					"Nuevo ingreso de " + producto_temp.getNombrep() + " stock actual: " + toti,
+					"/inventario/ver/" + moviento.getId(), "blue");
 		}
 		return inventario;
 	}
@@ -325,7 +337,8 @@ public class InventarioController {
 				Integer stockold = inventarioTemp.getStock();
 				operacionStock(inventarioTemp.getProducto().getId(), false, stockold);
 				addProductomodify(inventarioTemp.getProducto(), new Date(), inventarioTemp.getProducto().getPrecio(),
-						inventarioTemp.getProducto().getProveedor().getNombre(), stockold + inventarioTemp.getProducto().getStock());
+						inventarioTemp.getProducto().getProveedor().getNombre(),
+						stockold + inventarioTemp.getProducto().getStock());
 				flash.addFlashAttribute("success", "Inventariado eliminado con éxito!");
 			}
 		}
@@ -391,6 +404,6 @@ public class InventarioController {
 
 	public void printinlog(String texto) {
 		System.out.print(texto);
-		//logger.debug(texto);
+		// logger.debug(texto);
 	}
 }

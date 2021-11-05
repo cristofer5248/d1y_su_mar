@@ -66,14 +66,20 @@
                     case 'fas fa-box-open':
                         iconTypeClassName = 'fas fa-box-open ';
                         break;
-                    case 'productDel':
-                        iconTypeClassName = 'fas fa-trash-alt ';
+                    case 'fas fa-cart-plus':
+                        iconTypeClassName = 'fas fa-cart-plus ';
                         break;
-                    case 'producto':
-                        iconTypeClassName = 'el-icon-warning ';
+                    case 'fas fa-money-check-alt':
+                        iconTypeClassName = 'fas fa-money-check-alt ';
                         break;
-                    case 'error':
-                        iconTypeClassName = 'el-icon-error ';
+                    case 'fas fa-exclamation-triangle':
+                        iconTypeClassName = 'fas fa-exclamation-triangle ';
+                        break;
+                    case 'fas fa-tools':
+                        iconTypeClassName = 'fas fa-tools ';
+                        break;
+                    case 'fas fa-parachute-box':
+                        iconTypeClassName = 'fas fa-parachute-box ';
                         break;
                 }
                 switch (options.color) {
@@ -97,6 +103,7 @@
                         break;
 
                 }
+
                 if (options.icon.indexOf('/') >= 0) {
                     iconHTML = sys.iconImgTemplate.replace('{{icon}}', options.icon).replace('{{iconType}}', iconTypeClassName);
                 } else {
@@ -131,6 +138,7 @@
                 $.notify.close($parent, { len: length, offset: options.offset });
             });
             $('body').off('click', '.' + options.className + '-title,.' + options.className + '-content').on('click', '.' + options.className + '-title,.' + options.className + '-content', function () {
+                console.log(options.url);
                 if (options.onClick && typeof options.onClick == 'function') {
                     options.onClick();
                 } else if (options.url != '') {

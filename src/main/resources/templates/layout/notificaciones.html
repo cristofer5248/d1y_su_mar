@@ -42,12 +42,14 @@
 					str = ""
 					icon = ""
 					color = ""
+					url = ""					
 					for (key in obj) {
 						str = `${obj[key].nombre}`;
 						icon = `${obj[key].icono}`;					
 						color = `${obj[key].color}`;
-						console.log(color);
-						$.notify({title :str, timeout:0, iconType:icon,icon:'success',color:color, timeout:8000});
+						url = `${obj[key].url}`;
+						console.log(icon);
+						$.notify({title :str, timeout:0, iconType:icon,icon:'success',color:color, timeout:8000,url:url});
 						var audio = new Audio('/js/bubble.mp3');
 						audio.play();
 					}					

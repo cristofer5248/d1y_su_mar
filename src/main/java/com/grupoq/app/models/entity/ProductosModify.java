@@ -27,6 +27,8 @@ public class ProductosModify implements Serializable{
 	
 	private Double precio;
 	private String proveedor;
+	@Column(length=100)
+	private String detalle;
 
 	@Column(length = 6)
 	private int stock;
@@ -106,6 +108,12 @@ public class ProductosModify implements Serializable{
 
 	public void setStock(int stock) {
 		this.stock = stock;
+	}
+	public void setDetalle(String detalle){
+		this.detalle = detalle;
+	}
+	public String getDetalle(){
+		return detalle;
 	}
 
 	private static final long serialVersionUID = 1L;

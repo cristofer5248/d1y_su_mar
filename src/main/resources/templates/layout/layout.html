@@ -75,6 +75,10 @@
 								class="dropdown-item" sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_JEFEADM','ROLE_INV')"
 								th:href="@{/inventario/listar}"><i class="fas fa-arrow-down"></i>
 								Ingresos</a>
+								<a class="dropdown-item"
+								sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_JEFEADM','ROLE_INV')"
+								th:href="@{/producto/transformacion}"><i class="fas fa-exchange-alt"></i>
+								Transformacion</a>
 							<!-- 							<div class="dropdown-divider"></div> -->
 							<!-- 							<a class="dropdown-item" href="#">Movimientos</a> -->
 						</div>

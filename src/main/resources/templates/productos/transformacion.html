@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="layout/layout :: head"></head>
+
+<body>
+
+	<header th:replace="layout/layout :: header"></header>
+
+	<div class="container py-4">
+
+		<div class="card bg-dark text-white">
+			<div class="card-header" th:text="${titulo}"></div>
+			<div class="card-body">
+
+				<form th:action="@{/producto/productosave}" method="post" enctype="multipart/form-data">
+					<div class="row g-6">
+						<div class="col-sm-3">
+							<label>Producto</label>
+							<input type="text" class="form-control" placeholder="Producto a extraer"
+								id="cargar_producto">
+							<input type="hidden" class="form-control" id="productoOrigen">
+						</div>
+						<div class="col-sm-1">
+							<label>Actual Stock</label>
+							<input type="number" id="cantidadProducto1" class="form-control" placeholder="0"
+								onchange="mostrardiferencia()" disabled>
+							<input type="hidden" id="cantidadProducto1_">
+						</div>
+						<div class="col-sm-1">
+							<label>Equivale a</label>
+							<input type="number" id="equivalencia" class="form-control" value="1" onchange="mostrardiferencia()" required>
+						</div>
+						<div class="col-sm-1" style="padding: 0px; text-align: center;">
+							<i class="fas fa-long-arrow-alt-right" style="font-size:40px;"></i>
+						</div>
+						<div class="col-sm-3">
+							<label>Se traslada a </label>
+							<input type="text" id="cargar_producto2" class="form-control"
+								placeholder="Producto que recibe">
+							<input type="hidden" class="form-control" id="productoDestino">
+						</div>
+						<div class="col-sm-1">
+							<label>Actual Stock</label>
+							<label id="cantidadProducto2">0</label>
+							<input type="hidden" id="cantidadProducto2_">
+						</div>
+						<div class="col-sm-2">
+							<label>¿Aun no existe?</label>
+							<a class="btn btn-primary btn-xs" th:href="@{/producto/nuevo/}" target="_blank"> Crear
+								producto </a>
+						</div>
+					</div>
+					<label>Resultado previo:</label>
+					<div class="container" style=" padding-top: 40px; padding-bottom: 40px;">
+						<div class="row">
+							<div class="col">
+								<label id="producto1" style="background-color: white; color:black"></label>
+								<label id="stock1"></label>
+							</div>
+							<div class="col">
+								<label id="producto2" style="background-color: white; color:black"></label>
+								<label id="stock2"></label>
+							</div>
+						</div>
+					</div>
+					<div>
+
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+
+
+	<footer th:replace="layout/layout :: footer"></footer>
+	<input type="hidden" id="urlAjaxcategoria" th:value="@{/categoria/cargar_categoria}" />
+	<input type="hidden" id="urlAjaxmarca" th:value="@{/marca/cargar_marca}" />
+	<input type="hidden" id="urlAjaxmargen" th:value="@{/margen/cargar_margen}" />
+	<input type="hidden" id="urlAjaxstock" th:value="@{/producto/savestock/}" />
+	<input type="hidden" id="urlAjaxpresentacion" th:value="@{/presentacion/cargar_presentacion}" />
+	<input type="hidden" id="urlAjaxproveedor" th:value="@{/proveedor/cargar_proveedor}" />
+	<input type="hidden" id="urlPresentacion" th:value="@{/producto/saveExpress/}" />
+	<input type="hidden" id="urlAjaxpro" th:value="@{/factura/cargar_producto/}" />
+	<input type="hidden" id="urlAjaxpresentaciones" th:value="@{/presentacion/cargar_presentaciones/}" />
+	<script th:replace="productos/js/setselected :: javascript"></script>
+	<script th:replace="productos/js/autocomplete :: javascript"></script>
+	<script>
+		$('#mydate').datepicker({
+			format: "yyyy-mm-dd"
+		});
+
+
+		function checkiva() {
+
+			if ($('#iva').is(':checked')) {
+				$('#replace_').val(1);
+
+			} else {
+				$('#replace_').val(0);
+
+			}
+		}
+		$(document).ready(function () {
+			// Warning
+			$(window).on('beforeunload', function () {
+				return "Any changes will be lost";
+			});
+
+			// Form Submit
+			$(document).on("submit", "form", function (event) {
+				// disable warning
+				$(window).off('beforeunload');
+			});
+		});
+		function mostrardiferencia() {
+			var diferencia = 0;
+			var equivalencia = $("#equivalencia").val();
+			diferencia = $("#cantidadProducto1_").val()-$("#cantidadProducto1").val();
+			diferencia = diferencia*equivalencia;
+			let stockvalue = $("#stock1").text();			
+			var longitudsince = stockvalue.search("TRASLADARAN");			
+			longitudsince = longitudsince+11;
+			$("#stock1").text(stockvalue.slice(0,longitudsince)+" "+diferencia+" al producto -->");	
+			//column2
+			var stock2 = $("#cantidadProducto2").text();
+			stock2>0?stock2plus(diferencia):console.log('aun es 0');
+			diferencia<0?notepases(stockvalue):console.log('good');
+			
+		}
+		function notepases(stockvalue){
+			alert('Debe reducir, no aumentar')
+			$("#cantidadProducto1").val($("#cantidadProducto1_").val());
+			$("#stock1").text(stockvalue);
+		}
+		function stock2plus(sumar){
+			$("#cantidadProducto2").text(parseInt($("#cantidadProducto2_").val())+sumar);
+		}
+	</script>
+
+</body>
+
+</html>

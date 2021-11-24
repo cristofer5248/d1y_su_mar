@@ -281,6 +281,13 @@ public class ProductoController {
 		model.put("nullchecker", 1);
 		return "/productos/productoform";
 	}
+	@Secured({ "ROLE_ADMIN", "ROLE_INV" })
+	@RequestMapping(value = "/transformacion", method = RequestMethod.GET)
+	public String transformacion(Map<String, Object> model) {		
+		model.put("titulo", "Tranformacion de productos");
+		model.put("nullchecker", 1);
+		return "/productos/transformacion";
+	}
 
 	@Secured({ "ROLE_ADMIN", "ROLE_SELLER" })
 	@RequestMapping(value = "/nuevoS", method = RequestMethod.GET)

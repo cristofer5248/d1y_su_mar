@@ -166,6 +166,14 @@ public class IProductoServiceImpl implements IProductoService {
 		return productosDao.findByNombrepNoID(term, term,idno);
 	}
 
+	@Override
+	public List<Producto> rellenarstock() {
+		// TODO Auto-generated method stub
+		return productosDao.rellanarstock();
+	}
+
+
+
 
 
 }

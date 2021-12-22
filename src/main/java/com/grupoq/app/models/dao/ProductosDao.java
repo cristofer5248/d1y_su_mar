@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -76,4 +77,9 @@ public interface ProductosDao extends PagingAndSortingRepository<Producto, Long>
 	
 	@Query(value = "select p from Producto p where p.id=?1 and p.codigo!=?2")
 	public Producto findOneByCodigoNot(Long id,Long id2);
+
+	
+	@Query(nativeQuery =true, value= "select * from productos where idp not in (select producto_idp from inventario) and stock>0")
+	public  List<Producto> rellanarstock();
+	
 }

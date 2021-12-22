@@ -44,6 +44,14 @@
 						Ver todos ⚠</a>
 					<a class="btn btn-success btn-xs" style="color: white" data-target="#minimum1" data-toggle="modal"
 						th:if="${not #lists.isEmpty(minimum)}">Minimos <i class="fas fa-exclamation-triangle"></i></a>
+					<a style="color: black; padding-left: 10px;"
+						title="Ver los productos que no presentan ningun moviento de inventario"
+						th:href="@{/adminzone/noMoves}" sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV')"><i
+							class="fas fa-star-half-alt"></i></a>
+					<a style="color: black; padding-left: 10px;"
+						title="Arreglar esos productos que no presentan ningun moviento de inventario"
+						th:href="@{/adminzone/ponerstocks}" sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV')"><i
+							class="fas fa-hammer"></i></a>
 
 					<form class="searchbox" id="formsearch" action="">
 						<input type="search" placeholder="Introducir parametro de busqueda......"
@@ -63,7 +71,8 @@
 					<table class="table table-striped table-bordered table-sm" id="example">
 						<thead class="thead-inverse">
 							<tr>
-								<th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV','ROLE_JEFEADM','ROLE_SELLER')">id</th>
+								<th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV','ROLE_JEFEADM','ROLE_SELLER')">id
+								</th>
 								<th>Codigo</th>
 								<th>Nombre</th>
 								<th>Costo</th>
@@ -85,9 +94,11 @@
 							<div>
 								<tr th:each="producto: ${productos}"
 									th:style="${producto.asegurar}==true? 'color: red' : 'color: black'">
-									<td sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV','ROLE_JEFEADM','ROLE_SELLER')"><a
-											class="btn btn-primary btn-xs" th:href="@{/producto/ver/} + ${producto.id}"
-											th:text="${producto.id}"></a></td>
+									<td
+										sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV','ROLE_JEFEADM','ROLE_SELLER')">
+										<a class="btn btn-primary btn-xs" th:href="@{/producto/ver/} + ${producto.id}"
+											th:text="${producto.id}"></a>
+									</td>
 									<td class="tddata" th:text="${producto.codigo}"></td>
 									<td class="tddata" th:text="${producto.nombrep}"></td>
 									<td class="tddata" th:text="'$'+${producto.precio}"></td>

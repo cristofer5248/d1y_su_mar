@@ -47,4 +47,8 @@ public interface IProductoService {
 	public Page<Producto> findByCategoria(String codigo, Pageable page);
 	public Producto findByCodigo(String codigo);
 	
+//queries asi old directos
+
+public List<Producto> rellenarstock();
+
 }

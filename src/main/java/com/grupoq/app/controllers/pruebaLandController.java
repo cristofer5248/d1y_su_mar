@@ -1,5 +1,6 @@
 package com.grupoq.app.controllers;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,6 +9,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 //import org.springframework.security.access.annotation.Secured;
 //import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +20,13 @@ import org.springframework.ui.Model;
 import com.grupoq.app.models.entity.Facturacion;
 import com.grupoq.app.models.entity.Giro;
 import com.grupoq.app.models.entity.Inventario;
+import com.grupoq.app.models.entity.Movimientos;
 import com.grupoq.app.models.entity.Producto;
 import com.grupoq.app.models.service.ICarritoItemsService;
 import com.grupoq.app.models.service.IFacturaService;
 import com.grupoq.app.models.service.IGiroService;
 import com.grupoq.app.models.service.IInventarioService;
+import com.grupoq.app.models.service.IMovimientosService;
 import com.grupoq.app.models.service.IProductoService;
 import com.grupoq.app.models.service.MailSenderService;
 
@@ -47,6 +51,9 @@ public class pruebaLandController {
 
 	@Autowired
 	private MailSenderService mailservice;
+
+	@Autowired
+	private IMovimientosService movimientosService;
 
 	@RequestMapping(value = "/saveExpress/{nombre}", method = { RequestMethod.GET }, produces = { "application/json" })
 	@ResponseBody
@@ -159,13 +166,61 @@ public class pruebaLandController {
 		String text = null;
 		List<Object[]> producto0_ = productoService.findAllminimo();
 
-		for(int i=0; i<producto0_.size(); i++){
+		for (int i = 0; i < producto0_.size(); i++) {
 			for (Object[] a : producto0_) {
 				text = ("Producto "
 						+ a[0]);
-						
+
 			}
-			
+
+		}
+
+		// model.addAttribute("titulo", "Listado de productos minimos");
+		// model.addAttribute("productos", producto0_);
+		return text;
+	}
+
+	@RequestMapping(value = "/noMoves", method = RequestMethod.GET)
+	public String noMoves() {
+		String text = "LOS SIGUIENTES PRODUCTOS NO PRESENTAN NINGUN MOVIMIENTO:";
+		List<Producto> producto0_ = productoService.rellenarstock();
+
+		for (Producto p : producto0_) {
+			text += ("Producto <br></br>"
+					+ p.getNombrep());
+		}
+		text += "total: " + producto0_.size();
+
+		// model.addAttribute("titulo", "Listado de productos minimos");
+		// model.addAttribute("productos", producto0_);
+		return text;
+	}
+
+	@RequestMapping(value = "/ponerstocks", method = RequestMethod.GET)
+	public String rellenarstock(Authentication authentication) {		
+		List<Producto> producto0_ = productoService.rellenarstock();
+		String text = producto0_.size()==0?"Accion no necesaria, no hubo que realizar": null;
+		Movimientos newmove = new Movimientos();
+		movimientosService.save(newmove);
+		try {
+
+			for (Producto p : producto0_) {
+				Inventario inventario = new Inventario();
+				inventario.setCodigoProveedor("AUTOMATICO" + producto0_.get(1).getId());
+				inventario.setComentario(
+						"Este registro fue insertado automaticamente, el producto no presentaba una entrada inicial");
+				inventario.setEstado(true);
+				inventario.setFecha(new Date());
+				inventario.setMovimientos(newmove);
+				inventario.setZaNombrede(authentication.getName());
+				inventario.setProducto(p);
+				inventario.setStock(p.getStock());
+				inventarioservice.save(inventario);
+				text="Listo, por favor revisar de nuevo";
+
+			}
+		} catch (Exception e) {
+			text="hubo un error";
 		}
 
 		// model.addAttribute("titulo", "Listado de productos minimos");

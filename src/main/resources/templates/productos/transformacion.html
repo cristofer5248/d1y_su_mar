@@ -214,6 +214,13 @@
 			alertify.alert('Exito!', 'Traslado exitoso...autodirigiendo al producto numero 2!', function () { alertify.success('Ok'); });
 			//setTimeout(() => {window.location.href = "/producto/ver/" + $("#productoDestino").val()}, 5000);
 			//window.location.href = "/producto/ver/" + $("#productoDestino").val();
+			setTimeout(() => {limpiandoymoviendo()},5000);
+			$("#cantidadProducto1").prop("disabled", false);
+			
+		}
+		function limpiandoymoviendo(){
+			window.open("/producto/ver/" + $("#productoDestino").val(), "_blank");
+			$("#enviartrans").prop("disabled", true);
 		}
 		function trasladoWrong() {
 			document.getElementById("transform").reset();

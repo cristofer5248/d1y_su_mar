@@ -257,7 +257,9 @@ public class InventarioController {
 		Inventario inventario = addWhenItprodIsAlreadyThere(id);
 		if (!Objects.isNull(inventario)) {
 			int stockold_temp = inventario.getStock();
-			inventario.setStock(stockold_temp + c);
+			//inventario.setStock(stockold_temp + c);
+			inventario.setStock(c);
+			//AQUI SE PUEDE CORRREGIR SI MOSTRAR LO QUE QUEDO O LO QUEDO EN STOCK O LO QUE SE SUMO, DEJAREMOS SUMO
 			inventario.setFecha(fecha);
 			int toti = stockold_temp + c;
 			printinlog("Producto:" + inventario.getProducto().getNombrep() + " id:" + inventario.getProducto().getId()

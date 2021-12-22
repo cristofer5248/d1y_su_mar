@@ -11,8 +11,8 @@ public class Zonetimeutil {
         time_zone_default.setDefault(time_zone_default);
 
         // Displaying the default TimeZone
-        System.out.println("Default TimeZone: " + time_zone_default);
+        //System.out.println("Default TimeZone: " + time_zone_default);
         Date kk = new Date();
-        System.out.print(kk);
+        //System.out.print(kk);
     }
 }

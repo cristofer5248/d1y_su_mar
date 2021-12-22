@@ -37,7 +37,6 @@ public class NotificacionesController {
 	public @ResponseBody List<Notificaciones> verNuevo() {
 		Date date1 = new Date();	
 		Date date2 = new Date(System.currentTimeMillis() - 60 * 1000);
-		System.out.printf("EL TIEMPO ES: " + date1 + " segundo " + date2);
 		List<Notificaciones> list = notificacionesService.therenew(date2, date1);
 		return list;
 	}

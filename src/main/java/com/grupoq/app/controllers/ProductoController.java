@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -26,6 +27,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,6 +41,8 @@ import com.grupoq.app.webservice.EntradasYsalidas;
 import com.grupoq.app.webservice.HistorialDePrecios;
 import com.grupoq.app.models.entity.CarritoItems;
 import com.grupoq.app.models.entity.Facturacion;
+import com.grupoq.app.models.entity.Inventario;
+import com.grupoq.app.models.entity.Movimientos;
 import com.grupoq.app.models.entity.NotadeCredito;
 import com.grupoq.app.models.entity.Notificaciones;
 import com.grupoq.app.models.entity.Presentacion;
@@ -46,6 +51,8 @@ import com.grupoq.app.models.entity.ProductosModify;
 import com.grupoq.app.models.entity.Proveedor;
 import com.grupoq.app.models.entity.Usuario;
 import com.grupoq.app.models.service.IFacturaService;
+import com.grupoq.app.models.service.IInventarioService;
+import com.grupoq.app.models.service.IMovimientosService;
 import com.grupoq.app.models.service.INotadeCreditoService;
 import com.grupoq.app.models.service.INotificacionesService;
 import com.grupoq.app.models.service.IPresentacionService;
@@ -55,6 +62,8 @@ import com.grupoq.app.models.service.IUsuarioService;
 import com.grupoq.app.models.service.MailSenderService;
 import com.grupoq.app.util.paginator.PageRender;
 import org.slf4j.LoggerFactory;
+import org.apache.catalina.connector.Response;
+import org.apache.poi.util.RLEDecompressingInputStream;
 import org.slf4j.Logger;
 
 @Controller
@@ -87,6 +96,12 @@ public class ProductoController {
 
 	@Autowired
 	private MailSenderService mailservice;
+
+	@Autowired
+	private IInventarioService inventarioService;
+
+	@Autowired
+	private IMovimientosService movimientosService;
 
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM", "ROLE_SELLER" })
 	@RequestMapping(value = { "/listar", "/listar/{op}/{nombrep}", "/listar/{op}",
@@ -193,8 +208,6 @@ public class ProductoController {
 			productos = (date1 != null && nombrep == null) ? productoService.findAllFechas(pageRequest, date1_, date2_)
 					: productoService.findAllJoin(pageRequest);
 
-			
-
 		}
 
 		// que model pondremos si es lista o page
@@ -281,9 +294,10 @@ public class ProductoController {
 		model.put("nullchecker", 1);
 		return "/productos/productoform";
 	}
+
 	@Secured({ "ROLE_ADMIN", "ROLE_INV" })
 	@RequestMapping(value = "/transformacion", method = RequestMethod.GET)
-	public String transformacion(Map<String, Object> model) {		
+	public String transformacion(Map<String, Object> model) {
 		model.put("titulo", "Tranformacion de productos");
 		model.put("nullchecker", 1);
 		return "/productos/transformacion";
@@ -315,8 +329,8 @@ public class ProductoController {
 			SessionStatus status) {
 		Producto pro = producto;
 		productoService.save(pro);
-		//productomodifyService.save(nuevamodificacion(pro, pro));
-		return "redirect:/producto/editar/"+pro.getId();
+		// productomodifyService.save(nuevamodificacion(pro, pro));
+		return "redirect:/producto/editar/" + pro.getId();
 
 	}
 
@@ -324,6 +338,7 @@ public class ProductoController {
 	@RequestMapping(value = "/productosave", method = RequestMethod.POST)
 	public String guardar(@Valid Producto producto, BindingResult result, Model model, RedirectAttributes flash,
 			SessionStatus status) {
+		System.out.print("el codigo del id :" + producto.getId() + " d");
 		Producto pro = (producto.getId() != null) ? productoService.findOne(producto.getId()) : null;
 		Double precioold = (producto.getId() != null) ? pro.getPrecio() : null;
 		Proveedor preveedorold = (producto.getProveedor() != null && producto.getId() != null) ? pro.getProveedor()
@@ -367,7 +382,7 @@ public class ProductoController {
 			}
 
 			if (producto.getPrecio() != precioold || producto.getProveedor() != preveedorold) {
-				productomodifyService.save(nuevamodificacion(producto, pro));
+				productomodifyService.save(nuevamodificacion(producto, pro, " no hay"));
 				String detalleprod = pro.getId() + ">" + pro.getCodigo() + ">" + pro.getBodega() + ">" + pro.getFecha()
 						+ ">" + pro.getMargen() + ">" + pro.getMinimo() + ">" + pro.getPrecio() + ">" + pro.getStock()
 						+ ">" + pro.getCategoria().getNombre() + ">" + pro.getMarca().getNombrem() + ">"
@@ -389,7 +404,7 @@ public class ProductoController {
 				// mailservice.sendEmailchris(e.toString(), "Error ProductoController linea
 				// 354");
 			}
-			productomodifyService.save(nuevamodificacion(producto, producto));
+			productomodifyService.save(nuevamodificacion(producto, producto, "no hay"));
 		}
 
 		status.setComplete();
@@ -414,14 +429,97 @@ public class ProductoController {
 		return "redirect:/producto/listar";
 	}
 
-	public ProductosModify nuevamodificacion(Producto producto, Producto pro) {
+	public ProductosModify nuevamodificacion(Producto producto, Producto pro, String detalle) {
 		ProductosModify pro_modify = new ProductosModify();
 		pro_modify.setFecha(new Date());
 		pro_modify.setPrecio(producto.getPrecio());
 		pro_modify.setProveedor(producto.getProveedor().getNombre());
 		pro_modify.setProductomodi(productoService.findOne(pro.getId()));
 		pro_modify.setStock(producto.getStock());
+		pro_modify.setDetalle(detalle);
 		return pro_modify;
+
+	}
+
+	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })
+	@RequestMapping(value = "/transformacion/{id}/{id2}/{cantidad}")
+	public String transformacionStock(@PathVariable(value = "id") Long id1, @PathVariable(value = "id2") Long id2,
+			@PathVariable(value = "cantidad") Long cantidad, RedirectAttributes flash) {
+		System.out.print("ID1= " + id1 + " id2= " + id2 + " stock= " + cantidad);
+		return "redirect:/producto/trasformacion";
+	}
+
+	@RequestMapping(value = "/savetransformacion/{producto1}/{producto2}/{stock}/{equivale}", method = {
+			RequestMethod.GET }, produces = { "application/json" })
+	public @ResponseBody Boolean savegettransformation(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable(value = "producto1", required = true) Long producto1,
+			@PathVariable(value = "producto2", required = true) Long producto2,
+			@PathVariable(value = "stock", required = true) int stock,
+			@PathVariable(value = "equivale", required = true) int equivale, Authentication authentication) {
+		Producto producto1Obj = productoService.findOne(producto1);
+		Producto producto2Obj = productoService.findOne(producto2);
+		Boolean responsef = false;
+		//System.out.print(stock);
+		if (producto1Obj.getStock() > 0) {
+			printLogger("buscando producto producto 1... (" + producto1Obj.getNombrep() + ")\n stock de: "
+					+ producto1Obj.getStock());
+			int stockFirst = producto1Obj.getStock();
+			int stockRevenue = stock < stockFirst ? stock : stockFirst;
+
+			int stock2 = (stockFirst - stock)*equivale;
+			producto1Obj.setStock(stockRevenue);
+			productoService.save(producto1Obj);
+			printLogger("guardando cambio de producto 1 (" + producto1Obj.getNombrep() + ")\n stock ahora de: "
+					+ stockRevenue);
+			printLogger("creando movimiento de modificacion de esto...");
+			try {
+				productomodifyService
+						.save(nuevamodificacion(producto1Obj, producto1Obj, "Se sustrajo una cantidad del producto "
+								+ producto1Obj.getNombrep() + " hacia " + producto2Obj.getNombrep()));
+				printLogger("pasamos al producto 2");
+			} catch (Exception e) {
+				productomodifyService
+						.save(nuevamodificacion(producto1Obj, producto1Obj,
+								"Se sustrajo una cantidad del producto con ID"
+										+ producto1Obj.getId() + " hacia producto con id" + producto2Obj.getId()));
+				printLogger("El detalle del producto es muy largo, se tuvo que recortar \n Pasamos al producto 2");
+			}
+
+			printLogger("Stock para a sumarle: " + stock2);
+			producto2Obj.setStock(producto2Obj.getStock()+stock2);
+			productoService.save(producto2Obj);
+			printLogger("Se guarda el producto dos. Datos:\n Producto " + producto2Obj.getNombrep()
+					+ " stock actual deberia ser " + stock2);
+			Inventario inventarioForp2 = new Inventario();
+			List<ProductosModify> pm_temp = productomodifyService.findAllByProductomodi(producto1Obj);
+			int pm_tempSize = pm_temp.size();
+			inventarioForp2.setCodigoProveedor(producto2Obj.getCodigo() + "TRAS"
+					+ (pm_temp.get(pm_tempSize-1).getId()) + 1);
+			inventarioForp2.setComentario("Traslado del producto " + producto1Obj.getNombrep());
+			inventarioForp2.setEstado(true);
+			inventarioForp2.setFecha(new Date());
+			Movimientos newmove = new Movimientos();
+			movimientosService.save(newmove);
+			inventarioForp2.setMovimientos(newmove);
+			inventarioForp2.setProducto(producto2Obj);
+			inventarioForp2.setStock(stock2);
+			inventarioForp2.setZaNombrede(authentication.getName());
+			inventarioService.save(inventarioForp2);
+			productomodifyService.save(nuevamodificacion(producto2Obj, producto2Obj,
+					"Se fue trasferido stock del producto con ID " + producto1));
+			printLogger("Se guarda el inventario");
+			responsef = true;
+
+		} else {
+			return true;
+		}
+		return responsef;
+	}
+
+	@PostMapping(value = "/savetransformacion") // no sirve en post sad
+	public String transformacionStock_(@Param("producto1") String producto1, @Param("producto2") String producto2,
+			@Param("stock") String stock) {
+		return "ok";
 
 	}
 
@@ -475,13 +573,27 @@ public class ProductoController {
 	}
 
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })
-	@RequestMapping(value = "/editar/{id}")
-	public String editar(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
-
+	@RequestMapping(value = { "/editar/{id}", "/clonar/{op}/{id}" })
+	public String editar(@PathVariable(value = "id") Long id, @PathVariable(value = "op", required = false) Boolean op,
+			Map<String, Object> model, RedirectAttributes flash) {
+		op = op == null ? false : true;
 		Producto producto = null;
+		Producto proClon = new Producto();
+		String mensaje = "Error innesperado";
 
 		if (id > 0) {
 			producto = productoService.findOne(id);
+			if (op) {
+				proClon.setNombrep(producto.getNombrep());
+				proClon.setPrecio(producto.getPrecio());
+				proClon.setBodega(producto.getBodega());
+				proClon.setFecha(producto.getFecha());
+				proClon.setMinimo(producto.getMinimo());
+				proClon.setMargen(producto.getMargen());
+
+			} else
+				printLogger("edicion");
+
 			if (producto == null) {
 				flash.addFlashAttribute("error", "El ID del cliente no existe en la BBDD!");
 				return "redirect:/producto/listar";
@@ -490,7 +602,8 @@ public class ProductoController {
 			flash.addFlashAttribute("error", "El ID del cliente no puede ser cero!");
 			return "redirect:/producto/listar";
 		}
-		model.put("producto", producto);
+
+		model.put("producto", op ? proClon : producto);
 
 		model.put("categoriaid", producto.getCategoria().getId());
 		model.put("marcaid", producto.getMarca().getIdm());
@@ -498,7 +611,7 @@ public class ProductoController {
 		model.put("presentacionid", producto.getPresentacion().getId());
 		model.put("proveedorid", producto.getProveedor().getId());
 		model.put("nullchecker", 0);
-		model.put("titulo", "Editar Producto");
+		model.put("titulo", op ? "Clonar producto" : "Editar Producto");
 		return "/productos/productoform";
 	}
 
@@ -524,19 +637,18 @@ public class ProductoController {
 		return "redirect:/producto/ver/" + id;
 	}
 
-	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM","ROLE_FACT","ROLE_SELLER" })
+	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM", "ROLE_FACT", "ROLE_SELLER" })
 	@GetMapping(value = "/ver/{id}")
 	public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
-		System.out.print("entrando a ver");
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 		LocalDateTime now = LocalDateTime.now();
-		System.out.println(dtf.format(now));
+		// System.out.println(dtf.format(now));
 		TimeZone zone = TimeZone.getDefault();
-		System.out.println(zone.getDisplayName());
-		System.out.println(zone.getID());
+		// System.out.println(zone.getDisplayName());
+		// System.out.println(zone.getID());
 		ZoneId z = ZoneId.systemDefault();
 		String output = z.toString();
-		System.out.print(output);
+		// System.out.print(output);
 
 		// Taller taller = clienteService.findByIdTallerWithClienteWithFactura(id);
 		// List<?> taller = facturaService.probando(id);

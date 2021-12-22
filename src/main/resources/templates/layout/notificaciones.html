@@ -32,6 +32,7 @@
 			// ASYN-TRUE/FALSE)
 			xhr.open("GET",
 				"http://192.168.0.99:8080/notificaciones/givenews/", true);
+				//"http://localhost/notificaciones/givenews/", true);
 			// When response is ready
 			xhr.onload = function () {
 				if (this.status === 200) {
@@ -62,7 +63,7 @@
 			// At last send the request
 			xhr.send();
 		}
-		buttonclickhandler();
+		//buttonclickhandler();
 		setInterval(buttonclickhandler, 25 * 1000); // 60 * 1000 milsec		
 
 	</script>

@@ -31,9 +31,14 @@
 					<!-- 						th:text="'Nuevo requerimiento'"></a> -->
 					<a class="btn btn-primary btn-xs" th:href="@{/producto/listar}" th:text="'Volver'"></a> <a
 						class="btn btn-primary btn-xs" th:href="@{/producto/editar/} + ${idp}" th:text="'Editar'"></a>
-					<a class="btn btn-warning btn-xs" th:text="'Historial de precio'" data-target="#historialmodal"
-						data-toggle="modal"
-						onclick="modalHistorialdePrecios(document.getElementById('idp').textContent);"></a>
+					<a class="btn btn-brown" style="color:white" th:href="@{/producto/clonar/1/}+${idp}"
+						title="Clonar item para realizar una version levemente diferente"><i
+							class="fas fa-clone"></i></a>
+					<a class="btn btn-warning btn-xs" data-target="#historialmodal"
+						title="Historial del producto con precios de venta incluidos" data-toggle="modal"
+						onclick="modalHistorialdePrecios(document.getElementById('idp').textContent);"><i
+							class="fas fa-history"></i></a>
+
 					<label th:text='${idp}' id="idp" style="visibility: hidden"></label>
 
 
@@ -54,8 +59,7 @@
 								class="fas fa-tools"></i></a></li>
 					<li class="list-group-item" th:text="'Proveedor:    '+${producto.proveedor.nombre}"></li>
 					<li class="list-group-item" th:text="'Marca:    '+${producto.marca.nombrem}"></li>
-					<li class="list-group-item"
-						th:text="'Costo unitario: $' +${producto.precio}">
+					<li class="list-group-item" th:text="'Costo unitario: $' +${producto.precio}">
 					</li>
 					<li class="list-group-item" th:text="'Margen:    '+${producto.margen}+'%'"></li>
 					<li class="list-group-item" th:text="'Precio de venta:  $'+${precioventa}"></li>
@@ -87,6 +91,7 @@
 											<th>Proveedor</th>
 											<th>Stock</th>
 											<th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV')">Borrar</th>
+											<th>Detalle</th>
 
 										</tr>
 									</thead>
@@ -94,15 +99,16 @@
 										<tr th:each="productosmodify_: ${producto.productosmodify}"
 											th:with="df=#{date.format}">
 											<td th:text="${#calendars.format(productosmodify_.fecha,df)}"></td>
-											<td
-												th:text="${productosmodify_.precio}">
+											<td th:text="${productosmodify_.precio}">
 											</td>
 											<td th:text="${productosmodify_.proveedor}"></td>
 											<td th:text="${productosmodify_.stock}"></td>
 											<td sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV')"><a
 													th:href=@{/producto/Ehistoryindv/}+${productosmodify_.id}><i
 														style="color:red" class="fas fa-trash"></i></a></td>
+											<td th:text="${productosmodify_.detalle}"></td>
 										</tr>
+
 									</tbody>
 
 								</table>
@@ -130,7 +136,8 @@
 										th:style="'color:' +${inventario.color}"></a></td>
 								<td th:text="${inventario.movimiento}" th:style="'color:' +${inventario.color}"></td>
 								<td th:text="${inventario.concepto}" th:style="'color:' +${inventario.color}"></td>
-								<td th:text="${#dates.format(inventario.fecha, 'dd-MM-yyyy')}" th:style="'color:' +${inventario.color}"></td>
+								<td th:text="${#dates.format(inventario.fecha, 'dd-MM-yyyy')}"
+									th:style="'color:' +${inventario.color}"></td>
 								<!-- 							<td th:text="${inventario.cantidad}"></td> -->
 
 								<!-- 							<td th:text="${factura.cantidad * factura.servicios.precio}"></td> -->

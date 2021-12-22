@@ -13,23 +13,25 @@
 			<div class="card-header" th:text="${titulo}"></div>
 			<div class="card-body">
 
-				<form th:action="@{/producto/productosave}" method="post" enctype="multipart/form-data">
+				<form th:action="@{/producto/pruebita}" id="transform" method="post" enctype="multipart/form-data">
+					<!--<form id="transform">-->
 					<div class="row g-6">
 						<div class="col-sm-3">
 							<label>Producto</label>
 							<input type="text" class="form-control" placeholder="Producto a extraer"
-								id="cargar_producto">
-							<input type="hidden" class="form-control" id="productoOrigen">
+								id="cargar_producto" onchange="iniciodeingreso()" onkeyup="checkfilled()">
+							<input type="hidden" class="form-control" id="productoOrigen" name="producto1">
 						</div>
 						<div class="col-sm-1">
 							<label>Actual Stock</label>
 							<input type="number" id="cantidadProducto1" class="form-control" placeholder="0"
 								onchange="mostrardiferencia()" disabled>
-							<input type="hidden" id="cantidadProducto1_">
+							<input type="hidden" id="cantidadProducto1_" name="stock">
 						</div>
 						<div class="col-sm-1">
 							<label>Equivale a</label>
-							<input type="number" id="equivalencia" class="form-control" value="1" onchange="mostrardiferencia()" required>
+							<input type="number" id="equivalencia" class="form-control" value="1"
+								onchange="mostrardiferencia()" name="unidad" required>
 						</div>
 						<div class="col-sm-1" style="padding: 0px; text-align: center;">
 							<i class="fas fa-long-arrow-alt-right" style="font-size:40px;"></i>
@@ -37,8 +39,8 @@
 						<div class="col-sm-3">
 							<label>Se traslada a </label>
 							<input type="text" id="cargar_producto2" class="form-control"
-								placeholder="Producto que recibe">
-							<input type="hidden" class="form-control" id="productoDestino">
+								placeholder="Producto que recibe" onkeyup="checkfilled()">
+							<input type="hidden" class="form-control" id="productoDestino" name="producto2">
 						</div>
 						<div class="col-sm-1">
 							<label>Actual Stock</label>
@@ -50,22 +52,30 @@
 							<a class="btn btn-primary btn-xs" th:href="@{/producto/nuevo/}" target="_blank"> Crear
 								producto </a>
 						</div>
+						<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 					</div>
+					<!--</form>-->
 					<label>Resultado previo:</label>
-					<div class="container" style=" padding-top: 40px; padding-bottom: 40px;">
+					<div class="container"
+						style=" padding-top: 40px; padding-bottom: 40px; background-color: white; border-radius: 10px;">
 						<div class="row">
-							<div class="col">
-								<label id="producto1" style="background-color: white; color:black"></label>
+							<div class="col" style="color:blue">
+								<label id="producto1"></label>
 								<label id="stock1"></label>
 							</div>
-							<div class="col">
-								<label id="producto2" style="background-color: white; color:black"></label>
+							<div class="col-sm-1"><i class="fas fa-long-arrow-alt-right"
+									style="font-size:40px; color: black"></i></div>
+							<div class="col" style="color:blue; text-align: left;">
+								<label id="producto2"></label>
 								<label id="stock2"></label>
 							</div>
 						</div>
 					</div>
-					<div>
-
+					<div class="container">
+						<div class="row">
+							<button type="submit" id="enviartrans" class="btn btn-primary" th:text="enviar"
+								disabled></button>
+						</div>
 					</div>
 				</form>
 			</div>
@@ -83,6 +93,7 @@
 	<input type="hidden" id="urlAjaxproveedor" th:value="@{/proveedor/cargar_proveedor}" />
 	<input type="hidden" id="urlPresentacion" th:value="@{/producto/saveExpress/}" />
 	<input type="hidden" id="urlAjaxpro" th:value="@{/factura/cargar_producto/}" />
+	<input type="hidden" id="urlAjaxsavepro" th:value="@{/producto/savetransformacion/}" />
 	<input type="hidden" id="urlAjaxpresentaciones" th:value="@{/presentacion/cargar_presentaciones/}" />
 	<script th:replace="productos/js/setselected :: javascript"></script>
 	<script th:replace="productos/js/autocomplete :: javascript"></script>
@@ -102,10 +113,14 @@
 
 			}
 		}
-		$(document).ready(function () {
-			// Warning
+
+		function selecionado(){
+			alert('f');
+		}
+		// Warning			
+		function iniciodeingreso() {
 			$(window).on('beforeunload', function () {
-				return "Any changes will be lost";
+				return "Esta apunto de salir, perdara los datos que ha ingresado.";
 			});
 
 			// Form Submit
@@ -113,30 +128,98 @@
 				// disable warning
 				$(window).off('beforeunload');
 			});
-		});
-		function mostrardiferencia() {
-			var diferencia = 0;
-			var equivalencia = $("#equivalencia").val();
-			diferencia = $("#cantidadProducto1_").val()-$("#cantidadProducto1").val();
-			diferencia = diferencia*equivalencia;
-			let stockvalue = $("#stock1").text();			
-			var longitudsince = stockvalue.search("TRASLADARAN");			
-			longitudsince = longitudsince+11;
-			$("#stock1").text(stockvalue.slice(0,longitudsince)+" "+diferencia+" al producto -->");	
-			//column2
-			var stock2 = $("#cantidadProducto2").text();
-			stock2>0?stock2plus(diferencia):console.log('aun es 0');
-			diferencia<0?notepases(stockvalue):console.log('good');
 			
 		}
-		function notepases(stockvalue){
+
+		$(document).ready(function () {
+			$("#transform").submit(function (event) {
+
+				// Prevent the form from submitting via the browser.
+				event.preventDefault();
+				ajaxPostTrans();
+			});
+		});
+		function mostrardiferencia() {
+			
+			var diferencia = 0;
+			var equivalencia = $("#equivalencia").val();
+			diferencia = $("#cantidadProducto1_").val() - $("#cantidadProducto1").val();
+			diferencia = diferencia * equivalencia;
+			let stockvalue = $("#stock1").text();
+			var longitudsince = stockvalue.search("TRASLADARAN");
+			longitudsince = longitudsince + 11;
+			$("#stock1").text(stockvalue.slice(0, longitudsince) + " " + diferencia);
+			//column2
+			var stock2 = $("#cantidadProducto2").text();
+			stock2 > 0 ? stock2plus(diferencia) : doNothing();
+			diferencia < 0 ? notepases(stockvalue) : doNothing();
+			checkfilled();
+
+		}
+		function doNothing() {
+
+		}
+		function checkfilled() {
+			if($("#cargar_producto2").val()==''){
+				console.log('f');
+				$("#cantidadProducto1").prop("disabled", true);
+			}			
+
+			if ($("#cargar_producto").val() != '' && $("#cargar_producto2").val() != '' && ($("#cantidadProducto1_").val() !=$("#cantidadProducto1").val())) {
+				$("#enviartrans").removeAttr('disabled');
+			} else {$("#enviartrans").prop('disabled',true); };			
+		}
+		function notepases(stockvalue) {
 			alert('Debe reducir, no aumentar')
 			$("#cantidadProducto1").val($("#cantidadProducto1_").val());
 			$("#stock1").text(stockvalue);
 		}
-		function stock2plus(sumar){
-			$("#cantidadProducto2").text(parseInt($("#cantidadProducto2_").val())+sumar);
+		var urlwe = $("#urlAjaxsavepro").val();
+		
+		function stock2plus(sumar) {
+			//$("#cantidadProducto2").text(parseInt($("#cantidadProducto2_").val()) + sumar);
+			$("#stock2").text(parseInt($("#cantidadProducto2_").val()) + sumar);
 		}
+		function ajaxPostTrans() {
+			csrfValue = $("input[name=_csrf]").val();
+			var formData = {
+				producto1: $("#productoOrigen").val() + "/",
+				producto2: $("#productoDestino").val() + "/",
+				stock: $("#cantidadProducto1").val() + "/",
+				equivalencia: $("#equivalencia").val()
+				//_csrf: csrfValue					
+			}
+			$.ajax({
+				type: "GET",
+				dataType: "json",
+				url: $("#urlAjaxsavepro").val() + formData.producto1 + formData.producto2 + formData.stock + formData.equivalencia,
+				dataType: 'json',
+				timeout: 600000,
+				success: function (response) {
+					document.getElementById("transform").reset();
+					response ? trasladoGood() : trasladoWrong();
+					//...
+				},
+				error: function () {
+					alert('Peticion mal formada, actualiza la pagina porfavor');
+					//...
+				}
+			});
+			//var data = $("#transform").val();
+
+
+		}
+		function trasladoGood() {
+			document.getElementById("transform").reset();
+			alertify.alert('Exito!', 'Traslado exitoso...autodirigiendo al producto numero 2!', function () { alertify.success('Ok'); });
+			//setTimeout(() => {window.location.href = "/producto/ver/" + $("#productoDestino").val()}, 5000);
+			//window.location.href = "/producto/ver/" + $("#productoDestino").val();
+		}
+		function trasladoWrong() {
+			document.getElementById("transform").reset();
+			alertify.alert('Error!', 'Traslado con errores...autodirigiendo al producto numero 2!', function () { alertify.success('Ok'); });
+		}
+
 	</script>
 
 </body>

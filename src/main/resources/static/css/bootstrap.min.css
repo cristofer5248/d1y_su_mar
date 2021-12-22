@@ -2041,6 +2041,11 @@ a.btn.disabled, fieldset[disabled] a.btn {
 	background-color: #ffc107;
 	border-color: #ffc107
 }
+.btn-brown {
+	color: #111;
+	background-color:brown;
+	border-color: brown;
+}
 
 .btn-warning:hover {
 	color: #111;

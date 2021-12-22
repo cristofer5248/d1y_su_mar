@@ -16,6 +16,9 @@ public interface ProductosDao extends PagingAndSortingRepository<Producto, Long>
 	@Query(value = "select * from productos p inner join marca m on p.marca_idm=m.idm inner join categorias c on p.categoria_id=c.id inner join proveedor prov on p.proveedor_id=prov.id inner join presentacion pre on p.presentacion_id=pre.id where p.nombrep like %?1% and p.status!=0 order by p.nombrep like ?2% desc", nativeQuery =true)
 	public List<Producto> findByNombrep(String term, String term2);
 
+	@Query(value = "select * from productos p inner join marca m on p.marca_idm=m.idm inner join categorias c on p.categoria_id=c.id inner join proveedor prov on p.proveedor_id=prov.id inner join presentacion pre on p.presentacion_id=pre.id where p.nombrep like %?1% and p.status!=0 and p.idp!=?3 order by p.nombrep like ?2% desc", nativeQuery =true)
+	public List<Producto> findByNombrepNoID(String term, String term2,Long idno);
+
 	@Query(value = "(select p.idp,p.nombrep,p.minimo,f.create_at, p.stock from facturacion f inner join carrito_items c on f.cotizacion_id=c.id inner join productos p on c.productos_idp=p.idp where p.stock<p.minimo group by p.idp)union (select p2.idp, p2.nombrep,p2.minimo, i.create_at,p2.stock from inventario i inner join productos p2 on i.producto_idp=p2.idp where p2.stock<p2.minimo group by p2.idp)", nativeQuery =true)
 	public List<Object[]> findByMinimo();
 	

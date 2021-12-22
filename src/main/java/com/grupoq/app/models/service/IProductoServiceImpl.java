@@ -160,6 +160,12 @@ public class IProductoServiceImpl implements IProductoService {
 		
 	}
 
+	@Override
+	public List<Producto> findByNombrepNoID(String term, Long idno) {
+		// TODO Auto-generated method stub
+		return productosDao.findByNombrepNoID(term, term,idno);
+	}
+
 
 
 }

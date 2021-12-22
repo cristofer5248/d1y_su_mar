@@ -168,7 +168,7 @@
 					timeout: 600000,
 
 					success: function (response) {
-						console.log(data);
+						
 						$("#btnPresentacion").prop("disabled", true);
 						$('#modalpresentacion').modal('toggle');
 						alertify.alert('Exito!', 'Nuevo presentacion registrada , ahora puedes buscarlo en el formulario!', function () { alertify.success('Ok'); });
@@ -223,14 +223,14 @@
 
 			source: function (request, response) {
 				$.ajax({
-					url: urlAjaxPro + request.term,
+					url: urlAjaxPro + removeUglyCharacters(request.term)+"/"+$("#productoDestino").val(),
 					dataType: "json",
 					data: {
 						term: request.term
 
 					},
 					success: function (data) {
-						$("#cantidadProducto1").prop("disabled", false);
+						
 						
 						response($.map(data, function (item) {
 							return {
@@ -255,10 +255,11 @@
 			}
 		});
 		$("#cargar_producto2").autocomplete({
-
-			source: function (request, response) {
+			
+			source: function (request, response) {				
+				
 				$.ajax({
-					url: urlAjaxPro + request.term,
+					url: urlAjaxPro + removeUglyCharacters(request.term)+"/"+$("#productoOrigen").val(),
 					dataType: "json",
 					data: {
 						term: request.term
@@ -266,6 +267,7 @@
 					},
 					success: function (data) {
 						//$("#cantidadProducto").prop("disabled", false);
+						
 						mostrardiferencia();
 						
 						response($.map(data, function (item) {
@@ -286,10 +288,17 @@
 				$("#cantidadProducto2").text(ui.item.stock)
 				$("#cantidadProducto2_").val(ui.item.stock)
 				$("#productoDestino").val(ui.item.value)
+				$("#cantidadProducto1").prop("disabled", false);
 				return false;
 			}
 		});
 
+		function removeUglyCharacters(txt){
+			var txtR = txt;
+			txtR = txt.includes("#") ? txtR.replace("#","XXX"):txtR;
+			txtR = txt.includes("/") ? txtR.replace("/","XXY"):txtR;
+			return txtR;
+		}
 	</script>
 	<script type="text/javascript">
 

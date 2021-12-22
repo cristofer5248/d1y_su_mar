@@ -29,6 +29,7 @@ public interface IProductoService {
 	
 	public List<Producto> findAllList();
 	public List<Producto> findByNombrep(String term);	
+	public List<Producto> findByNombrepNoID(String term, Long idno);	
 	public List<Producto> findByNombrepYMarca(String term, String term2);
 	public Page<Producto> findByNombrepYMarcaPage(String term, String term2, Pageable page);
 	public Page<Producto> findByBodega(String term, Pageable page);

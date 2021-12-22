@@ -497,11 +497,15 @@ public class FacturaController {
 		notificacionesService.save(noti);
 	}
 
-	@GetMapping(value = "/cargar_producto/{term}", produces = { "application/json" })
-	public @ResponseBody List<ProductosWB> listarByNombreJson(@PathVariable String term) {
+	@GetMapping(value = { "/cargar_producto/{term}/", "/cargar_producto/{term}/{noid}","/cargar_producto/{term}" }, produces = {
+			"application/json" })
+	public @ResponseBody List<ProductosWB> listarByNombreJson(@PathVariable String term, @PathVariable(required = false) Long noid) {
 		List<ProductosWB> list2 = new ArrayList<ProductosWB>();
 		// List<Producto> list1 = productoService.findByNombrep(term);
-		List<Producto> list1 = productoservice.findByNombrep(term);
+		term = term.replace("XXX","#");
+		term = term.replace("XXY","/");
+		List<Producto> list1 = (noid == null) ? productoservice.findByNombrep(term)
+				: productoservice.findByNombrepNoID(term, noid);
 		if (list1.isEmpty()) {
 			int lastSpaceIndex = term.lastIndexOf(" ");
 			String term2 = term.substring(lastSpaceIndex + 1, term.length());
@@ -917,16 +921,20 @@ public class FacturaController {
 				flash.addFlashAttribute("success", "Facturacion eliminada con éxito!");
 				// aqui le ponemos reversa de factura hasta productos/inventarios
 				Facturacion fac = facturaservice.findBy(id);
-				printLogger("\n/////////////////////////\n Reversa de factura..."+new Date()+" \n Factura con id: " + id
-						+ "\n Codigo de factura: " + fac.getCodigofactura()+"\n Iterando para ver los productos de la factura..."+"\n Cantidad: "+fac.getCotizacion().getCarrito().size());
+				printLogger("\n/////////////////////////\n Reversa de factura..." + new Date() + " \n Factura con id: "
+						+ id + "\n Codigo de factura: " + fac.getCodigofactura()
+						+ "\n Iterando para ver los productos de la factura..." + "\n Cantidad: "
+						+ fac.getCotizacion().getCarrito().size());
 				String coddoc = fac.getCodigofactura();
-				int iCarrito=1;
-				for (CarritoItems carrito : fac.getCotizacion().getCarrito()) {					
+				int iCarrito = 1;
+				for (CarritoItems carrito : fac.getCotizacion().getCarrito()) {
 					Producto pro = productoservice.findOne(carrito.getProductos().getId());
 
-					printLogger("PRODUCTO N "+iCarrito+" NOMBRE: "+pro.getNombrep()+"\n |Stock actual: "+pro.getStock()+" Se le sumaria: "+carrito.getCantidad()+" Quedaria: "+(pro.getStock()+carrito.getCantidad()));
-					Integer stocknew = pro.getStock()+carrito.getCantidad();
-					pro.setStock(stocknew);					
+					printLogger("PRODUCTO N " + iCarrito + " NOMBRE: " + pro.getNombrep() + "\n |Stock actual: "
+							+ pro.getStock() + " Se le sumaria: " + carrito.getCantidad() + " Quedaria: "
+							+ (pro.getStock() + carrito.getCantidad()));
+					Integer stocknew = pro.getStock() + carrito.getCantidad();
+					pro.setStock(stocknew);
 					ProductosModify pm = new ProductosModify();
 					pm.setPrecio(pro.getPrecio());
 					pm.setFecha(new Date());
@@ -939,12 +947,11 @@ public class FacturaController {
 					printLogger("Se registrado en el historial...");
 					iCarrito++;
 				}
-				try{	
-				printLogger("Borrando factura...");
-				facturaservice.delete(id);
-				printLogger("Accion completada");
-				}			
-				catch(Exception e){
+				try {
+					printLogger("Borrando factura...");
+					facturaservice.delete(id);
+					printLogger("Accion completada");
+				} catch (Exception e) {
 					e.printStackTrace();
 					printLogger("Algo salio mal. ERROR GRAVE QUE SE NECESITA REVISAR");
 				}
@@ -953,7 +960,7 @@ public class FacturaController {
 						+ " ha sido eliminado por " + auth.getName(), "#", "red");
 
 			} catch (Exception e) {
-				mailservice.sendEmailchris(e.toString(), "Error FacturaController FAC_ELIMINAR | TIME: "+ new Date());
+				mailservice.sendEmailchris(e.toString(), "Error FacturaController FAC_ELIMINAR | TIME: " + new Date());
 				flash.addFlashAttribute("error",
 						"El Facturacion posiblemente tiene registros enlazados, no se puede eliminar!");
 				return "redirect:/factura/listar";

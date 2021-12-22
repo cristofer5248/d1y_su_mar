@@ -28,7 +28,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -579,7 +578,7 @@ public class ProductoController {
 		op = op == null ? false : true;
 		Producto producto = null;
 		Producto proClon = new Producto();
-		String mensaje = "Error innesperado";
+		//String mensaje = "Error innesperado";
 
 		if (id > 0) {
 			producto = productoService.findOne(id);
@@ -640,14 +639,14 @@ public class ProductoController {
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM", "ROLE_FACT", "ROLE_SELLER" })
 	@GetMapping(value = "/ver/{id}")
 	public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-		LocalDateTime now = LocalDateTime.now();
+		//DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+		//LocalDateTime now = LocalDateTime.now();
 		// System.out.println(dtf.format(now));
-		TimeZone zone = TimeZone.getDefault();
+		//TimeZone zone = TimeZone.getDefault();
 		// System.out.println(zone.getDisplayName());
 		// System.out.println(zone.getID());
-		ZoneId z = ZoneId.systemDefault();
-		String output = z.toString();
+		//ZoneId z = ZoneId.systemDefault();
+		//String output = z.toString();
 		// System.out.print(output);
 
 		// Taller taller = clienteService.findByIdTallerWithClienteWithFactura(id);
@@ -712,7 +711,8 @@ public class ProductoController {
 				return (a.getFecha().compareTo(b.getFecha()));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				mailservice.sendEmailchris(e.toString(), "Error ProductoController");
+				printLogger("Error PROD01");
+				//mailservice.sendEmailchris(e.toString(), "Error ProductoController");
 			}
 			return 0;
 		}).collect(Collectors.toList());

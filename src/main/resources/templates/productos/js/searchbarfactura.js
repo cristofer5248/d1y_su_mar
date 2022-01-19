@@ -2,13 +2,19 @@
             var submitIcon = $('.searchbox-icon');
             var inputBox = $('.searchbox-input');
             var vamonos = $('#vamonos');
+            var vamonos2 = $('#vamonos2');
             var searchBox = $('.searchbox');
+            var searchBox2 = $('.searchbox2');
             var isOpen = false;
             
             
             vamonos.click(function(){            	
             	var opc = $("#opcSearch").val();            	
             	location.href = $("#urlenviar").val()+opc+"/"+$("#btn-search").val();
+            });
+            vamonos2.click(function(){            	
+            	            	
+            	location.href = $("#urlenviar").val()+"ocultos"+"/"+$("#btn-search").val();
             });
                         
             submitIcon.click(function(){
@@ -49,6 +55,6 @@
                     $('.searchbox-input').val('');
                     $('.searchbox-icon').css('display','block');
                     var opc = $("#opcSearch").val();                    
-                    $('#formsearch').attr('action', $("#urlenviar").val()+opc+"/"+$("#btn-search").val());
+                    $('#formsearch').attr('action', $("#urlenviar").val()+"ocultos"+"/"+$("#btn-search").val());
                 }
             }

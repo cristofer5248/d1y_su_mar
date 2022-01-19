@@ -134,8 +134,10 @@ public class ProductoController {
 		if (op != null) {
 			pageRequest = (op.equals("all")) ? Pageable.unpaged() : PageRequest.of(page, npage);
 			enablebtnall = (op.equals("all") ? true : false);
+			model.addAttribute("ocultos", op.equals("ocultos")?true:false);
 		} else {
 			pageRequest = PageRequest.of(page, npage);
+			model.addAttribute("ocultos", false);
 		}
 
 		pageRequest = (op2 != 0) ? Pageable.unpaged() : PageRequest.of(page, npage);
@@ -192,6 +194,11 @@ public class ProductoController {
 				pathall = "producto/listar/bodega/" + nombrep + pathall;
 				productos = productoService.findByBodega(nombrep, pageRequest);
 			}
+			if (op.equals("ocultos")) {
+				pathall = "producto/listar/ocultos/" + nombrep + pathall;
+				productos = productoService.findByStatus(nombrep, pageRequest);
+				
+			}
 			if (productos == null) {
 				model.addAttribute("error", "Error, Query mal formado");
 			}
@@ -219,7 +226,8 @@ public class ProductoController {
 		model.addAttribute("xlsxpath", xlsxPath);
 		model.addAttribute("pathall", pathall);
 		model.addAttribute("enableallsearch", enableallsearch);
-		model.addAttribute("enablebtnall", enablebtnall);
+		model.addAttribute("enablebtnall", enablebtnall);		
+		
 		// We are adding the new model to get data about minimum products
 		List<Object[]> productsminimum = productoService.findAllminimo();
 		model.addAttribute("minimum", productsminimum);
@@ -249,6 +257,7 @@ public class ProductoController {
 		model.addAttribute("enablebtnall", true);
 		model.addAttribute("productos", productos);
 		model.addAttribute("page", pageRender);
+		model.addAttribute("ocultos", true);
 		return "/productos/listar";
 	}
 

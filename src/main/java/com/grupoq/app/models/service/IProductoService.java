@@ -33,6 +33,7 @@ public interface IProductoService {
 	public List<Producto> findByNombrepYMarca(String term, String term2);
 	public Page<Producto> findByNombrepYMarcaPage(String term, String term2, Pageable page);
 	public Page<Producto> findByBodega(String term, Pageable page);
+	public Page<Producto> findByStatus(String term, Pageable page);
 	public List<Producto> findByNombrepAndProveedorId(String term, Long term2);
 	
 	public Producto fetchProductoWithInventario(Long id);

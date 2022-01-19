@@ -172,6 +172,12 @@ public class IProductoServiceImpl implements IProductoService {
 		return productosDao.rellanarstock();
 	}
 
+	@Override
+	public Page<Producto> findByStatus(String term, Pageable page) {
+		// TODO Auto-generated method stub
+		return productosDao.findByStatus(term, page);
+	}
+
 
 
 

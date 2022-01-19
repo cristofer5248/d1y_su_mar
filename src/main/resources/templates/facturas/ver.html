@@ -144,7 +144,7 @@
 								<th>Marca</th>
 								<th>Costo</th>
 								<th>Margen</th>
-								<th>Precio sin iva</th>
+								<th>Precio sin iva(vendido)</th>
 								<th>Descuento</th>
 								<th>Cantidad</th>
 								<th>Total con iva</th>
@@ -171,7 +171,7 @@
 								<td th:text="${carritos.productos.marca.nombrem}"></td>
 								<td
 									th:text="'$'+${carritos.productos.precio}">
-								</td>yyy
+								</td>
 								<td th:text="${carritos.margen}+'%'"></td>
 								<!-- 								<td	th:text="'$'+${((carritos.productos.precio)/((100-carritos.margen)/100)),0,'COMMA',3,'POINT')}"></td> -->
 								<td th:text="'$'+${(carritos.precio)}"></td>

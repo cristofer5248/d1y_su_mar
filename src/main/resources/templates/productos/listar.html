@@ -31,19 +31,19 @@
 						Producto</a> <a sec:authorize="hasRole('ROLE_SELLER')" th:href="@{/producto/nuevoS}"
 						class="btn btn-primary btn-xs">Crear
 						solicitud</a> <a sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV')" data-toggle="modal"
-						data-target="#filterByDate" th:href="@{/inventario/filtrar}"
+						data-target="#filterByDate" th:href="@{/inventario/filtrar}" th:if="${!ocultos}"
 						class="btn btn-info btn-xs">Filtrar</a> <a class="btn btn-success btn-xs"
-						th:if="${!enablebtnall}" th:href="@{'/producto/listar'+ ${xlsxpath}(format=xlsx)}">Una
+						th:if="${!enablebtnall && !ocultos}" th:href="@{'/producto/listar'+ ${xlsxpath}(format=xlsx)}" >Una
 						hoja <i class="fas fa-file-excel"></i>
 					</a> <a class="btn btn-success btn-xs" th:if="${enableallsearch}"
 						th:href="@{${pathall}(format=xlsx)}">TODOS EN <i class="fas fa-file-excel"></i></a>
 					<a class="btn btn-warning btn-xs" style="color: white"
 						onclick="return confirm('¿Esta seguro? Mostrar muchos datos podria tardar un poco y alentar el servidor');"
-						th:if="${!enablebtnall}" th:href="@{/producto/listar/all?page=0&op2=1}"
+						th:if="${!enablebtnall && !ocultos}" th:href="@{/producto/listar/all?page=0&op2=1}"
 						sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV', 'ROLE_JEFEADM')">⚠
 						Ver todos ⚠</a>
 					<a class="btn btn-success btn-xs" style="color: white" data-target="#minimum1" data-toggle="modal"
-						th:if="${not #lists.isEmpty(minimum)}">Minimos <i class="fas fa-exclamation-triangle"></i></a>
+						th:if="${not #lists.isEmpty(minimum) && !ocultos}">Minimos <i class="fas fa-exclamation-triangle"></i></a>
 					<a style="color: black; padding-left: 10px;"
 						title="Ver los productos que no presentan ningun moviento de inventario"
 						th:href="@{/adminzone/noMoves}" sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV')"><i
@@ -53,19 +53,21 @@
 						th:href="@{/adminzone/ponerstocks}" sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV')"><i
 							class="fas fa-hammer"></i></a>
 
-					<form class="searchbox" id="formsearch" action="">
+					<form class="searchbox" id="formsearch" action="" >
 						<input type="search" placeholder="Introducir parametro de busqueda......"
 							class="searchbox-input" onkeyup="buttonUp();" id="btn-search" required> <select
 							class="custom-select mr-sm-2" id="opcSearch" style="margin-left: 10px; height: 3.3em;">
-							<option value="nombre">Nombre/Marca</option>
-							<option value="codigo">Codigo</option>
-							<option value="proveedor">Proveedor</option>
-							<option value="marca">Marca</option>
-							<option value="categoria">Categoria</option>
-							<option value="bodega">Bodega</option>
+							<option value="ocultos" th:if="${ocultos}">OCULTOS</option>
+							<option value="nombre" th:if="${!ocultos}">Nombre/Marca</option>
+							<option value="codigo" th:if="${!ocultos}">Codigo</option>
+							<option value="proveedor" th:if="${!ocultos}">Proveedor</option>
+							<option value="marca" th:if="${!ocultos}">Marca</option>
+							<option value="categoria" th:if="${!ocultos}">Categoria</option>
+							<option value="bodega" th:if="${!ocultos}">Bodega</option>
 						</select> <input type="button" id="vamonos" class="searchbox-submit" value="GO"> <span
 							class="searchbox-icon">Buscar</span>
 					</form>
+
 				</div>
 				<div class="table-responsive">
 					<table class="table table-striped table-bordered table-sm" id="example">

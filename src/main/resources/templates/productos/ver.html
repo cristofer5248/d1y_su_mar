@@ -90,7 +90,7 @@
 											<th>Precio</th>
 											<th>Proveedor</th>
 											<th>Stock</th>
-											<th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV')">Borrar</th>
+											<th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV')">OPERACION</th>
 											<th>Detalle</th>
 
 										</tr>
@@ -105,7 +105,11 @@
 											<td th:text="${productosmodify_.stock}"></td>
 											<td sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV')"><a
 													th:href=@{/producto/Ehistoryindv/}+${productosmodify_.id}><i
-														style="color:red" class="fas fa-trash"></i></a></td>
+														style="color:red" class="fas fa-trash"></i></a>
+												<a data-toggle="modal" data-target="#modalstock"
+													th:onclick="'dameinfo('+${productosmodify_.stock}+','+${productosmodify_.id}+')'"><i
+														style="color:blue" class="fas fa-edit"></i></a>
+											</td>
 											<td th:text="${productosmodify_.detalle}"></td>
 										</tr>
 
@@ -192,6 +196,43 @@
 					</div>
 				</div>
 			</div>
+			<!-- modal por stock-->
+			<div class="modal fade" id="modalstock" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLabel">Modificar stock ⚠</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body">
+
+							<form th:action="@{/producto/updateHistory}" method="GET" enctype="multipart/form-data">
+								<div class="form-group row">
+									<label for="stock" class="col-sm-2 col-form-label" th:text="Stock"></label>
+									<div class="col-sm-6">
+										<input class="form-control" id="stock_" type="number" step="1" />
+										<input class="form-control"  id="idhistory_" type="hidden" />
+
+										<!-- 							<select th:field="*{margen}" id="cargar_margen" -->
+										<!-- 								name="cargar_margen" class="custom-select mr-sm-2"> -->
+										<!-- 							</select> -->
+									</div>
+								</div>
+						</div>
+
+
+						<input type="button" th:value="'Actualizar'" onclick="enviarya()" class="btn btn-secondary" />
+
+
+
+
+					</div>
+
+				</div>
+			</div>
 		</div>
 
 		<footer th:replace="layout/layout :: footer"></footer>
@@ -200,7 +241,15 @@
 		<input type="hidden" id="urlAjaxCoti" th:value="@{/cotizacion/ver/}" />
 		<script th:replace="productos/js/historialdeprecios :: javascript"></script>
 		<script>
-
+			function dameinfo(dato,dato2) {
+				$("#stock_").val(dato);
+				$("#idhistory_").val(dato2);
+			
+			}
+			function enviarya() {
+				//alert("/producto/updateHistory/" + $("#stock_").val() + "/"+$("#idhistory_").val());
+				window.location.href = "/producto/updateHistory/" + $("#idhistory_").val() + "/"+$("#stock_").val();
+			}
 
 		</script>
 </body>

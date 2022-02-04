@@ -7,7 +7,7 @@
 		<tbody id="plantillaItemsFactura">
 			<tr id="row_{ID}">
 				<td class="d-none"><input value="{ID}" name="item_id[]" /></td>
-				<td>{NOMBRE}</td>
+				<td><a id="ahref_{ID}" target="popup" th:href="@{/producto/}" >{NOMBRE}</a></td>
 				<td
 					th:if="${#request.isUserInRole('ADMIN') OR #request.isUserInRole('JEFEADM')}">{COSTO}</td>
 				<!-- 				<td style="display:none;"><span id="descuento_{ID}">0</span></td> -->

@@ -34,6 +34,7 @@ import com.grupoq.app.models.entity.Cotizacion;
 import com.grupoq.app.models.entity.Descuento;
 import com.grupoq.app.models.entity.Facturacion;
 import com.grupoq.app.models.entity.Inventario;
+import com.grupoq.app.models.entity.Movimientoventa;
 import com.grupoq.app.models.entity.NotadeCredito;
 import com.grupoq.app.models.entity.Notificaciones;
 import com.grupoq.app.models.entity.Producto;
@@ -45,6 +46,7 @@ import com.grupoq.app.models.service.ICotizacionService;
 import com.grupoq.app.models.service.IDescuentoService;
 import com.grupoq.app.models.service.IFacturaService;
 import com.grupoq.app.models.service.IInventarioService;
+import com.grupoq.app.models.service.IMovimientoventaService;
 import com.grupoq.app.models.service.INotadeCreditoService;
 import com.grupoq.app.models.service.INotificacionesService;
 import com.grupoq.app.models.service.IProductoModifyService;
@@ -98,6 +100,9 @@ public class FacturaController {
 
 	@Autowired
 	private MailSenderService mailservice;
+
+	@Autowired
+	private IMovimientoventaService movimientoventaService;
 
 	@Autowired
 	private IProductoModifyService productosmodifyService;
@@ -403,7 +408,8 @@ public class FacturaController {
 					// fin
 					facturacion.setStatus(3);
 				} else {
-					productogetStock.setStock(productogetStock.getStock() - pro.getCantidad());
+					//stock descomentar abajo una linea
+					//productogetStock.setStock(productogetStock.getStock() - pro.getCantidad());
 					// logger.error("ENTRANDO A LA CONDICION DE NUMEROS NEGATIVOS EN STOCK Y PONER
 					// SEST STATUS TRUE");
 					ProductosModify pm = new ProductosModify();
@@ -413,7 +419,17 @@ public class FacturaController {
 					pm.setStock(stockstatic - pro.getCantidad());
 					pm.setProductomodi(productogetStock);
 					productosmodifyService.save(pm);
-					productoservice.save(productogetStock);
+
+					//antes
+					Movimientoventa mv = new Movimientoventa();
+					mv.setStockAfter(stockstatic - pro.getCantidad());
+					mv.setStockBefore(stockstatic);
+					mv.setStockCar(pro.getCantidad());
+					mv.setOperacion("De el stock "+stockstatic+" se resta "+pro.getCantidad() +" y quedaria "+(stockstatic - pro.getCantidad()));
+					mv.setIdp(pm.getProductomodi().getId().intValue());
+					movimientoventaService.save(mv);
+					
+					//productoservice.save(productogetStock);
 					facturacion.setStatus(3);
 					pro.setStatus(false);
 					carritoitemsservice.save(pro);
@@ -421,7 +437,9 @@ public class FacturaController {
 			}
 
 			else {
-				productogetStock.setStock(stockstatic - pro.getCantidad());
+				//stock descomentar abajo
+				printLogger("aqui se paso\n");
+				//productogetStock.setStock(stockstatic - pro.getCantidad());
 				ProductosModify pm = new ProductosModify();
 				pm.setPrecio(productogetStock.getPrecio());
 				pm.setFecha(new Date());
@@ -429,7 +447,15 @@ public class FacturaController {
 				pm.setStock(stockstatic - pro.getCantidad());
 				pm.setProductomodi(productogetStock);
 				productosmodifyService.save(pm);
-				productoservice.save(productogetStock);
+				//antes
+				Movimientoventa mv = new Movimientoventa();
+					mv.setStockAfter(stockstatic - pro.getCantidad());
+					mv.setStockBefore(stockstatic);
+					mv.setStockCar(pro.getCantidad());
+					mv.setOperacion("De el stock "+stockstatic+" se resta "+pro.getCantidad() +" y quedaria "+(stockstatic - pro.getCantidad()));
+					mv.setIdp(pm.getProductomodi().getId().intValue());
+					movimientoventaService.save(mv);
+				//productoservice.save(productogetStock);
 			}
 			// notificar cuando ya quedo en minimo
 			if (productogetStock.getStock() - pro.getCantidad() <= productogetStock.getMinimo()) {

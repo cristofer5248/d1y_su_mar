@@ -35,7 +35,7 @@ var urlAjaxdes = $("#urlAjaxdes").val();
 									value : item.id,
 									label : item.presentacionnombre+" - "+item.nombrep +" - " +item.marcanombre,
 									precio: item.precio,
-									margen: item.margen,
+									margen: item.margen,									
 									stock : item.stock
 									
 								};
@@ -69,6 +69,8 @@ var urlAjaxdes = $("#urlAjaxdes").val();
 					//itemHelper.calcularimporte....();
 					//sin descuento
 					itemsHelper.cambiarTotalyMargen(ui.item.value, ui.item.precio,1,ui.item.margen,1);
+					$("#ahref_"+ui.item.value).attr("href", "/producto/ver/"+ui.item.value);
+					//margen = $("#ahref_"+id).val();
 					var margenOP = (100-ui.item.margen)/100;
 					//aqui ponemos costo! no precio de venta
 					$("#margen_"+ui.item.value).html(ui.item.margen);

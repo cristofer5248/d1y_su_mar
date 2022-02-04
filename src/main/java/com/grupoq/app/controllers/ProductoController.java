@@ -134,7 +134,7 @@ public class ProductoController {
 		if (op != null) {
 			pageRequest = (op.equals("all")) ? Pageable.unpaged() : PageRequest.of(page, npage);
 			enablebtnall = (op.equals("all") ? true : false);
-			model.addAttribute("ocultos", op.equals("ocultos")?true:false);
+			model.addAttribute("ocultos", op.equals("ocultos") ? true : false);
 		} else {
 			pageRequest = PageRequest.of(page, npage);
 			model.addAttribute("ocultos", false);
@@ -197,7 +197,7 @@ public class ProductoController {
 			if (op.equals("ocultos")) {
 				pathall = "producto/listar/ocultos/" + nombrep + pathall;
 				productos = productoService.findByStatus(nombrep, pageRequest);
-				
+
 			}
 			if (productos == null) {
 				model.addAttribute("error", "Error, Query mal formado");
@@ -226,8 +226,8 @@ public class ProductoController {
 		model.addAttribute("xlsxpath", xlsxPath);
 		model.addAttribute("pathall", pathall);
 		model.addAttribute("enableallsearch", enableallsearch);
-		model.addAttribute("enablebtnall", enablebtnall);		
-		
+		model.addAttribute("enablebtnall", enablebtnall);
+
 		// We are adding the new model to get data about minimum products
 		List<Object[]> productsminimum = productoService.findAllminimo();
 		model.addAttribute("minimum", productsminimum);
@@ -346,7 +346,7 @@ public class ProductoController {
 	@RequestMapping(value = "/productosave", method = RequestMethod.POST)
 	public String guardar(@Valid Producto producto, BindingResult result, Model model, RedirectAttributes flash,
 			SessionStatus status) {
-		System.out.print("el codigo del id :" + producto.getId() + " d");
+		printLogger("el codigo del id :" + producto.getId() + " d");
 		Producto pro = (producto.getId() != null) ? productoService.findOne(producto.getId()) : null;
 		Double precioold = (producto.getId() != null) ? pro.getPrecio() : null;
 		Proveedor preveedorold = (producto.getProveedor() != null && producto.getId() != null) ? pro.getProveedor()
@@ -467,14 +467,14 @@ public class ProductoController {
 		Producto producto1Obj = productoService.findOne(producto1);
 		Producto producto2Obj = productoService.findOne(producto2);
 		Boolean responsef = false;
-		//System.out.print(stock);
+		// System.out.print(stock);
 		if (producto1Obj.getStock() > 0) {
 			printLogger("buscando producto producto 1... (" + producto1Obj.getNombrep() + ")\n stock de: "
 					+ producto1Obj.getStock());
 			int stockFirst = producto1Obj.getStock();
 			int stockRevenue = stock < stockFirst ? stock : stockFirst;
 
-			int stock2 = (stockFirst - stock)*equivale;
+			int stock2 = (stockFirst - stock) * equivale;
 			producto1Obj.setStock(stockRevenue);
 			productoService.save(producto1Obj);
 			printLogger("guardando cambio de producto 1 (" + producto1Obj.getNombrep() + ")\n stock ahora de: "
@@ -494,7 +494,7 @@ public class ProductoController {
 			}
 
 			printLogger("Stock para a sumarle: " + stock2);
-			producto2Obj.setStock(producto2Obj.getStock()+stock2);
+			producto2Obj.setStock(producto2Obj.getStock() + stock2);
 			productoService.save(producto2Obj);
 			printLogger("Se guarda el producto dos. Datos:\n Producto " + producto2Obj.getNombrep()
 					+ " stock actual deberia ser " + stock2);
@@ -502,7 +502,7 @@ public class ProductoController {
 			List<ProductosModify> pm_temp = productomodifyService.findAllByProductomodi(producto1Obj);
 			int pm_tempSize = pm_temp.size();
 			inventarioForp2.setCodigoProveedor(producto2Obj.getCodigo() + "TRAS"
-					+ (pm_temp.get(pm_tempSize-1).getId()) + 1);
+					+ (pm_temp.get(pm_tempSize - 1).getId()) + 1);
 			inventarioForp2.setComentario("Traslado del producto " + producto1Obj.getNombrep());
 			inventarioForp2.setEstado(true);
 			inventarioForp2.setFecha(new Date());
@@ -581,13 +581,42 @@ public class ProductoController {
 	}
 
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })
+	@RequestMapping(value = "/updateHistory/{id}/{stock}")
+	public String updatehistorypro(@PathVariable(value = "id") Long id, @PathVariable(value = "stock") int stock,
+			RedirectAttributes flash) {
+		Long idpro = null;
+		if (id > 0) {
+			try {
+				ProductosModify aja = productomodifyService.findById(id);
+				idpro= aja.getProductomodi().getProductosmodify().get(0).getProductomodi().getId();
+				aja.setStock(stock);				
+				productomodifyService.save(aja);
+				printLogger("datos = "+id+" stock="+stock+" productoid"+idpro+"\n");
+
+				flash.addFlashAttribute("success", "Historial de Producto se ha actualizado con éxito!");
+				//nuevaNotificacion("fas fa-box-open", "Historial de Producto con ID'" + id + "' actualizado!", "#", "red");
+			} catch (Exception e) {
+				//System.out.print(e.getMessage());
+				//e.printStackTrace();
+				// mailservice.sendEmailchris(e.toString(), "Error ProductoController eliminando
+				// historial");
+				flash.addFlashAttribute("error",
+						"El producto posiblemente tiene registros de inventariado, no se puede actualizar!");
+				return "redirect:/producto/ver/"+idpro;
+			}
+
+		}
+		return "redirect:/producto/ver/" + idpro ;
+	}
+
+	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })
 	@RequestMapping(value = { "/editar/{id}", "/clonar/{op}/{id}" })
 	public String editar(@PathVariable(value = "id") Long id, @PathVariable(value = "op", required = false) Boolean op,
 			Map<String, Object> model, RedirectAttributes flash) {
 		op = op == null ? false : true;
 		Producto producto = null;
 		Producto proClon = new Producto();
-		//String mensaje = "Error innesperado";
+		// String mensaje = "Error innesperado";
 
 		if (id > 0) {
 			producto = productoService.findOne(id);
@@ -648,14 +677,14 @@ public class ProductoController {
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM", "ROLE_FACT", "ROLE_SELLER" })
 	@GetMapping(value = "/ver/{id}")
 	public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
-		//DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-		//LocalDateTime now = LocalDateTime.now();
+		// DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+		// LocalDateTime now = LocalDateTime.now();
 		// System.out.println(dtf.format(now));
-		//TimeZone zone = TimeZone.getDefault();
+		// TimeZone zone = TimeZone.getDefault();
 		// System.out.println(zone.getDisplayName());
 		// System.out.println(zone.getID());
-		//ZoneId z = ZoneId.systemDefault();
-		//String output = z.toString();
+		// ZoneId z = ZoneId.systemDefault();
+		// String output = z.toString();
 		// System.out.print(output);
 
 		// Taller taller = clienteService.findByIdTallerWithClienteWithFactura(id);
@@ -721,7 +750,7 @@ public class ProductoController {
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				printLogger("Error PROD01");
-				//mailservice.sendEmailchris(e.toString(), "Error ProductoController");
+				// mailservice.sendEmailchris(e.toString(), "Error ProductoController");
 			}
 			return 0;
 		}).collect(Collectors.toList());

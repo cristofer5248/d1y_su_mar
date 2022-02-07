@@ -408,8 +408,8 @@ public class FacturaController {
 					// fin
 					facturacion.setStatus(3);
 				} else {
-					//stock descomentar abajo una linea
-					//productogetStock.setStock(productogetStock.getStock() - pro.getCantidad());
+					// stock descomentar abajo una linea
+					// productogetStock.setStock(productogetStock.getStock() - pro.getCantidad());
 					// logger.error("ENTRANDO A LA CONDICION DE NUMEROS NEGATIVOS EN STOCK Y PONER
 					// SEST STATUS TRUE");
 					ProductosModify pm = new ProductosModify();
@@ -420,16 +420,17 @@ public class FacturaController {
 					pm.setProductomodi(productogetStock);
 					productosmodifyService.save(pm);
 
-					//antes
+					// antes
 					Movimientoventa mv = new Movimientoventa();
 					mv.setStockAfter(stockstatic - pro.getCantidad());
 					mv.setStockBefore(stockstatic);
 					mv.setStockCar(pro.getCantidad());
-					mv.setOperacion("De el stock "+stockstatic+" se resta "+pro.getCantidad() +" y quedaria "+(stockstatic - pro.getCantidad()));
+					mv.setOperacion("De el stock " + stockstatic + " se resta " + pro.getCantidad() + " y quedaria "
+							+ (stockstatic - pro.getCantidad()));
 					mv.setIdp(pm.getProductomodi().getId().intValue());
 					movimientoventaService.save(mv);
-					
-					//productoservice.save(productogetStock);
+
+					// productoservice.save(productogetStock);
 					facturacion.setStatus(3);
 					pro.setStatus(false);
 					carritoitemsservice.save(pro);
@@ -437,9 +438,9 @@ public class FacturaController {
 			}
 
 			else {
-				//stock descomentar abajo
+				// stock descomentar abajo
 				printLogger("aqui se paso\n");
-				//productogetStock.setStock(stockstatic - pro.getCantidad());
+				// productogetStock.setStock(stockstatic - pro.getCantidad());
 				ProductosModify pm = new ProductosModify();
 				pm.setPrecio(productogetStock.getPrecio());
 				pm.setFecha(new Date());
@@ -447,15 +448,16 @@ public class FacturaController {
 				pm.setStock(stockstatic - pro.getCantidad());
 				pm.setProductomodi(productogetStock);
 				productosmodifyService.save(pm);
-				//antes
+				// antes
 				Movimientoventa mv = new Movimientoventa();
-					mv.setStockAfter(stockstatic - pro.getCantidad());
-					mv.setStockBefore(stockstatic);
-					mv.setStockCar(pro.getCantidad());
-					mv.setOperacion("De el stock "+stockstatic+" se resta "+pro.getCantidad() +" y quedaria "+(stockstatic - pro.getCantidad()));
-					mv.setIdp(pm.getProductomodi().getId().intValue());
-					movimientoventaService.save(mv);
-				//productoservice.save(productogetStock);
+				mv.setStockAfter(stockstatic - pro.getCantidad());
+				mv.setStockBefore(stockstatic);
+				mv.setStockCar(pro.getCantidad());
+				mv.setOperacion("De el stock " + stockstatic + " se resta " + pro.getCantidad() + " y quedaria "
+						+ (stockstatic - pro.getCantidad()));
+				mv.setIdp(pm.getProductomodi().getId().intValue());
+				movimientoventaService.save(mv);
+				// productoservice.save(productogetStock);
 			}
 			// notificar cuando ya quedo en minimo
 			if (productogetStock.getStock() - pro.getCantidad() <= productogetStock.getMinimo()) {
@@ -523,13 +525,15 @@ public class FacturaController {
 		notificacionesService.save(noti);
 	}
 
-	@GetMapping(value = { "/cargar_producto/{term}/", "/cargar_producto/{term}/{noid}","/cargar_producto/{term}" }, produces = {
-			"application/json" })
-	public @ResponseBody List<ProductosWB> listarByNombreJson(@PathVariable String term, @PathVariable(required = false) Long noid) {
+	@GetMapping(value = { "/cargar_producto/{term}/", "/cargar_producto/{term}/{noid}",
+			"/cargar_producto/{term}" }, produces = {
+					"application/json" })
+	public @ResponseBody List<ProductosWB> listarByNombreJson(@PathVariable String term,
+			@PathVariable(required = false) Long noid) {
 		List<ProductosWB> list2 = new ArrayList<ProductosWB>();
 		// List<Producto> list1 = productoService.findByNombrep(term);
-		term = term.replace("XXX","#");
-		term = term.replace("XXY","/");
+		term = term.replace("XXX", "#");
+		term = term.replace("XXY", "/");
 		List<Producto> list1 = (noid == null) ? productoservice.findByNombrep(term)
 				: productoservice.findByNombrepNoID(term, noid);
 		if (list1.isEmpty()) {
@@ -872,46 +876,41 @@ public class FacturaController {
 		return "/facturas/ver";
 	}
 
-	// para ver el detalle de la FACTURA
-	@Secured({ "ROLE_ADMIN", "ROLE_JEFEADM", "ROLE_FACT" })
-	@RequestMapping(value = "/cambiarcosto/", method = RequestMethod.POST)
-	public String editarcarrito(@RequestParam(name = "id") Long id,
-			@RequestParam(name = "codigoItemCarrito") Long codigoItemCarrito,
-			@RequestParam(name = "costoN") double costoN, Map<String, Object> model, RedirectAttributes flash,
+	@Secured({ "ROLE_ADMIN", "ROLE_JEFEADM", "ROLE_FACT", "ROLE_INV" })
+	@RequestMapping(value = "/cambiarcantidad/", method = RequestMethod.POST)
+	public String editarcarrito_(Long id,
+			Long codigoitemcarrito,
+			int cantidad, Map<String, Object> model, RedirectAttributes flash,
 			Authentication auth, HttpServletRequest request) {
-
-		// logger.error("\n VEAMOS EL codigoItemCarrito :" + codigoItemCarrito + " costo
-		// " + costoN + " el id: " + id);
+		printLogger("id: " + id + " codigoitemcarrito: " + codigoitemcarrito + " cantidad " + cantidad);
 		String pathredirect = "/factura/listar/";
+		// Double costoN = Double.parseDouble(costoN_);
 		boolean cambiarcosto = false;
 		double totalnuevo = 0.0;
-		if (id > 0 && costoN > 0) {
+		if (id > 0 && cantidad > 0) {
 			try {
-
 				Facturacion factura = facturaservice.findBy(id);
-
 				for (CarritoItems carrito : factura.getCotizacion().getCarrito()) {
-					if (carrito.getId().equals(codigoItemCarrito)) {
+					if (carrito.getId().equals(codigoitemcarrito)) {
 
 						flash.addFlashAttribute("success", "Operacion exitosa!");
-						nuevaNotificacion("fas fa-file-alt", "El costo de un producto en una factura ha sido cambiado!",
+						nuevaNotificacion("fas fa-file-alt", "La cantidad de un producto en una factura ha sido cambiado de "+carrito.getCantidad()+" a "+cantidad,
 								"/factura/ver/" + factura.getId(), "gray");
 						pathredirect = "/cotizacion/ver/" + factura.getCotizacion().getId().toString() + "/"
 								+ factura.getId();
 						cambiarcosto = true;
-						double preciosin = (costoN * carrito.getCantidad());
+						double preciosin = (carrito.getPrecio() * cantidad);
 						// double descuento = carrito.getDescuento() / 100;
 						// el descuento es sin iva?
 						// descuento = carrito.getPrecio()*descuento;
 						totalnuevo += (preciosin * 1.13);
-						double margennuevo = ((carrito.getProductos().getPrecio() / (costoN * 1.13)) * -1 * 100) + 100;
+						double margennuevo = ((carrito.getProductos().getPrecio() / (carrito.getPrecio() * 1.13)) * -1 * 100) + 100;
 						carrito.setMargen(margennuevo);
-						carrito.setPrecio(costoN);
+						carrito.setCantidad(cantidad);
 						carritoitemsservice.save(carrito);
 
 					} else {
 						totalnuevo += carrito.getPrecio() * 1.13 * carrito.getCantidad();
-
 					}
 
 				}
@@ -926,7 +925,74 @@ public class FacturaController {
 				}
 
 			} catch (Exception e) {
-				mailservice.sendEmailchris(e.toString(), "Error FacturaController");
+				e.printStackTrace();
+				// mailservice.sendEmailchris(e.toString(), "Error FacturaController");
+				flash.addFlashAttribute("error", "Error cambiando el cantidad!");
+				return "redirect:" + pathredirect;
+			}
+
+		} else {
+			flash.addFlashAttribute("error", "Error cambiando el cantidad!");
+			return "redirect:" + pathredirect;
+		}
+		return "redirect:" + pathredirect;
+	}
+
+	// para ver el detalle de la FACTURA
+	@Secured({ "ROLE_ADMIN", "ROLE_JEFEADM", "ROLE_FACT", "ROLE_INV" })
+	@RequestMapping(value = "/cambiarcosto/", method = RequestMethod.POST)
+	public String editarcarrito(Long id,
+			Long codigoitemcarrito,
+			Double coston, Map<String, Object> model, RedirectAttributes flash,
+			Authentication auth, HttpServletRequest request) {
+
+		// logger.error("\n VEAMOS EL codigoItemCarrito :" + codigoItemCarrito + " costo
+		// " + costoN + " el id: " + id);
+		printLogger("id: " + id + " codigoitemcarrito: " + codigoitemcarrito + " costoN " + coston);
+		String pathredirect = "/factura/listar/";
+		// Double costoN = Double.parseDouble(costoN_);
+		boolean cambiarcosto = false;
+		double totalnuevo = 0.0;
+		if (id > 0 && coston > 0) {
+			try {
+				Facturacion factura = facturaservice.findBy(id);
+				for (CarritoItems carrito : factura.getCotizacion().getCarrito()) {
+					if (carrito.getId().equals(codigoitemcarrito)) {
+
+						flash.addFlashAttribute("success", "Operacion exitosa!");
+						nuevaNotificacion("fas fa-file-alt", "El costo de un producto en una factura ha sido cambiado de "+carrito.getPrecio()+" a "+coston,
+								"/factura/ver/" + factura.getId(), "gray");
+						pathredirect = "/cotizacion/ver/" + factura.getCotizacion().getId().toString() + "/"
+								+ factura.getId();
+						cambiarcosto = true;
+						double preciosin = (coston * carrito.getCantidad());
+						// double descuento = carrito.getDescuento() / 100;
+						// el descuento es sin iva?
+						// descuento = carrito.getPrecio()*descuento;
+						totalnuevo += (preciosin * 1.13);
+						double margennuevo = ((carrito.getProductos().getPrecio() / (coston * 1.13)) * -1 * 100) + 100;
+						carrito.setMargen(margennuevo);
+						carrito.setPrecio(coston);
+						carritoitemsservice.save(carrito);
+
+					} else {
+						totalnuevo += carrito.getPrecio() * 1.13 * carrito.getCantidad();
+					}
+
+				}
+				if (cambiarcosto) {
+					// logger.error("\ncuantas veces paso" + totalnuevo);
+					double totalnuevosin = totalnuevo / 1.13;
+					totalnuevo = (totalnuevosin > 113.00 & factura.getCliente().getCliente().getAgente())
+							? totalnuevo - (totalnuevosin * 0.01)
+							: totalnuevo;
+					factura.setTotaRegistrado(totalnuevo);
+					facturaservice.save(factura);
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				// mailservice.sendEmailchris(e.toString(), "Error FacturaController");
 				flash.addFlashAttribute("error", "Error cambiando el costo!");
 				return "redirect:" + pathredirect;
 			}
@@ -966,6 +1032,7 @@ public class FacturaController {
 					pm.setFecha(new Date());
 					pm.setProveedor(pro.getProveedor().getNombre());
 					pm.setStock(stocknew);
+					pm.setDetalle("Motivo: se elimino una factura y los productos fueron integrados");
 					productoservice.save(pro);
 					printLogger("Se ha editado y guardado el stock en la operacion anterior");
 					pm.setProductomodi(pro);

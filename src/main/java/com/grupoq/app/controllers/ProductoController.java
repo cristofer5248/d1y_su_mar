@@ -336,9 +336,17 @@ public class ProductoController {
 	public String guardarStock(@Valid Producto producto, BindingResult result, Model model, RedirectAttributes flash,
 			SessionStatus status) {
 		Producto pro = producto;
+		ProductosModify pm = new ProductosModify();
+		pm.setDetalle("Stock modificado directamente");
+		pm.setFecha(new Date());
+		pm.setPrecio(pro.getPrecio());
+		pm.setProductomodi(pro);
+		pm.setProveedor(pro.getProveedor().getNombre());
+		pm.setStock(pro.getStock());
+		productomodifyService.save(pm);
 		productoService.save(pro);
 		// productomodifyService.save(nuevamodificacion(pro, pro));
-		return "redirect:/producto/editar/" + pro.getId();
+		return "redirect:/producto/ver/" + pro.getId();
 
 	}
 

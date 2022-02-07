@@ -78,10 +78,19 @@ public class Cotizacion implements Serializable {
 		return carrito;
 	}
 
+
 	public CarritoItems getCarrito_objeto() {
 		for (CarritoItems car : getCarrito()) {
 			System.out.print(car.getId() + " ");
 			return car;
+		}
+		return null;
+
+	}
+	public Facturacion getFactura_objeto() {
+		for (Facturacion fa : getFactura()) {
+			System.out.print(fa.getId() + " ");
+			return fa;
 		}
 		return null;
 

@@ -177,4 +177,10 @@ public class IFacturaServiceImpl implements IFacturaService {
 		// TODO Auto-generated method stub
 		return facturadao.findFirstByCodigofacturaAndStatus(id);
 	}
+
+	@Override
+	public Facturacion findByCotizacionId(Long id) {
+		// TODO Auto-generated method stub
+		return facturadao.findByCotizacionId(id);
+	}
 }

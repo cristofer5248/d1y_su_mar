@@ -70,4 +70,7 @@ public interface IFacturaDao extends PagingAndSortingRepository<Facturacion, Lon
 
 	@Query("select f from Facturacion f join fetch f.cliente cd join fetch cd.cliente c join fetch f.tipoFactura tp join fetch f.condicionesDPago cp join fetch f.formadepago fp where f.codigofactura=?1 and f.status != 5")
 	public Facturacion findFirstByCodigofacturaAndStatus(String id);
+
+	public Facturacion findByCotizacionId(Long id);
 }
+

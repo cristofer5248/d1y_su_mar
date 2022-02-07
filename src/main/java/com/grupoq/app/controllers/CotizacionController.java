@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.grupoq.app.models.entity.Cotizacion;
 import com.grupoq.app.models.entity.Notificaciones;
 import com.grupoq.app.models.service.ICotizacionService;
+import com.grupoq.app.models.service.IFacturaService;
 import com.grupoq.app.models.service.INotificacionesService;
 
 
@@ -27,6 +28,9 @@ public class CotizacionController {
 	ICotizacionService cotizacionService;
 	@Autowired
 	INotificacionesService notificacionesService;
+
+	@Autowired
+	IFacturaService facturacionService;
 
 	
 	
@@ -47,12 +51,13 @@ public class CotizacionController {
 			return "redirect:/factura/listar";
 		}
 		model.put("cotizacion", cotizacion);
-		model.put("codigoco", cotizacion.getId());
+		model.put("codigoco", cotizacion.getId());		
 		model.put("titulo", "Detalle de cotizacion");
+		
 		if (idfa != null) {
 			model.put("idfactura", idfa);
 		} else {
-			model.put("idfactura", 0);
+			model.put("idfactura", facturacionService.findByCotizacionId(term).getId());
 		}
 		return "cotizaciones/ver";
 	}

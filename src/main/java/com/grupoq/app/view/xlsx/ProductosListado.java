@@ -5,7 +5,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -22,7 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.view.document.AbstractXlsxView;
 
 import com.grupoq.app.models.entity.Producto;
-import com.grupoq.app.models.entity.ProductosModify;
+
 
 @Component("/productos/listar")
 public class ProductosListado extends AbstractXlsxView {

@@ -6,12 +6,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class ErrorsHandler implements ErrorController {
-   /* @RequestMapping("/error")
+    @RequestMapping("/error")
     public String handleError() {
-        //do something like logging
+        // do something like logging
         return "404";
     }
- */
+
     @Override
     public String getErrorPath() {
         return null;

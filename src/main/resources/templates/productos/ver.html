@@ -103,7 +103,7 @@
 											</td>
 											<td th:text="${productosmodify_.proveedor}"></td>
 											<td th:text="${productosmodify_.stock}"></td>
-											<td sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV')"><a
+											<td sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_INV','ROLE_FACT')"><a
 													th:href=@{/producto/Ehistoryindv/}+${productosmodify_.id}><i
 														style="color:red" class="fas fa-trash"></i></a>
 												<a data-toggle="modal" data-target="#modalstock"

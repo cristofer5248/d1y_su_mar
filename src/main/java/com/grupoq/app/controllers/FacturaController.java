@@ -143,13 +143,16 @@ public class FacturaController {
 						model.addAttribute("activePivot", true);
 					} else {
 
-						Usuario user_temp = (request.isUserInRole("ROLE_ADMIN") || request.isUserInRole("ROLE_JEFEADM"))
-								? null
-								: usuarioService.findByUsername(authentication.getName());
+						Usuario user_temp = (request.isUserInRole("ROLE_ADMIN") || request.isUserInRole("ROLE_JEFEADM")
+								|| request.isUserInRole("ROLE_INV"))
+										? null
+										: usuarioService.findByUsername(authentication.getName());
 
-						facturacion = (request.isUserInRole("ROLE_ADMIN") || request.isUserInRole("ROLE_JEFEADM"))
-								? facturaservice.findAllByFecha(pageRequest, date1, date2)
-								: facturaservice.findAllByFechaRestricted(pageRequest, date1, date2, user_temp.getId());
+						facturacion = (request.isUserInRole("ROLE_ADMIN") || request.isUserInRole("ROLE_JEFEADM")
+								|| request.isUserInRole("ROLE_INV"))
+										? facturaservice.findAllByFecha(pageRequest, date1, date2)
+										: facturaservice.findAllByFechaRestricted(pageRequest, date1, date2,
+												user_temp.getId());
 
 						model.addAttribute("activePivot", true);
 					}
@@ -165,7 +168,8 @@ public class FacturaController {
 
 		} else {
 			if (request.isUserInRole("ROLE_ADMIN") || request.isUserInRole("ROLE_FACT")
-					|| request.isUserInRole("ROLE_JEFEADM")) {
+					|| request.isUserInRole("ROLE_JEFEADM") || authentication.getName().equals("melody")) {
+
 				facturacion = facturaservice.findAll(pageRequest);
 			} else {
 				facturacion = facturaservice.findByaACuentadeNombre(authentication.getName(), pageRequest);
@@ -843,10 +847,11 @@ public class FacturaController {
 	}
 
 	// para ver el detalle de la FACTURA
-	@Secured({ "ROLE_ADMIN", "ROLE_SELLER", "ROLE_JEFEADM", "ROLE_FACT" })
+	@Secured({ "ROLE_ADMIN", "ROLE_SELLER", "ROLE_JEFEADM", "ROLE_FACT", "ROLE_INV" })
 	@GetMapping(value = "/ver/{id}")
 	public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash,
 			Authentication auth, HttpServletRequest request) {
+		boolean poderfactura = auth.getName().equals("melody");
 
 		Facturacion facturacion = facturaservice.fetchByIdWithClienteWithCarritoItemsWithProducto(id);
 		if (facturacion == null) {
@@ -857,7 +862,7 @@ public class FacturaController {
 		// logger.error("\n usuario2 " + facturacion.getaCuentade().getUsername());
 
 		if (!facturacion.getaCuentade().getUsername().equals(auth.getName()) && !(request.isUserInRole("ROLE_ADMIN")
-				|| request.isUserInRole("ROLE_JEFEADM") || request.isUserInRole("ROLE_FACT"))) {
+				|| request.isUserInRole("ROLE_JEFEADM") || request.isUserInRole("ROLE_FACT") || poderfactura)) {
 			flash.addFlashAttribute("error", "La factura que intentas ver no te corresponde porque no es tuya.");
 			return "redirect:/facturacion/listar";
 		}
@@ -894,7 +899,9 @@ public class FacturaController {
 					if (carrito.getId().equals(codigoitemcarrito)) {
 
 						flash.addFlashAttribute("success", "Operacion exitosa!");
-						nuevaNotificacion("fas fa-file-alt", "La cantidad de un producto en una factura ha sido cambiado de "+carrito.getCantidad()+" a "+cantidad,
+						nuevaNotificacion("fas fa-file-alt",
+								"La cantidad de un producto en una factura ha sido cambiado de " + carrito.getCantidad()
+										+ " a " + cantidad,
 								"/factura/ver/" + factura.getId(), "gray");
 						pathredirect = "/cotizacion/ver/" + factura.getCotizacion().getId().toString() + "/"
 								+ factura.getId();
@@ -904,7 +911,8 @@ public class FacturaController {
 						// el descuento es sin iva?
 						// descuento = carrito.getPrecio()*descuento;
 						totalnuevo += (preciosin * 1.13);
-						double margennuevo = ((carrito.getProductos().getPrecio() / (carrito.getPrecio() * 1.13)) * -1 * 100) + 100;
+						double margennuevo = ((carrito.getProductos().getPrecio() / (carrito.getPrecio() * 1.13)) * -1
+								* 100) + 100;
 						carrito.setMargen(margennuevo);
 						carrito.setCantidad(cantidad);
 						carritoitemsservice.save(carrito);
@@ -960,7 +968,9 @@ public class FacturaController {
 					if (carrito.getId().equals(codigoitemcarrito)) {
 
 						flash.addFlashAttribute("success", "Operacion exitosa!");
-						nuevaNotificacion("fas fa-file-alt", "El costo de un producto en una factura ha sido cambiado de "+carrito.getPrecio()+" a "+coston,
+						nuevaNotificacion("fas fa-file-alt",
+								"El costo de un producto en una factura ha sido cambiado de " + carrito.getPrecio()
+										+ " a " + coston,
 								"/factura/ver/" + factura.getId(), "gray");
 						pathredirect = "/cotizacion/ver/" + factura.getCotizacion().getId().toString() + "/"
 								+ factura.getId();

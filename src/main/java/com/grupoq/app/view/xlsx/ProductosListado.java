@@ -180,10 +180,14 @@ public class ProductosListado extends AbstractXlsxView {
 
 			cell = fila.createCell(10);
 			// cell.setCellValue(pro.getStock());
+			/*
 			for (ProductosModify pro_ : pro.getProductosmodify()) {
 				System.out.print("oye crack por aqui " + pro.getNombrep() + " " + pro_.getStock() + "\n");
 			}
-			cell.setCellValue(pro.getProductosmodify().get(pro.getProductosmodify().size() - 1).getStock());
+			*/
+			//cell.setCellValue(pro.getProductosmodify().get(pro.getProductosmodify().size() - 1).getStock());
+			//porque esta asi el de arriba? no lo se
+			cell.setCellValue(pro.getStock());
 			cell.setCellStyle(tbodystyle);
 
 			total += pro.getStock();

@@ -1073,7 +1073,7 @@ public class FacturaController {
 		return "redirect:/factura/listar";
 	}
 
-	@Secured({ "ROLE_ADMIN", "ROLE_FACT" })
+	@Secured({ "ROLE_ADMIN", "ROLE_FACT","ROLE_MELODY" })
 	@RequestMapping(value = "/statusChange", method = RequestMethod.POST)
 	public String finalizandoFactura(@RequestParam(name = "id") Long id, @RequestParam(name = "codigo") String codigo,
 			@RequestParam(name = "ndr") int ndr, RedirectAttributes flash) {

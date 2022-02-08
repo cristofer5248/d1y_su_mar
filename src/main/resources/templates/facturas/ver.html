@@ -47,7 +47,7 @@
 						th:text="'Evaluar existencias'"></a> <a
 						th:if="${facturaciones.status==2 || facturaciones.status==1 || facturaciones.status==4 }"
 						class="btn btn-success btn-xs" data-toggle="modal" data-target="#exampleModal2"
-						style="color: white;" sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_FACT')" onclick="meterid();"
+						style="color: white;" sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_FACT','ROLE_MELODY')" onclick="meterid();"
 						th:text="'Procesar'"></a>
 
 

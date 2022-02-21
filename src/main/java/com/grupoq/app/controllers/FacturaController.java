@@ -1015,8 +1015,8 @@ public class FacturaController {
 	}
 
 	@Secured({ "ROLE_ADMIN", "ROLE_JEFEADM", "ROLE_FACT" })
-	@RequestMapping(value = "/eliminar/{id}")
-	public String eliminar(@PathVariable(value = "id") Long id, RedirectAttributes flash, Authentication auth) {
+	@RequestMapping(value = {"/eliminar/{id}","/eliminar/{id}/{opc}"})
+	public String eliminar(@PathVariable(value = "id") Long id,@PathVariable(value = "opc") int opc, RedirectAttributes flash, Authentication auth) {
 
 		if (id > 0) {
 			try {
@@ -1031,19 +1031,24 @@ public class FacturaController {
 				int iCarrito = 1;
 				for (CarritoItems carrito : fac.getCotizacion().getCarrito()) {
 					Producto pro = productoservice.findOne(carrito.getProductos().getId());
-
+					ProductosModify pm = new ProductosModify();
+					Integer stocknew = pro.getStock() + carrito.getCantidad();
+					if(opc==1){
 					printLogger("PRODUCTO N " + iCarrito + " NOMBRE: " + pro.getNombrep() + "\n |Stock actual: "
 							+ pro.getStock() + " Se le sumaria: " + carrito.getCantidad() + " Quedaria: "
 							+ (pro.getStock() + carrito.getCantidad()));
-					Integer stocknew = pro.getStock() + carrito.getCantidad();
+					
+					
 					pro.setStock(stocknew);
-					ProductosModify pm = new ProductosModify();
+					pm.setStock(stocknew);
+					//productoservice.save(pro);
+					}
+					pm.setStock(opc==1?stocknew:pro.getStock());
 					pm.setPrecio(pro.getPrecio());
 					pm.setFecha(new Date());
 					pm.setProveedor(pro.getProveedor().getNombre());
-					pm.setStock(stocknew);
 					pm.setDetalle("Motivo: se elimino una factura y los productos fueron integrados");
-					productoservice.save(pro);
+					
 					printLogger("Se ha editado y guardado el stock en la operacion anterior");
 					pm.setProductomodi(pro);
 					productosmodifyService.save(pm);

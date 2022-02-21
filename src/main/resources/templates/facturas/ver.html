@@ -33,12 +33,11 @@
 					<!-- 						th:href="@{'/taller/form/' + ${producto.id}}" -->
 					<!-- 						th:text="'Nuevo requerimiento'"></a> -->
 					<a class="btn btn-primary btn-xs" href="javascript: history.go(-1)"><i
-							class="fas fa-arrow-left"></i> Volver </a> <a class="btn btn-danger btn-xs"
-						th:href="@{/factura/eliminar/}+${codigofa}"
-						sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_FACT','ROLE_JEFEADM')"
-						onclick="return confirm('Estas seguro que quieres eliminar?');">
+							class="fas fa-arrow-left"></i> Volver </a> <button class="btn btn-danger btn-xs"
+						sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_FACT','ROLE_JEFEADM')" data-toggle="modal"
+						data-target="#myModal3">
 						<i class="far fa-trash-alt"></i>
-					</a> <a class="btn btn-primary btn-xs" th:href="@{/factura/editar/}+${codigofa}"
+					</button> <a class="btn btn-primary btn-xs" th:href="@{/factura/editar/}+${codigofa}"
 						sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_FACT','ROLE_JEFEADM')">
 						<i class="fas fa-edit"></i>
 					</a> <a class="btn btn-success btn-xs" th:if="${facturaciones.status==3}"
@@ -47,8 +46,8 @@
 						th:text="'Evaluar existencias'"></a> <a
 						th:if="${facturaciones.status==2 || facturaciones.status==1 || facturaciones.status==4 }"
 						class="btn btn-success btn-xs" data-toggle="modal" data-target="#exampleModal2"
-						style="color: white;" sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_FACT','ROLE_MELODY')" onclick="meterid();"
-						th:text="'Procesar'"></a>
+						style="color: white;" sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_FACT','ROLE_MELODY')"
+						onclick="meterid();" th:text="'Procesar'"></a>
 
 
 				</h4>
@@ -128,6 +127,27 @@
 							style="background-color: orange"
 							th:href="@{'/cotizacion/ver/'+${carritoid}+'/'+${codigofa}}"></a></li>
 				</ul>
+				<div class="modal fade" id="myModal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+										aria-hidden="true">×</span></button>
+								
+							</div>
+							<div class="modal-body">
+								Si elijes sustraer se eliminara y se integrara la cantidad al producto correspondiente.
+								Si escoges NO solo se eliminara la factura sin integrar sus productos.
+							</div>
+							<div class="modal-footer">
+								<a type="button" class="btn btn btn-primary" style="color:white" th:href="@{/factura/eliminar/}+${codigofa}+'/1'">Si</a>
+								<a type="button" class="btn btn btn-success" style="color:white" th:href="@{/factura/eliminar/}+${codigofa}+'/2'">No</a>
+								<button type="button" class="btn btn-orange" data-dismiss="modal">Cancelar</button>
+							</div>
+						</div>
+					</div>
+				</div>
 
 				<!-- <div th:if="${#lists.isEmpty(factura)}"
 					class="alert alert-info my-4"
@@ -169,8 +189,7 @@
 								<td th:text="${carritos.productos.nombrep}"></td>
 								<td th:text="${carritos.productos.proveedor.nombre}"></td>
 								<td th:text="${carritos.productos.marca.nombrem}"></td>
-								<td
-									th:text="'$'+${carritos.productos.precio}">
+								<td th:text="'$'+${carritos.productos.precio}">
 								</td>
 								<td th:text="${carritos.margen}+'%'"></td>
 								<!-- 								<td	th:text="'$'+${((carritos.productos.precio)/((100-carritos.margen)/100)),0,'COMMA',3,'POINT')}"></td> -->

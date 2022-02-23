@@ -456,6 +456,17 @@ public class ProductoController {
 		return pro_modify;
 
 	}
+	public ProductosModify nuevamodificacionConProvee(Producto producto, Producto pro, String detalle,String proveedor) {
+		ProductosModify pro_modify = new ProductosModify();
+		pro_modify.setFecha(new Date());
+		pro_modify.setPrecio(producto.getPrecio());
+		pro_modify.setProveedor(proveedor);
+		pro_modify.setProductomodi(productoService.findOne(pro.getId()));
+		pro_modify.setStock(producto.getStock());
+		pro_modify.setDetalle(detalle);
+		return pro_modify;
+
+	}
 
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })
 	@RequestMapping(value = "/transformacion/{id}/{id2}/{cantidad}")
@@ -474,15 +485,24 @@ public class ProductoController {
 			@PathVariable(value = "equivale", required = true) int equivale, Authentication authentication) {
 		Producto producto1Obj = productoService.findOne(producto1);
 		Producto producto2Obj = productoService.findOne(producto2);
+		String proveedorP2 = producto1Obj.getProveedor().getNombre();
 		Boolean responsef = false;
-		// System.out.print(stock);
+		
+		//Boolean stop = true;
+		
 		if (producto1Obj.getStock() > 0) {
 			printLogger("buscando producto producto 1... (" + producto1Obj.getNombrep() + ")\n stock de: "
 					+ producto1Obj.getStock());
 			int stockFirst = producto1Obj.getStock();
 			int stockRevenue = stock < stockFirst ? stock : stockFirst;
 
-			int stock2 = (stockFirst - stock) * equivale;
+			int stock2 = ((stockFirst - stock) * equivale)+producto2Obj.getStock();
+			/*if (stop) {
+				printLogger("VALORES: "+producto1+"\nProducto2: "+producto2+"\nStock: "+stock+"\nEquivale: "+equivale);
+				printLogger("stock2: "+stock2);
+				printLogger("proveedordeP2: "+producto2Obj.getProveedor().getNombre());
+				return false;
+			}*/
 			producto1Obj.setStock(stockRevenue);
 			productoService.save(producto1Obj);
 			printLogger("guardando cambio de producto 1 (" + producto1Obj.getNombrep() + ")\n stock ahora de: "
@@ -501,8 +521,8 @@ public class ProductoController {
 				printLogger("El detalle del producto es muy largo, se tuvo que recortar \n Pasamos al producto 2");
 			}
 
-			printLogger("Stock para a sumarle: " + stock2);
-			producto2Obj.setStock(producto2Obj.getStock() + stock2);
+			printLogger("Stock para a sumarle: " + (stock2-producto2Obj.getStock()));
+			producto2Obj.setStock(stock2);
 			productoService.save(producto2Obj);
 			printLogger("Se guarda el producto dos. Datos:\n Producto " + producto2Obj.getNombrep()
 					+ " stock actual deberia ser " + stock2);
@@ -521,8 +541,8 @@ public class ProductoController {
 			inventarioForp2.setStock(stock2);
 			inventarioForp2.setZaNombrede(authentication.getName());
 			inventarioService.save(inventarioForp2);
-			productomodifyService.save(nuevamodificacion(producto2Obj, producto2Obj,
-					"Se fue trasferido stock del producto con ID " + producto1));
+			productomodifyService.save(nuevamodificacionConProvee(producto2Obj, producto2Obj,
+					"Se fue trasferido stock del producto con ID " + producto1,proveedorP2));
 			printLogger("Se guarda el inventario");
 			responsef = true;
 
@@ -596,25 +616,26 @@ public class ProductoController {
 		if (id > 0) {
 			try {
 				ProductosModify aja = productomodifyService.findById(id);
-				idpro= aja.getProductomodi().getProductosmodify().get(0).getProductomodi().getId();
-				aja.setStock(stock);				
+				idpro = aja.getProductomodi().getProductosmodify().get(0).getProductomodi().getId();
+				aja.setStock(stock);
 				productomodifyService.save(aja);
-				printLogger("datos = "+id+" stock="+stock+" productoid"+idpro+"\n");
+				printLogger("datos = " + id + " stock=" + stock + " productoid" + idpro + "\n");
 
 				flash.addFlashAttribute("success", "Historial de Producto se ha actualizado con éxito!");
-				//nuevaNotificacion("fas fa-box-open", "Historial de Producto con ID'" + id + "' actualizado!", "#", "red");
+				// nuevaNotificacion("fas fa-box-open", "Historial de Producto con ID'" + id +
+				// "' actualizado!", "#", "red");
 			} catch (Exception e) {
-				//System.out.print(e.getMessage());
-				//e.printStackTrace();
+				// System.out.print(e.getMessage());
+				// e.printStackTrace();
 				// mailservice.sendEmailchris(e.toString(), "Error ProductoController eliminando
 				// historial");
 				flash.addFlashAttribute("error",
 						"El producto posiblemente tiene registros de inventariado, no se puede actualizar!");
-				return "redirect:/producto/ver/"+idpro;
+				return "redirect:/producto/ver/" + idpro;
 			}
 
 		}
-		return "redirect:/producto/ver/" + idpro ;
+		return "redirect:/producto/ver/" + idpro;
 	}
 
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })

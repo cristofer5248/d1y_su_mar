@@ -34,8 +34,10 @@
 					<!-- 						th:text="'Nuevo requerimiento'"></a> -->
 					<a class="btn btn-primary btn-xs" th:href="@{/factura/listar}"
 						sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_JEFEADM')" th:text="'Volver'"></a> <a
-						class="btn btn-danger btn-xs" th:href="@{/factura/nuevof/}+${codigoco}"
+						class="btn btn-danger btn-xs" th:href="@{/factura/nuevof/}+${codigoco}+'/0'"
 						th:text="'Remisionar'"></a>
+					<a class="btn btn-success btn-xs" th:href="@{/factura/nuevof/}+${codigoco}+'/1'"
+						th:text="'Descontar'"></a>
 					<a sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_JEFEADM','ROLE_FACT')"
 						th:if="${!cotizacion.aprobado}" class="btn btn-success btn-xs"
 						th:href="@{/cotizacion/aprobar/}+${codigoco}" th:text="'APROBAR AHORA'"></a>
@@ -97,7 +99,8 @@
 									data-toggle="modal" th:value="${carritos.id}" data-target="#exampleModal2"
 									onclick="meteridIpro(this.value)"
 									th:text="'$'+${#numbers.formatDecimal(carritos.precio, 0, 'COMMA', 3, 'POINT')}"></button>
-								<i style="color: blue" class="fas fa-pen-alt"></i></td>
+								<i style="color: blue" class="fas fa-pen-alt"></i>
+							</td>
 							<td th:text="'$'+${#numbers.formatDecimal(carritos.precio, 0, 'COMMA', 2, 'POINT')}"
 								sec:authorize="!(hasAnyRole('ROLE_ADMIN','ROLE_JEFEADM','ROLE_INV'))"></td>
 							<td th:if="${carritos.descuento<1}" th:text="${carritos.descuento*100}+'%'"></td>

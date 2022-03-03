@@ -259,14 +259,25 @@ public class FacturaController {
 	}
 
 	// ESTOS SI SON PARA FACTURA
-	@Secured({ "ROLE_ADMIN", "ROLE_SELLER" })
-	@RequestMapping(value = "/nuevof/{term}", method = RequestMethod.GET)
-	public String nuevo(Map<String, Object> model, RedirectAttributes flash, @PathVariable Long term,
+	@Secured({ "ROLE_ADMIN", "ROLE_SELLER","ROLE_INV" })
+	@RequestMapping(value = {"/nuevof/{term}","/nuevof/{term}/{opc}"}, method = RequestMethod.GET)
+	public String nuevo(Map<String, Object> model, RedirectAttributes flash, @PathVariable Long term,@PathVariable (required=false) int opc,
 			HttpServletRequest request, Authentication authentication) {
 		Facturacion facturacion = new Facturacion();
 		Cotizacion cotizacion = new Cotizacion();
 		cotizacion = cotizacionService.findby(term);
 		model.put("titulo", "Remision");
+		if(opc==1){
+			printLogger("codigo cotizacion a descontar: "+term);
+			for(CarritoItems carrito : cotizacion.getCarrito()){
+				printLogger("productos: "+carrito.getProductos().getNombrep());
+				Producto producto = productoservice.findOne(carrito.getProductos().getId());
+				int stocktemp = producto.getStock();
+				producto.setStock(stocktemp - carrito.getCantidad());
+				productoservice.save(producto);
+			};
+			return "redirect:/cotizacion/ver/"+term+"/"+opc; 
+		}
 		if (cotizacion == null) {
 			model.put("facturacion", facturacion);
 			flash.addFlashAttribute("error", "No existe ese id de cotizacion. Mostrando formulario vacio...");

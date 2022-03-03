@@ -609,8 +609,8 @@ public class ProductoController {
 	}
 
 	@Secured({ "ROLE_ADMIN", "ROLE_INV", "ROLE_JEFEADM" })
-	@RequestMapping(value = "/updateHistory/{id}/{stock}")
-	public String updatehistorypro(@PathVariable(value = "id") Long id, @PathVariable(value = "stock") int stock,
+	@RequestMapping(value = "/updateHistory/{id}/{stock}/{comentario}")
+	public String updatehistorypro(@PathVariable(value = "id") Long id, @PathVariable(value = "stock") int stock,@PathVariable(value = "comentario") String comentario,
 			RedirectAttributes flash) {
 		Long idpro = null;
 		if (id > 0) {
@@ -618,8 +618,9 @@ public class ProductoController {
 				ProductosModify aja = productomodifyService.findById(id);
 				idpro = aja.getProductomodi().getProductosmodify().get(0).getProductomodi().getId();
 				aja.setStock(stock);
+				aja.setDetalle(comentario);
 				productomodifyService.save(aja);
-				printLogger("datos = " + id + " stock=" + stock + " productoid" + idpro + "\n");
+				printLogger("datos = " + id + " stock=" + stock + " productoid" + idpro + "\n"+"comentario: "+comentario);
 
 				flash.addFlashAttribute("success", "Historial de Producto se ha actualizado con éxito!");
 				// nuevaNotificacion("fas fa-box-open", "Historial de Producto con ID'" + id +

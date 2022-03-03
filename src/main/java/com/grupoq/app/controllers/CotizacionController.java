@@ -57,12 +57,14 @@ public class CotizacionController {
 		if (idfa != null) {
 			model.put("idfactura", idfa);
 		} else {
-			model.put("idfactura", facturacionService.findByCotizacionId(term).getId());
+			//model.put("idfactura", cotizacion.aprobado?facturacionService.findByCotizacionId(term).getId():"SIN FACTURAR");
+			model.put("idfactura", cotizacion.aprobado?"LISTA":"SIN FACTURAR");
 		}
 		return "cotizaciones/ver";
 	}
 
-	@Secured({ "ROLE_ADMIN", "ROLE_SELLER", "ROLE_JEFEADM" })
+	@Secured({ "ROLE_ADMIN", "ROLE_FACT", "ROLE_JEFEADM" })
+	//@Secured({ "ROLE_ADMIN", "ROLE_SELLER", "ROLE_JEFEADM" })
 	@RequestMapping(value = "/aprobar/{term}", method = RequestMethod.GET)
 	public String aprobar(@PathVariable Long term, Map<String, Object> model, RedirectAttributes flash) {
 		Cotizacion cotizacion = cotizacionService.findby(term);

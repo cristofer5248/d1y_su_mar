@@ -212,9 +212,11 @@
 							<form th:action="@{/producto/updateHistory}" method="GET" enctype="multipart/form-data">
 								<div class="form-group row">
 									<label for="stock" class="col-sm-2 col-form-label" th:text="Stock"></label>
+									
 									<div class="col-sm-6">
 										<input class="form-control" id="stock_" type="number" step="1" />
-										<input class="form-control"  id="idhistory_" type="hidden" />
+										<input class="form-control" id="comentario_" type="text" placeholder="Descipcion" />
+										<input class="form-control"  id="idhistory_" type="hidden" />										
 
 										<!-- 							<select th:field="*{margen}" id="cargar_margen" -->
 										<!-- 								name="cargar_margen" class="custom-select mr-sm-2"> -->
@@ -248,7 +250,7 @@
 			}
 			function enviarya() {
 				//alert("/producto/updateHistory/" + $("#stock_").val() + "/"+$("#idhistory_").val());
-				window.location.href = "/producto/updateHistory/" + $("#idhistory_").val() + "/"+$("#stock_").val();
+				window.location.href = "/producto/updateHistory/" + $("#idhistory_").val() + "/"+$("#stock_").val()+"/"+$("#comentario_").val();
 			}
 
 		</script>

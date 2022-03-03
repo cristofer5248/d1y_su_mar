@@ -385,10 +385,13 @@ public class FacturaController {
 
 		for (CarritoItems pro : cotizaciontemporal.getCarrito()) {
 			int stockstatic;
+			int stockcarritoStatic;
 
 			Producto productogetStock = productoservice.findOne(pro.getProductos().getId());
 			// por si en alguna razon esta accion se repite para el mismo producto, detener!
 			stockstatic = productogetStock.getStock();
+			List<ProductosModify> temp_pm = productosmodifyService.findAllByProductomodi(pro.getProductos());
+			stockcarritoStatic = temp_pm.get(temp_pm.size()-1).getStock();
 			// logger.error("COMPARANDO LA CANTIDA PEDIDA: " + pro.getCantidad() + "\n LA
 			// CANTIDAD QUE HAY: "
 			// + productogetStock.getStock());
@@ -413,14 +416,16 @@ public class FacturaController {
 					facturacion.setStatus(3);
 				} else {
 					// stock descomentar abajo una linea
-					// productogetStock.setStock(productogetStock.getStock() - pro.getCantidad());
+					productogetStock.setStock(stockstatic - pro.getCantidad());
 					// logger.error("ENTRANDO A LA CONDICION DE NUMEROS NEGATIVOS EN STOCK Y PONER
 					// SEST STATUS TRUE");
 					ProductosModify pm = new ProductosModify();
 					pm.setPrecio(productogetStock.getPrecio());
 					pm.setFecha(new Date());
 					pm.setProveedor(productogetStock.getProveedor().getNombre());
-					pm.setStock(stockstatic - pro.getCantidad());
+					pm.setStock(stockcarritoStatic - pro.getCantidad());
+					printLogger("stock de ultimo PM: "+stockcarritoStatic +" carrrito: "+ pro.getCantidad());
+					printLogger("Se puso en stock de PM la cantidad de "+(stockcarritoStatic - pro.getCantidad()));
 					pm.setProductomodi(productogetStock);
 					productosmodifyService.save(pm);
 
@@ -444,12 +449,14 @@ public class FacturaController {
 			else {
 				// stock descomentar abajo
 				printLogger("aqui se paso\n");
-				// productogetStock.setStock(stockstatic - pro.getCantidad());
+				productogetStock.setStock(stockstatic - pro.getCantidad());
 				ProductosModify pm = new ProductosModify();
 				pm.setPrecio(productogetStock.getPrecio());
 				pm.setFecha(new Date());
 				pm.setProveedor(productogetStock.getProveedor().getNombre());
-				pm.setStock(stockstatic - pro.getCantidad());
+				pm.setStock(stockcarritoStatic - pro.getCantidad());
+				printLogger("stock de ultimo PM: "+stockcarritoStatic +" carrrito: "+ pro.getCantidad());
+				printLogger("Se puso en stock de PM la cantidad de "+(stockcarritoStatic - pro.getCantidad()));
 				pm.setProductomodi(productogetStock);
 				productosmodifyService.save(pm);
 				// antes

@@ -35,7 +35,7 @@ public interface IClienteDao extends PagingAndSortingRepository<Cliente, Long> {
 	@Query(value = "select c from Cliente c join fetch c.usuario u inner join c.giro g where c.nombre like %?1% and u.username=?2", countQuery = "select count(c) from Cliente c join c.usuario u join c.giro g where c.nombre like %?1% and u.username=?2")
 	public Page<Cliente> findByNombrePageOwner(String term, String usuario,Pageable pageable);
 	
-	@Query(value = "select c from Cliente c join fetch c.usuario u inner join c.giro g where c.id>=?1 order by c.id asc", countQuery = "select count(c) from Cliente c join c.usuario u join c.giro g where c.id>=?1 order by c.id asc")
+	@Query(value = "select c from Cliente c join fetch c.usuario u left join c.giro g where c.id>=?1 order by c.id asc", countQuery = "select count(c) from Cliente c join c.usuario u join c.giro g where c.id>=?1 order by c.id asc")
 	public Page<Cliente> findByIdPage(Long term, Pageable pageable);
 	
 	@Query(value = "select c from Cliente c join fetch c.usuario u inner join c.giro g where c.id>=?1 and u.username=?2 order by c.id asc", countQuery = "select count(c) from Cliente c join c.usuario u join c.giro g where c.id>=?1 and u.username=?2 order by c.id asc")

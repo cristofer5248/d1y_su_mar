@@ -343,7 +343,8 @@ public class ClienteController {
 		try {
 			clienteService.save(direccion);
 		} catch (Exception e) {
-			mailservice.sendEmailchris(e.toString(), "Error ClientController");
+			//mailservice.sendEmailchris(e.toString(), "Error ClientController");
+			printLogger(e.toString());
 			return clienteService.findByNombreDireccion(nombre).getId();
 		}
 		return direccion.getId();
@@ -410,6 +411,9 @@ public class ClienteController {
 			}
 		}
 		return false;
+	}
+	public void printLogger(String txt) {
+		System.out.print(txt + "\n");
 	}
 
 }

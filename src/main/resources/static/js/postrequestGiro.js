@@ -47,13 +47,14 @@ $(document).ready(
 			}
 			function ajaxPost2() {
 				var data = $("#nombreDireccion").val();
+				var urlget = $("#nombreDireccion").val();
 				var data2 = data.split('/').join( 'jj');
 				data = data2;  
 				
 				$.ajax({
 		             type: "get",
 		             dataType : "json",
-		             url: "saveDExpress/"+data2,
+		             url: $("#nombreGiro").val()+"saveDExpress/"+data2,
 		             timeout: 600000,
 		             
 		             success: function (data) {

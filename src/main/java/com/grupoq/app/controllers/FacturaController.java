@@ -267,7 +267,8 @@ public class FacturaController {
 		Facturacion facturacion = new Facturacion();
 		Cotizacion cotizacion = new Cotizacion();
 		cotizacion = cotizacionService.findby(term);
-		model.put("titulo", "Remision");
+		model.put("titulo", "Formulario de facturacion");
+		model.put("titulobtn", "Enviar");
 		if (opc == 1) {
 			printLogger("codigo cotizacion a descontar: " + term);
 			for (CarritoItems carrito : cotizacion.getCarrito()) {
@@ -355,6 +356,7 @@ public class FacturaController {
 
 		if (result.hasErrors()) {
 			model.addAttribute("titulo", "Formulario de Facturacions");
+			model.addAttribute("titulobtn", "Enviar de nuevo");
 			if (facturacion.getCotizacion() == null) {
 				flash.addFlashAttribute("error",
 						"El codigo de cotizacion no puede estar vacio, mostrando formulario vacio...");

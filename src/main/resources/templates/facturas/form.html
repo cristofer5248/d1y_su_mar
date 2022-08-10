@@ -135,7 +135,7 @@
 					</div>
 					<div class="form-group row">
 						<div class="col-sm-6">
-							<input type="submit" th:value="${titulo}"
+							<input type="submit" th:value="${titulobtn}" onclick="this.disabled=true; this.value='Enviando...'; this.form.submit();"
 								class="btn btn-secondary" />
 						</div>
 					</div>
